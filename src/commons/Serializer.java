@@ -18,9 +18,10 @@ public class Serializer {
         return bb;
     }
 
-    public static ByteBuffer serializeTestRequest(Request request) { //For XQ's testing for Communicator
+    public static ByteBuffer serializeTestRequest(Object o) { //For XQ's testing for Communicator
+        Request request = (Request) o;
         String className = request.getClass().getName();
-        System.out.println("Serializing " + className);
+//        System.out.println("Serializing " + className);
 
         byte[] data_buf = request.name.getBytes();
         ByteBuffer bb = ByteBuffer.allocate(data_buf.length + 5);
@@ -29,9 +30,10 @@ public class Serializer {
         return bb;
     }
 
-    public static ByteBuffer serializeTestResponse(Response response) { //For XQ's testing for Communicator
+    public static ByteBuffer serializeTestResponse(Object o) { //For XQ's testing for Communicator
+        Response response = (Response) o;
         String className = response.getClass().getName();
-        System.out.println("Serializing " + className);
+//        System.out.println("Serializing " + className);
 
         byte[] data_buf = response.name.getBytes();
         ByteBuffer bb = ByteBuffer.allocate(data_buf.length + 5);

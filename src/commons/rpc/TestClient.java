@@ -12,5 +12,8 @@ public class TestClient {
         TestRequest testRequest = new TestRequest();
         communicator.send(testRequest, address, 17);
         communicator.receive();
+
+        communicator.send(testRequest, address, 17);
+        communicator.receive();
     }
 }
