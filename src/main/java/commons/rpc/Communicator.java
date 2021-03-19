@@ -22,7 +22,7 @@ public class Communicator {
 
     /**
      * Creates a socket to send / receive UDP packets at specified port number
-     * Packetsize should be fixed across both client and server (hence its not an arg)
+     * Packetsize should be fixed across both client and main.java.server (hence its not an arg)
      * @param port port number for UDP socket
      */
     public Communicator(int port) {

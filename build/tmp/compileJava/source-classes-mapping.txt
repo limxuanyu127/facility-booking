@@ -10,12 +10,14 @@ commons/rpc/Communicator.java
  commons.rpc.Communicator
 commons/responses/OffsetBookingResponse.java
  commons.responses.OffsetBookingResponse
-commons/responses/TestResponse.java
- commons.responses.TestResponse
 commons/requests/BookFacilityRequest.java
  commons.requests.BookFacilityRequest
+commons/responses/TestResponse.java
+ commons.responses.TestResponse
 commons/rpc/TestClient.java
  commons.rpc.TestClient
+server/managers/ObserverManager.java
+ server.managers.ObserverManager
 commons/rpc/Packet.java
  commons.rpc.Packet
 commons/requests/OffsetBookingRequest.java
@@ -30,12 +32,19 @@ server/Main.java
  server.Main
 commons/rpc/ClientRequest.java
  commons.rpc.ClientRequest
+server/entities/Facility.java
+ server.entities.Facility
 commons/responses/DeleteBookingResponse.java
  commons.responses.DeleteBookingResponse
-commons/requests/UpdateBookingRequest.java
- commons.requests.UpdateBookingRequest
+server/entities/FacilityObserver.java
+ server.entities.FacilityObserver
+server/entities/Booking.java
+ server.entities.Booking
+ server.entities.Booking$1
 commons/Deserializer.java
  commons.Deserializer
+commons/requests/UpdateBookingRequest.java
+ commons.requests.UpdateBookingRequest
 commons/requests/DeleteBookingRequest.java
  commons.requests.DeleteBookingRequest
 commons/responses/BookFacilityResponse.java
@@ -44,13 +53,15 @@ commons/requests/RegisterInterestRequest.java
  commons.requests.RegisterInterestRequest
 commons/Serializer.java
  commons.Serializer
-commons/responses/RegisterInterestResponse.java
- commons.responses.RegisterInterestResponse
 commons/requests/TestRequest.java
  commons.requests.TestRequest
+commons/responses/RegisterInterestResponse.java
+ commons.responses.RegisterInterestResponse
 commons/responses/UpdateBookingResponse.java
  commons.responses.UpdateBookingResponse
 commons/responses/Response.java
  commons.responses.Response
+server/managers/BookingManager.java
+ server.managers.BookingManager
 commons/rpc/TestServer.java
  commons.rpc.TestServer
