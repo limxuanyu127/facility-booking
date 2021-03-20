@@ -53,7 +53,7 @@ public class Deserializer {
                     e.printStackTrace();
                 }
             }
-            return o;
+            return c.cast(o);
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
