@@ -1,8 +1,12 @@
 package client;
 
+import commons.rpc.Communicator;
+import client.CLI;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("i'm a client");
+        Communicator router = new Communicator(3000);
+        CLI.run(router);
     }
 
 }
