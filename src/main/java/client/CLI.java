@@ -27,13 +27,7 @@ public class CLI {
             }
             switch (choice) {
                 case 1:
-                    System.out.println("Please enter facility name: ");
-                    String facilityName = scanner.nextLine();
-                    System.out.println("Please enter the start date [DD/MM/YYYY]: ");
-                    String startDate = scanner.nextLine();
-                    System.out.println("Please enter the end date [DD/MM/YYYY]: ");
-                    String endDate = scanner.nextLine();
-                    serviceManager.queryAvailability(facilityName, startDate, endDate);
+                    serviceManager.queryAvailability();
                     break;
                 case 2:
                     serviceManager.bookFacility();
