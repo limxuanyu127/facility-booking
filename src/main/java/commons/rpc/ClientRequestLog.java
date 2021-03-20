@@ -1,5 +1,7 @@
 package commons.rpc;
 
+import commons.utils.ClientRequest;
+
 import java.util.ArrayList;
 
 public class ClientRequestLog {

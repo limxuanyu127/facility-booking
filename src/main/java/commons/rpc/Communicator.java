@@ -1,10 +1,16 @@
 package commons.rpc;
-import commons.Serializer;
-import commons.requests.Request;
-import commons.responses.Response;
 
-import java.io.*;
-import java.net.*;
+import commons.Deserializer;
+import commons.Serializer;
+import commons.requests.TestRequest;
+import commons.utils.ClientRequest;
+import commons.utils.Packet;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 
 // To use, run TestServer on 1 terminal then run TestClient on another terminal
@@ -26,13 +32,13 @@ public class Communicator {
      * @param port port number for UDP socket
      */
     public Communicator(int port) {
-        try {
-            this.socket = new DatagramSocket(port);
-        } catch (SocketException e) {}
         this.requestID = 0;
         this.packetSize = 512;
         this.headerSize = 16;
         this.messageSize = this.packetSize - this.headerSize;
+        try {
+            this.socket = new DatagramSocket(port);
+        } catch (SocketException e) {}
         /**
          * 4 bytes for requestID
          * 4 bytes for the datagram number
@@ -49,20 +55,27 @@ public class Communicator {
      */
     public void send(Object o, InetAddress destIP, int destPort){
 
-        String className = o.getClass().getName();
-        ByteBuffer dataBuf = null;
-        if (className == "commons.requests.TestRequest"){
-            Request request = (Request) o;
-            dataBuf = Serializer.serializeTestRequest(request);
-        }
-        else if (className == "commons.responses.TestResponse"){
-            Response response = (Response) o;
-            dataBuf = Serializer.serializeTestResponse(response);
-        }
-        else {
-            System.out.println("unknown class");
-            System.out.println(className);
-        }
+//        String className = o.getClass().getName();
+//        if (className == "commons.requests.TestRequest"){
+//            Request request = (Request) o;
+//            dataBuf = Serializer.serializeTestRequest(request);
+//        }
+//        else if (className == "commons.responses.TestResponse"){
+//            Response response = (Response) o;
+//            dataBuf = Serializer.serializeTestResponse(response);
+//        }
+//        else {
+//            System.out.println("unknown class");
+//            System.out.println(className);
+//        }
+        ByteBuffer dataBuf = ByteBuffer.allocate(2000);
+        Serializer.serializeObject(o, dataBuf);
+//        int lengthSerialized = temp.position();
+//        byte[] tempData = new byte[lengthSerialized];
+//        temp.position(0);
+//        temp.get(tempData, 0, lengthSerialized);
+//
+//        ByteBuffer dataBuf = ByteBuffer.wrap(tempData);
 
         int totalDatagramPackets = (int) Math.ceil(dataBuf.position() / (float) this.messageSize);
         int dataBufPtr = 0;
@@ -111,7 +124,7 @@ public class Communicator {
      * @return ByteBuffer containing only message data
      * @Todo: Add deserialization
      */
-    public ClientRequest receive(){
+    public Object receive(){
         System.out.println("receiving");
         Packet currPacket = this.receivePacket();
         int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
@@ -124,9 +137,13 @@ public class Communicator {
                 combinedMessageBuffer.put(currPacket.messageBuffer);
             }
         }
-        byte[] testBuffer = combinedMessageBuffer.array();
-        String quote = new String(testBuffer, 0, combinedMessageSize);
-        System.out.println("Message Received: " + quote);
+//        byte[] testBuffer = combinedMessageBuffer.array();
+//        String quote = new String(testBuffer, 0, combinedMessageSize);
+//        System.out.println("Message Received: " + quote);
+
+        combinedMessageBuffer.flip();
+        TestRequest tempReq = (TestRequest) Deserializer.deserializeObject(combinedMessageBuffer);
+        System.out.println(tempReq.testString);
 
         ClientRequest clientRequest = new ClientRequest(currPacket.senderAddress, currPacket.senderPort,
                 currPacket.requestID, combinedMessageBuffer);
@@ -138,7 +155,7 @@ public class Communicator {
      * Private method for this.receive() to use if the message size exceeds packet size
      * @return Packet object containing message info
      */
-    private Packet receivePacket(){
+      protected Packet receivePacket(){
         byte[] buffer = new byte[this.packetSize];
         DatagramPacket message = new DatagramPacket(buffer, buffer.length);
 

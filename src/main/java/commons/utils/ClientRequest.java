@@ -1,13 +1,13 @@
-package commons.rpc;
+package commons.utils;
 
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
 public class ClientRequest {
-    InetAddress clientAddress;
-    int clientPort;
-    int requestID;
-    ByteBuffer message;
+    public InetAddress clientAddress;
+    public int clientPort;
+    public int requestID;
+    public ByteBuffer message;
 
     public ClientRequest(InetAddress clientAddress, int clientPort, int requestID, ByteBuffer message) {
         this.clientAddress = clientAddress;
