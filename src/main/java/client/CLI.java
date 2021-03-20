@@ -1,12 +1,13 @@
 package client;
 
+import java.net.InetAddress;
 import java.util.Scanner;
 import client.ServiceManager;
 import commons.rpc.Communicator;
 
 public class CLI {
-    public static void run(Communicator router) {
-        ServiceManager serviceManager = new ServiceManager(router);
+    public static void run(Communicator router, InetAddress serverAddress, int serverPort) {
+        ServiceManager serviceManager = new ServiceManager(router, serverAddress, serverPort);
         String menu = "Please enter a number.\n" +
                 "1: Query for a facility's availability \n" +
                 "2: Book a facility \n" +
@@ -26,7 +27,13 @@ public class CLI {
             }
             switch (choice) {
                 case 1:
-                    serviceManager.queryAvailability();
+                    System.out.println("Please enter facility name: ");
+                    String facilityName = scanner.nextLine();
+                    System.out.println("Please enter the start date [DD/MM/YYYY]: ");
+                    String startDate = scanner.nextLine();
+                    System.out.println("Please enter the end date [DD/MM/YYYY]: ");
+                    String endDate = scanner.nextLine();
+                    serviceManager.queryAvailability(facilityName, startDate, endDate);
                     break;
                 case 2:
                     serviceManager.bookFacility();
