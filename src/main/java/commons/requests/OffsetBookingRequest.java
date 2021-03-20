@@ -2,6 +2,7 @@ package commons.requests;
 
 import commons.utils.Datetime;
 
+
 public class OffsetBookingRequest extends Request{
     public int bookingID;
     public int offset;

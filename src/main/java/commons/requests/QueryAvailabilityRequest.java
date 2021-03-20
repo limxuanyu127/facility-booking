@@ -3,7 +3,8 @@ package commons.requests;
 import commons.utils.Datetime;
 import java.util.List;
 
-public class QueryAvailabilityRequest extends Request{
+
+public class QueryAvailabilityRequest extends Request {
     public String facilityName;
     public List<Datetime> days;
 
