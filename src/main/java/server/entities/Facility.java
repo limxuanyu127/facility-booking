@@ -44,7 +44,6 @@ public class Facility {
             newList.add(booking);
             this.bookingsTable.put(bookingDate, newList);
         }
-        System.out.println("Facility has added the booking");
     }
 
     public void removeBooking(Booking booking){

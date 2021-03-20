@@ -28,12 +28,12 @@ commons/utils/ResponseMessage.java
  commons.utils.ResponseMessage
 commons/responses/QueryAvailabilityResponse.java
  commons.responses.QueryAvailabilityResponse
-server/Main.java
- server.Main
+commons/rpc/TestServer.java
+ commons.rpc.TestServer
 commons/rpc/ClientRequest.java
  commons.rpc.ClientRequest
-server/entities/Facility.java
- server.entities.Facility
+server/Main.java
+ server.Main
 commons/responses/DeleteBookingResponse.java
  commons.responses.DeleteBookingResponse
 server/entities/FacilityObserver.java
@@ -61,7 +61,7 @@ commons/responses/UpdateBookingResponse.java
  commons.responses.UpdateBookingResponse
 commons/responses/Response.java
  commons.responses.Response
+server/entities/Facility.java
+ server.entities.Facility
 server/managers/BookingManager.java
  server.managers.BookingManager
-commons/rpc/TestServer.java
- commons.rpc.TestServer

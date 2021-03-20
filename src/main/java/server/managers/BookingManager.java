@@ -78,7 +78,7 @@ public class BookingManager {
     }
 
     public Pair<Booking, Exception> createBooking(int bookingId, int clientId, String facilName, LocalDateTime newStart, LocalDateTime newEnd, Hashtable facilTable){
-
+        //TODO implement exception throw when booking is before open time/ after closing time
         facilName = facilName.toLowerCase();
 
         if (!facilTable.containsKey(facilName)){
@@ -89,9 +89,27 @@ public class BookingManager {
             Exception e = new NoSuchElementException("Invalid start and end time"); //TODO review this exception
             return new Pair<Booking, Exception>(null, e);
         }
+
+        Boolean isAvailable = this.isAvailable(facilName, newStart, newEnd, facilTable);
+
+        if (!isAvailable){
+            Exception e = new NoSuchElementException("There is a booking at that time slot"); //TODO review this exception
+            return new Pair<Booking, Exception>(null, e);
+        }
+
+        //Booking procedure
+        Booking b = new Booking(bookingId, clientId, facilName, newStart, newEnd);
+        Facility f = (Facility) facilTable.get(facilName);
+        f.addBooking(b);
+        return new Pair<Booking, Exception>(b, null);
+    }
+
+    // Helper Func
+    private Boolean isAvailable(String facilName, LocalDateTime newStart, LocalDateTime newEnd, Hashtable facilTable){
         //Check if timeslot is available
         ArrayList<LocalDate> queryDates = new ArrayList<>();
         queryDates.add(newStart.toLocalDate());
+
         Pair<ArrayList, Exception> queryResults = this.queryAvailability(facilName, queryDates, facilTable);
         ArrayList availStartEnd = queryResults.getKey();
 
@@ -106,17 +124,7 @@ public class BookingManager {
                 isAvailable = true;
             }
         }
-
-        if (!isAvailable){
-            Exception e = new NoSuchElementException("There is a booking at that time slot"); //TODO review this exception
-            return new Pair<Booking, Exception>(null, e);
-        }
-
-        //Booking procedure
-        Booking b = new Booking(bookingId, clientId, facilName, newStart, newEnd);
-        Facility f = (Facility) facilTable.get(facilName);
-        f.addBooking(b);
-        return new Pair<Booking, Exception>(b, null);
+        return isAvailable;
     }
 //
 //    public Pair<Booking, Exception> offsetBooking(int bookingId, int offset){}
