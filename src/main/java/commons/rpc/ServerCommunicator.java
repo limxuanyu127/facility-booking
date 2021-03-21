@@ -89,37 +89,12 @@ public class ServerCommunicator {
 
     // to test timeout
     public void receive(int timeout) {
-        System.out.println("\nreceiving");
-        Packet currPacket = this.receivePacket();
-        int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
-        ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);
-        combinedMessageBuffer.put(currPacket.messageBuffer);
-
-        if (currPacket.totalDatagramPackets != 1) {
-            while (currPacket.datagramNum < currPacket.totalDatagramPackets - 1) {
-                currPacket = this.receivePacket();
-                combinedMessageBuffer.put(currPacket.messageBuffer);
-            }
-        }
-        combinedMessageBuffer.flip();
-        Object deserializedRequest = Deserializer.deserializeObject(combinedMessageBuffer);
-        ClientRequest clientRequest;
-
-        if (deserializedRequest instanceof commons.requests.Request){
-            clientRequest = new ClientRequest(currPacket.senderAddress, currPacket.senderPort,
-                    currPacket.requestID, (Request)deserializedRequest);
-        }
-        else{
-            throw new Error("Server only receives Requests");
-        }
-
         try {
             Thread.sleep(timeout);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        processClientRequest(clientRequest);
+        this.receive();
     }
 
 
@@ -127,15 +102,39 @@ public class ServerCommunicator {
         int duplicateIndex = checkDuplicateRequest(clientRequest);
         if (duplicateIndex == -999){
             Request r = clientRequest.request;
-            //TODO change to switch instead of multiple if else
-            if (r.getClass().equals(commons.requests.TestRequest.class)){
-                System.out.println("Test Request Received, calling Server Function...");
-                //TODO call server function
-                //Craft, Log and Send Response
-                TestResponse testResponse = new TestResponse();
-                clientRequest.setSentResponse(testResponse);
-                send(testResponse, clientRequest.clientAddress, clientRequest.clientPort);
+            Response response = null;
+
+            //TODO add server functions
+            switch(r.getClass().getName()){
+                case "commons.requests.BookFacilityRequest":
+                    System.out.println("Book Facility Received, calling Server Function...");
+                    break;
+                case "commons.requests.DeleteBookingRequest":
+                    System.out.println("Delete Booking Received, calling Server Function...");
+                    break;
+                case "commons.requests.OffsetBookingRequest":
+                    System.out.println("Offset Booking Request Received, calling Server Function...");
+                    break;
+                case "commons.requests.QueryAvailabilityRequest":
+                    System.out.println("Query Availability Request Received, calling Server Function...");
+                    break;
+                case "commons.requests.RegisterInterestRequest":
+                    System.out.println("Register Interest Request Received, calling Server Function...");
+                    break;
+                case "commons.requests.UpdateBookingRequest":
+                    System.out.println("Update Booking Request Received, calling Server Function...");
+                    break;
+                case "commons.requests.TestRequest":
+                    System.out.println("Test Request Received, calling Server Function...");
+                    response = new TestResponse();
+                    break;
+                default:
+                    System.out.println("Invalid Request Received");
+                    throw new RuntimeException("Invalid Request Type");
             }
+
+            clientRequest.setSentResponse(response);
+            send(response, clientRequest.clientAddress, clientRequest.clientPort);
         }
         else{ //Duplicate Request - send original reply
             ClientRequest orgRequest = this.clientRequests.get(duplicateIndex);

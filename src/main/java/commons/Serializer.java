@@ -43,29 +43,6 @@ public class Serializer {
         bb.putInt(i);
     }
 
-    public static ByteBuffer serializeTestRequest(Object o) { //For XQ's testing for Communicator
-        Request request = (Request) o;
-        String className = request.getClass().getName();
-//        System.out.println("Serializing " + className);
-
-        byte[] data_buf = request.name.getBytes();
-        ByteBuffer bb = ByteBuffer.allocate(data_buf.length + 5);
-        bb.put(data_buf, 0, data_buf.length);
-
-        return bb;
-    }
-
-    public static ByteBuffer serializeTestResponse(Object o) { //For XQ's testing for Communicator
-        Response response = (Response) o;
-        String className = response.getClass().getName();
-//        System.out.println("Serializing " + className);
-
-        byte[] data_buf = response.name.getBytes();
-        ByteBuffer bb = ByteBuffer.allocate(data_buf.length + 5);
-        bb.put(data_buf, 0, data_buf.length);
-
-        return bb;
-    }
     public static void serializeString(String s, ByteBuffer bb) {
         byte[] sBytes = s.getBytes();
         Integer length = sBytes.length;
