@@ -23,15 +23,13 @@ public class ServiceManager {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter facility name: ");
         String facilityName = scanner.nextLine();
-        System.out.println("Please enter the start date [DD/MM/YYYY]: ");
-        String startDate = scanner.nextLine();
-        System.out.println("Please enter the end date [DD/MM/YYYY]: ");
-        String endDate = scanner.nextLine();
+        System.out.println("Please enter list of dates [DD/MM/YYYY] separated by spaces: ");
+        String dates = scanner.nextLine();
 
-        List<Datetime> dates = new ArrayList<>();
-        dates.addAll(getListOfDates(startDate, endDate));
+        List<Datetime> dateObjs = new ArrayList<>();
+        dateObjs.addAll(getListOfDates(dates));
 
-        Request req = new QueryAvailabilityRequest(facilityName, dates);
+        Request req = new QueryAvailabilityRequest(facilityName, dateObjs);
         request(router, req);
     }
     public void bookFacility() {
@@ -94,10 +92,23 @@ public class ServiceManager {
     public void registerInterest() {
         System.out.println("Registering interest...");
     }
+
 //    TODO: implement
-    public static List<Datetime> getListOfDates(String startDate, String endDate){
-        List<Datetime> dates = new ArrayList<>();
-        return dates;
+    public static List<Datetime> getListOfDates(String dates){
+        List<Datetime> dateObjs = new ArrayList<>();
+        String [] dateList = dates.split(" ");
+        for (String d: dateList) {
+            String[] dateParts = d.split("/");
+            Datetime dateObj = new Datetime(
+                    Integer.parseInt(dateParts[2]),
+                    Integer.parseInt(dateParts[1]),
+                    Integer.parseInt(dateParts[0]),
+                    0,
+                    0
+            );
+            dateObjs.add(dateObj);
+        }
+        return dateObjs;
     }
 
     public static Datetime getDatetimeFromString(String datetime) {
