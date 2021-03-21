@@ -2,6 +2,7 @@ package commons.rpc;
 import commons.Deserializer;
 import commons.Serializer;
 import commons.requests.Request;
+import commons.requests.TestRequest;
 import commons.responses.Response;
 import commons.responses.TestResponse;
 import commons.utils.Packet;
@@ -19,39 +20,134 @@ public class ClientCommunicator {
     int packetSize;
     int messageSize;
     int headerSize;
-    byte[] buffer_req;
     DatagramSocket socket;
+    int maxTries;
     int requestID;
 
     /**
      * Creates a socket to send / receive UDP packets at specified port number
-     * Packetsize should be fixed across both client and main.java.server (hence its not an arg)
+     * Packet size should be fixed across both client and main.java.server (hence its not an arg)
      *
-     * @param port port number for UDP socket
+     * @param clientPort port number for UDP socket
      */
-    public ClientCommunicator(int clientPort, InetAddress serverAddress, int serverPort) {
+    public ClientCommunicator(int clientPort, InetAddress serverAddress, int serverPort, int maxTries, int timeout) {
         this.clientPort = clientPort;
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
-        this.requestID = 0;
         this.packetSize = 512;
-        this.headerSize = 16;
-        this.messageSize = this.packetSize - this.headerSize;
-        try {
-            this.socket = new DatagramSocket(clientPort);
-        } catch (SocketException e) {}
         /**
          * 4 bytes for requestID
          * 4 bytes for the datagram number
          * 4 bytes to send the total number of datagrams.
          * 4 bytes to send length of message in datagram
          */
+        this.headerSize = 16;
+        this.messageSize = this.packetSize - this.headerSize;
+        this.maxTries = maxTries;
+        try {
+            this.socket = new DatagramSocket(clientPort);
+            this.socket.setSoTimeout(timeout);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        this.requestID = 0;
     }
 
+    /**
+     * To Test, run ServerCommunicator then run ClientCommunicator
+     */
 
-    public void send(Request r) {
+    public static void main(String[] args) {
+        // Success
+        InetAddress serverAddress = null;
+        try {
+            serverAddress = InetAddress.getByName("localhost");
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        System.out.println("\n###### Testing Successful Request #######");
+        ClientCommunicator clientCommunicator = new ClientCommunicator(22, serverAddress, 17, 3, 5000);
+        TestRequest request = new TestRequest();
+        Response response = clientCommunicator.sendRequest(request);
+        System.out.println("Client Hash: " + request.hashCode());
+        TestResponse expected = new TestResponse();
+
+        System.out.println("Response: " + response.name + " , Expected: " + expected.name);
+
+        //Test Duplicate
+        System.out.println("\n###### Testing Duplicate Request #######");
+        response = clientCommunicator.sendRequest(request, 0);
+        System.out.println("Client Hash should be same as above: " + request.hashCode());
+        System.out.println("Response: " + response.name + " , Expected: " + expected.name);
+
+        //Test Timeout
+        System.out.println("\n###### Testing Timeout ######");
+        clientCommunicator.socket.close();
+        clientCommunicator = new ClientCommunicator(22, serverAddress, 17, 3, 1);
+
+        response = clientCommunicator.sendRequest(request);
+        expected = new TestResponse();
+
+        try{
+            System.out.println("Response: " + response.name + " , Expected: " + expected.name);
+        }
+        catch (NullPointerException e){
+            System.out.println("No Response after all retries");
+        }
+    }
+
+    public Response sendRequest(Request r){
+        int currTries = 0;
+        Response response = null;
         ByteBuffer dataBuf = ByteBuffer.allocate(2000);
         Serializer.serializeObject(r, dataBuf);
+
+        while (currTries < this.maxTries){
+            currTries += 1;
+            this.send(dataBuf, this.requestID);
+            try{
+                response = this.receive();
+                this.requestID += 1;
+                return response;
+            } catch (RuntimeException e){
+                if (e.getCause() instanceof SocketTimeoutException) {
+                    System.out.println("Socket Timeout");
+                }
+            }
+        }
+        if (currTries == this.maxTries){
+            System.out.println("No response from server after all retries exceeded");
+        }
+        this.requestID += 1;
+        return response;
+    }
+
+    //To send duplicate requests
+    public Response sendRequest(Request r, int requestID){
+        int currTries = 0;
+        Response response = null;
+        ByteBuffer dataBuf = ByteBuffer.allocate(2000);
+        Serializer.serializeObject(r, dataBuf);
+
+        while (currTries < this.maxTries){
+            currTries += 1;
+            this.send(dataBuf, requestID);
+            try{
+                response = this.receive();
+                return response;
+            } catch (RuntimeException e){
+                if (e.getCause() instanceof SocketTimeoutException) {
+                    System.out.println("Socket Timeout");
+                }
+            }
+        }
+        if (currTries == this.maxTries){
+            System.out.println("No response from server after all retries exceeded");
+        }
+        return response;
+    }
+
+    public void send(ByteBuffer dataBuf, int requestID) {
 
         int totalDatagramPackets = (int) Math.ceil(dataBuf.position() / (float) this.messageSize);
         int dataBufPtr = 0;
@@ -59,7 +155,7 @@ public class ClientCommunicator {
 
         for (int i = 0; i < totalDatagramPackets; i++){
             ByteBuffer packetBuf = ByteBuffer.allocate(this.packetSize);
-            packetBuf.putInt(this.requestID);
+            packetBuf.putInt(requestID);
             packetBuf.putInt(i);
             packetBuf.putInt(totalDatagramPackets);
             byte[] packetByteArray;
@@ -85,19 +181,12 @@ public class ClientCommunicator {
                 e.printStackTrace();
             }
         }
-        /**
-         * comment out row below to test duplicate request
-         */
-        this.requestID += 1;
-
-//        System.out.println("Sending message" + " to " + destIP + " " + destPort);
     }
 
     /**
      * Allows socket to listen for UDP packets
      *
      * @return ByteBuffer containing only message data
-     * @Todo: Fix deserialization
      */
     public Response receive() {
         System.out.println("receiving");
@@ -112,9 +201,6 @@ public class ClientCommunicator {
                 combinedMessageBuffer.put(currPacket.messageBuffer);
             }
         }
-//        byte[] testBuffer = combinedMessageBuffer.array();
-//        String quote = new String(testBuffer, 0, combinedMessageSize);
-//        System.out.println("Message Received: " + quote);
 
         combinedMessageBuffer.flip();
         Response response = (TestResponse) Deserializer.deserializeObject(combinedMessageBuffer);
@@ -123,14 +209,14 @@ public class ClientCommunicator {
         return response;
     }
 
-    protected Packet receivePacket(){
+    private Packet receivePacket(){
         byte[] buffer = new byte[this.packetSize];
         DatagramPacket message = new DatagramPacket(buffer, buffer.length);
 
         try {
             this.socket.receive(message);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         ByteBuffer received_bb = ByteBuffer.wrap(buffer);

@@ -4,7 +4,7 @@ import java.util.List;
 import commons.utils.Datetime;
 import commons.utils.ResponseMessage;
 
-public class QueryAvailabilityResponse {
+public class QueryAvailabilityResponse extends Response{
     public String facilityName;
     public List<List<Datetime>> intervals;
     public ResponseMessage responseMessage;

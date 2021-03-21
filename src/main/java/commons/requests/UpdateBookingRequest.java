@@ -2,7 +2,7 @@ package commons.requests;
 
 import commons.utils.Datetime;
 
-public class UpdateBookingRequest {
+public class UpdateBookingRequest extends Request{
     public int bookingID;
     public Datetime startTime;
     public Datetime endTime;

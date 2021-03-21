@@ -3,7 +3,7 @@ package commons.responses;
 import commons.utils.Datetime;
 import commons.utils.ResponseMessage;
 
-public class OffsetBookingResponse {
+public class OffsetBookingResponse extends Response{
     public int bookingID;
     public String facilityName;
     public Datetime startTime;
