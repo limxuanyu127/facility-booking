@@ -19,6 +19,8 @@ class CommunicatorTest {
     InetAddress clientAddress;
     int serverPort = 17;
     int clientPort = 22;
+    int maxTries = 3;
+    int timeout = 5000;
     {
         try {
             this.serverAddress = InetAddress.getByName("localhost");
@@ -33,7 +35,7 @@ class CommunicatorTest {
     void setUp() {
 
         this.serverCommunicator = new ServerCommunicator(this.serverPort);
-        this.clientCommunicator = new ClientCommunicator(this.clientPort, this.serverAddress, this.serverPort);
+        this.clientCommunicator = new ClientCommunicator(this.clientPort, this.serverAddress, this.serverPort, 1, 1000);
     }
 
     @AfterEach
@@ -45,12 +47,14 @@ class CommunicatorTest {
 
     @Test
     void clientToServerBasic() {
+        System.out.println("\nClient To Server Test: Sending Test Request to Server");
         TestRequest testRequest = new TestRequest();
 
-        clientCommunicator.send(testRequest);
+        clientCommunicator.sendRequest(testRequest, 0);
         ClientRequest clientRequest = new ClientRequest(this.serverAddress, 22, 0, testRequest);
 
-        ClientRequest received = this.serverCommunicator.receive();
+        this.serverCommunicator.receive();
+        ClientRequest received = this.serverCommunicator.clientRequests.get(0);
         assertEquals(clientRequest.clientAddress, received.clientAddress);
         assertEquals(clientRequest.clientPort, received.clientPort);
         assertEquals(clientRequest.requestID, received.requestID);
@@ -59,6 +63,7 @@ class CommunicatorTest {
 
     @Test
     void serverToClientBasic() {
+        System.out.println("\n Server To Client Test: sending Test Response to Client");
         TestResponse testResponse = new TestResponse();
         serverCommunicator.send(testResponse, clientAddress, clientPort);
 
@@ -67,5 +72,4 @@ class CommunicatorTest {
         assertEquals(testResponse.testString, received.testString);
         assertEquals(testResponse.name, received.name);
     }
-
 }

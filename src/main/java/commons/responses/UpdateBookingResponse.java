@@ -4,7 +4,7 @@ import commons.requests.UpdateBookingRequest;
 import commons.utils.Datetime;
 import commons.utils.ResponseMessage;
 
-public class UpdateBookingResponse {
+public class UpdateBookingResponse extends Response{
     public int bookingID;
     public String facilityName;
     public Datetime startTime;

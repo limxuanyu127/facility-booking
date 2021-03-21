@@ -3,38 +3,34 @@ package commons.rpc;
 import commons.Deserializer;
 import commons.Serializer;
 import commons.requests.Request;
-import commons.requests.TestRequest;
 import commons.responses.Response;
+import commons.responses.TestResponse;
 import commons.utils.ClientRequest;
 import commons.utils.Packet;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
-// To use, run TestServer on 1 terminal then run TestClient on another terminal
-
-public class ServerCommunicator{
-
-    /**
-     * Creates a socket to send / receive UDP packets at specified port number
-     * Packetsize should be fixed across both client and main.java.server (hence its not an arg)
-     *
-     * @param port port number for UDP socket
-     */
+public class ServerCommunicator {
+    ArrayList<ClientRequest> clientRequests;
+    ArrayList<Integer> clientRequestsHashed;
 
     int serverPort;
     int packetSize;
     int messageSize;
     int headerSize;
-    byte[] buffer_req;
     DatagramSocket socket;
     int requestID;
 
     public ServerCommunicator(int serverPort) {
+        this.clientRequests = new ArrayList<>();
+        this.clientRequestsHashed = new ArrayList<>();
         this.requestID = 0;
         this.packetSize = 512;
         this.headerSize = 16;
@@ -44,11 +40,107 @@ public class ServerCommunicator{
             this.socket = new DatagramSocket(serverPort);
         } catch (SocketException e) {}
         /**
+         * Headersize Param
          * 4 bytes for requestID
          * 4 bytes for the datagram number
          * 4 bytes to send the total number of datagrams.
          * 4 bytes to send length of message in datagram
          */
+    }
+
+    /**
+     * To Test, run ServerCommunicator then run ClientCommunicator
+     */
+
+
+    public static void main(String[] args) {
+        ServerCommunicator serverCommunicator = new ServerCommunicator(17);
+        while (true){
+            serverCommunicator.receive(10);
+        }
+    }
+
+    public void receive() {
+        System.out.println("receiving");
+        Packet currPacket = this.receivePacket();
+        int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
+        ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);
+        combinedMessageBuffer.put(currPacket.messageBuffer);
+
+        if (currPacket.totalDatagramPackets != 1) {
+            while (currPacket.datagramNum < currPacket.totalDatagramPackets - 1) {
+                currPacket = this.receivePacket();
+                combinedMessageBuffer.put(currPacket.messageBuffer);
+            }
+        }
+        combinedMessageBuffer.flip();
+        Object deserializedRequest = Deserializer.deserializeObject(combinedMessageBuffer);
+        ClientRequest clientRequest;
+
+        if (deserializedRequest instanceof commons.requests.Request){
+            clientRequest = new ClientRequest(currPacket.senderAddress, currPacket.senderPort,
+                    currPacket.requestID, (Request)deserializedRequest);
+        }
+        else{
+            throw new Error("Server only receives Requests");
+        }
+        processClientRequest(clientRequest);
+    }
+
+    // to test timeout
+    public void receive(int timeout) {
+        System.out.println("\nreceiving");
+        Packet currPacket = this.receivePacket();
+        int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
+        ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);
+        combinedMessageBuffer.put(currPacket.messageBuffer);
+
+        if (currPacket.totalDatagramPackets != 1) {
+            while (currPacket.datagramNum < currPacket.totalDatagramPackets - 1) {
+                currPacket = this.receivePacket();
+                combinedMessageBuffer.put(currPacket.messageBuffer);
+            }
+        }
+        combinedMessageBuffer.flip();
+        Object deserializedRequest = Deserializer.deserializeObject(combinedMessageBuffer);
+        ClientRequest clientRequest;
+
+        if (deserializedRequest instanceof commons.requests.Request){
+            clientRequest = new ClientRequest(currPacket.senderAddress, currPacket.senderPort,
+                    currPacket.requestID, (Request)deserializedRequest);
+        }
+        else{
+            throw new Error("Server only receives Requests");
+        }
+
+        try {
+            Thread.sleep(timeout);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        processClientRequest(clientRequest);
+    }
+
+
+    private void processClientRequest(ClientRequest clientRequest){
+        int duplicateIndex = checkDuplicateRequest(clientRequest);
+        if (duplicateIndex == -999){
+            Request r = clientRequest.request;
+            //TODO change to switch instead of multiple if else
+            if (r.getClass().equals(commons.requests.TestRequest.class)){
+                System.out.println("Test Request Received, calling Server Function...");
+                //TODO call server function
+                //Craft, Log and Send Response
+                TestResponse testResponse = new TestResponse();
+                clientRequest.setSentResponse(testResponse);
+                send(testResponse, clientRequest.clientAddress, clientRequest.clientPort);
+            }
+        }
+        else{ //Duplicate Request - send original reply
+            ClientRequest orgRequest = this.clientRequests.get(duplicateIndex);
+            send(orgRequest.sentResponse, clientRequest.clientAddress, clientRequest.clientPort);
+        }
     }
 
     public void send(Response r, InetAddress clientAddress, int clientPort) {
@@ -90,49 +182,12 @@ public class ServerCommunicator{
         /**
          * comment out row below to test duplicate request
          */
-        this.requestID += 1;
+//        this.requestID += 1;
 
 //        System.out.println("Sending message" + " to " + destIP + " " + destPort);
     }
 
-    /**
-     * Allows socket to listen for UDP packets
-     *
-     * @return ByteBuffer containing only message data
-     */
-    public ClientRequest receive() {
-        System.out.println("receiving");
-        Packet currPacket = this.receivePacket();
-        int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
-        ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);
-        combinedMessageBuffer.put(currPacket.messageBuffer);
-
-        if (currPacket.totalDatagramPackets != 1) {
-            while (currPacket.datagramNum < currPacket.totalDatagramPackets - 1) {
-                currPacket = this.receivePacket();
-                combinedMessageBuffer.put(currPacket.messageBuffer);
-            }
-        }
-
-        combinedMessageBuffer.flip();
-        Object deserializedRequest = Deserializer.deserializeObject(combinedMessageBuffer);
-        deserializedRequest.getClass().cast(deserializedRequest);
-
-        ClientRequest clientRequest;
-
-        if (deserializedRequest instanceof commons.requests.Request){
-             clientRequest = new ClientRequest(currPacket.senderAddress, currPacket.senderPort,
-                    currPacket.requestID, (Request) deserializedRequest);
-             System.out.println(((Request) deserializedRequest).name);
-        }
-        else{
-            throw new Error("Server only receives Requests");
-        }
-
-        return clientRequest;
-    }
-
-    protected Packet receivePacket(){
+    private Packet receivePacket(){
         byte[] buffer = new byte[this.packetSize];
         DatagramPacket message = new DatagramPacket(buffer, buffer.length);
 
@@ -157,4 +212,34 @@ public class ServerCommunicator{
 
         return new Packet(requestID, datagramNum, totalDatagramPackets, messageSize, senderAddress, senderPort, messageBuffer);
     }
+
+    private int checkDuplicateRequest(ClientRequest clientRequest){
+        int clientRequestHash = hashClientRequest(clientRequest);
+        System.out.println("Hashed: " + clientRequestHash);
+        if (clientRequestsHashed.contains(clientRequestHash)){
+            System.out.println("Duplicate request received");
+            int index = clientRequestsHashed.indexOf(clientRequestHash);
+            return index;
+        }
+        else{
+            this.clientRequests.add(clientRequest);
+            this.clientRequestsHashed.add(clientRequestHash);
+            return -999;
+        }
+    }
+
+    private int hashClientRequest(ClientRequest clientRequest){
+        int hash = 0;
+        hash += clientRequest.clientAddress.hashCode();
+        hash += clientRequest.clientPort;
+        hash += clientRequest.requestID;
+
+//        hash += clientRequest.request.hashCode();
+        Field[] fields = clientRequest.request.getClass().getDeclaredFields();
+        for (Field f: fields) {
+            hash += f.hashCode();
+        }
+        return hash;
+    }
+
 }
