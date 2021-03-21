@@ -2,7 +2,7 @@ package client;
 
 import commons.requests.*;
 import commons.responses.Response;
-import commons.rpc.Communicator;
+import commons.rpc.ClientCommunicator;
 import commons.utils.Datetime;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ServiceManager {
-    Communicator router;
+    ClientCommunicator router;
     InetAddress serverAddress;
     int serverPort;
 
-    public ServiceManager(Communicator router, InetAddress serverAddress, int serverPort) {
+    public ServiceManager(ClientCommunicator router, InetAddress serverAddress, int serverPort) {
         this.router = router;
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
@@ -30,10 +30,9 @@ public class ServiceManager {
 
         List<Datetime> dates = new ArrayList<>();
         dates.addAll(getListOfDates(startDate, endDate));
-        String className = "server.BookingManager";
-        String methodName = "queryAvailability";
+
         Request req = new QueryAvailabilityRequest(facilityName, dates);
-        request(router, req, className, methodName, serverAddress, serverPort);
+        request(router, req);
     }
     public void bookFacility() {
         Scanner scanner = new Scanner(System.in);
@@ -44,15 +43,12 @@ public class ServiceManager {
         System.out.println("Please enter end date and time [DD/MM/YYYY HH:MM]: ");
         String endDatetime = scanner.nextLine();
 
-        String className = "server.BookingManager";
-        String methodName = "bookFacility";
-
         Request req = new BookFacilityRequest(
                 facilityName,
                 getDatetimeFromString(startDatetime),
                 getDatetimeFromString(endDatetime)
         );
-        request(router, req, className, methodName, serverAddress, serverPort);
+        request(router, req);
     }
     public void offsetBooking() {
         Scanner scanner = new Scanner(System.in);
@@ -65,11 +61,8 @@ public class ServiceManager {
                 "and so on. ");
         int offset = Integer.parseInt(scanner.nextLine());
 
-        String className = "server.BookingManager";
-        String methodName = "offsetBooking";
-
         Request req = new OffsetBookingRequest(bookingID, offset);
-        request(router, req, className, methodName, serverAddress, serverPort);
+        request(router, req);
     }
     public void updateBooking() {
         Scanner scanner = new Scanner(System.in);
@@ -80,28 +73,22 @@ public class ServiceManager {
         System.out.println("Please enter end date and time [DD/MM/YYYY HH:MM]: ");
         String endDatetime = scanner.nextLine();
 
-        String className = "server.BookingManager";
-        String methodName = "updateBooking";
-
         Request req = new UpdateBookingRequest(
                 bookingID,
                 getDatetimeFromString(startDatetime),
                 getDatetimeFromString(endDatetime)
         );
-        request(router, req, className, methodName, serverAddress, serverPort);
+        request(router, req);
     }
     public void deleteBooking() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter booking ID: ");
         int bookingID = Integer.parseInt(scanner.nextLine());
 
-        String className = "server.BookingManager";
-        String methodName = "deleteBooking";
-
         Request req = new DeleteBookingRequest(
                 bookingID
         );
-        request(router, req, className, methodName, serverAddress, serverPort);
+        request(router, req);
     }
     // TODO: to think about callback -> spin up a new thread?
     public void registerInterest() {
@@ -134,19 +121,12 @@ public class ServiceManager {
         System.out.println(message);
     }
 
-    public static void request(Communicator router,
-                               Request req,
-                               String className,
-                               String methodName,
-                               InetAddress serverAddress,
-                               int serverPort) {
-        router.send(req, className, methodName, serverAddress, serverPort);
+    public static void request(ClientCommunicator router, Request req) {
+        router.send(req);
         try {
-            // TODO: update accordingly, depending on receive() impl
             Response res = router.receive();
             generateResponse(res);
-//            TODO: specify exception
-        } catch (Exception e){
+        } catch (RuntimeException e){
             e.printStackTrace();
         }
     }

@@ -3,10 +3,10 @@ package client;
 import java.net.InetAddress;
 import java.util.Scanner;
 import client.ServiceManager;
-import commons.rpc.Communicator;
+import commons.rpc.ClientCommunicator;
 
 public class CLI {
-    public static void run(Communicator router, InetAddress serverAddress, int serverPort) {
+    public static void run(ClientCommunicator router, InetAddress serverAddress, int serverPort) {
         ServiceManager serviceManager = new ServiceManager(router, serverAddress, serverPort);
         String menu = "Please enter a number.\n" +
                 "1: Query for a facility's availability \n" +
