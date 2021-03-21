@@ -1,6 +1,5 @@
 package commons.rpc;
 
-import commons.requests.Request;
 import commons.requests.TestRequest;
 import commons.responses.TestResponse;
 import commons.utils.ClientRequest;
@@ -16,21 +15,25 @@ import static org.junit.jupiter.api.Assertions.*;
 class CommunicatorTest {
     ServerCommunicator serverCommunicator;
     ClientCommunicator clientCommunicator;
-    InetAddress address;
+    InetAddress serverAddress;
+    InetAddress clientAddress;
     int serverPort = 17;
     int clientPort = 22;
+    {
+        try {
+            this.serverAddress = InetAddress.getByName("localhost");
+            this.clientAddress = InetAddress.getByName("localhost");
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     @BeforeEach
     void setUp() {
+
         this.serverCommunicator = new ServerCommunicator(this.serverPort);
-        this.clientCommunicator = new ClientCommunicator(this.clientPort);
-        try{
-            this.address = InetAddress.getByName("localhost");
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-//        this.serverCommunicator.receive();
+        this.clientCommunicator = new ClientCommunicator(this.clientPort, this.serverAddress, this.serverPort);
     }
 
     @AfterEach
@@ -41,11 +44,11 @@ class CommunicatorTest {
 
 
     @Test
-    void clientToServer() {
+    void clientToServerBasic() {
         TestRequest testRequest = new TestRequest();
 
-        clientCommunicator.send(testRequest, address, this.serverPort);
-        ClientRequest clientRequest = new ClientRequest(this.address, 22, 0, testRequest);
+        clientCommunicator.send(testRequest);
+        ClientRequest clientRequest = new ClientRequest(this.serverAddress, 22, 0, testRequest);
 
         ClientRequest received = this.serverCommunicator.receive();
         assertEquals(clientRequest.clientAddress, received.clientAddress);
@@ -55,9 +58,9 @@ class CommunicatorTest {
     }
 
     @Test
-    void serverToClient() {
+    void serverToClientBasic() {
         TestResponse testResponse = new TestResponse();
-        serverCommunicator.send(testResponse, address, this.clientPort);
+        serverCommunicator.send(testResponse, clientAddress, clientPort);
 
         TestResponse received = (TestResponse) this.clientCommunicator.receive();
         assertEquals(testResponse.testInt, received.testInt);
