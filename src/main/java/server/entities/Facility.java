@@ -6,9 +6,8 @@ import java.time.*;
 import java.util.*;
 
 public class Facility {
-    private ArrayList<FacilityObserver> observerList;
+    private ArrayList<FacilityObserver> observerList = new ArrayList<FacilityObserver>();
     private String name;
-//    private ArrayList<Booking> bookingsList = new ArrayList<Booking>();
     private Hashtable<LocalDate, ArrayList<Booking>> bookingsTable = new Hashtable<LocalDate, ArrayList<Booking>>();
 
 
@@ -44,20 +43,20 @@ public class Facility {
             newList.add(booking);
             this.bookingsTable.put(bookingDate, newList);
         }
-        System.out.println("Facility has added the booking");
     }
 
-    public void removeBooking(Booking booking){
-        LocalDate bookingDate =booking.getStart().toLocalDate();
+    public Exception removeBooking(Booking booking){
+        LocalDate bookingDate = booking.getStart().toLocalDate();
         ArrayList bookingsList = this.bookingsTable.get(bookingDate);
         for (int i =0; i< bookingsList.size(); i++){
             Booking b = (Booking) bookingsList.get(i);
             if (b.getBookingId() == booking.getBookingId()){
                 bookingsList.remove(b);
-                return;
+                return null;
             }
         }
-        System.out.println("Booking to remove is not found");
+        Exception e = new NoSuchElementException("Unable to find booking to remove");
+        return e;
     }
 
 
@@ -67,30 +66,36 @@ public class Facility {
     }
 
     public void attach(FacilityObserver o){
-        //TODO
+        observerList.add(o);
     }
 
     public void notifyObservers(){
         //TODO
     }
 
-    public ArrayList<Booking> getBookings (LocalDate date){
+    public ArrayList<Booking> getBookingsByDate(LocalDate date){
         return this.bookingsTable.get(date);
     }
 
+    public Booking getBookingById (int bookingId){
+        Enumeration<ArrayList<Booking>> allbookings = this.bookingsTable.elements();
 
-    public void setObserverList(ArrayList<FacilityObserver> observerList) {
-        this.observerList = observerList;
+        //iterate the values
+        while(allbookings.hasMoreElements() ){
+            ArrayList<Booking> bookingsList = allbookings.nextElement();
+            for (Booking b:bookingsList){
+                if (b.getBookingId() == bookingId){
+                    return b;
+                }
+            }
+        }
+        return null;
     }
+
 
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
 
 
 }
