@@ -30,3 +30,7 @@ hs_err_pid*
 
 # iml
 fac-book.iml
+
+# gradle stuff
+build/
+.gradle

@@ -12,7 +12,8 @@ import java.util.Hashtable;
 public class Main {
     public static void main(String[] args) {
 
-
+        Hashtable facilTable = new Hashtable<>();
+        BookingManager bookingManager = new BookingManager();
 
 
 
