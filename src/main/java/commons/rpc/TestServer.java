@@ -5,6 +5,7 @@ import commons.utils.ClientRequest;
 
 import java.net.*;
 
+@Deprecated
 public class TestServer {
     public static void main(String[] argv) throws UnknownHostException {
 

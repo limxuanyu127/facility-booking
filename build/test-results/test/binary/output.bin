@@ -1,0 +1,34 @@
++Serializing commons.responses.TestResponse
+Aserializing string commons.responses.TestResponse with length 30
+-serializing string testString with length 10
+8serializing string this is a test string with length 21
+)serializing string testInt with length 7
+
+receiving
+commons.responses.TestResponse
+class java.lang.String
+class java.lang.Integer
+this is a test string
+)Serializing commons.requests.TestRequest
+?serializing string commons.requests.TestRequest with length 28
+-serializing string testString with length 10
+8serializing string this is a test string with length 21
+)serializing string testInt with length 7
+*serializing string testList with length 8
+4serializing string java.lang.Integer with length 17
+1serializing string testNestedList with length 14
+6serializing string java.util.ArrayList with length 19
+4serializing string java.lang.Integer with length 17
+4serializing string java.lang.Integer with length 17
+
+receiving
+commons.requests.TestRequest
+class java.lang.String
+class java.lang.Integer
+interface java.util.List
+&List object type is java.lang.Integer
+interface java.util.List
+(List object type is java.util.ArrayList
+&List object type is java.lang.Integer
+&List object type is java.lang.Integer
+=TestRequest,TestRequest,TestRequest,TestRequest,TestRequest,

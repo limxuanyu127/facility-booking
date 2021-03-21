@@ -8,16 +8,16 @@ commons/utils/Datetime.java
  commons.utils.Datetime
 commons/requests/Request.java
  commons.requests.Request
-commons/responses/UpdateBookingResponse.java
- commons.responses.UpdateBookingResponse
+commons/rpc/Communicator.java
+ commons.rpc.Communicator
 commons/responses/OffsetBookingResponse.java
  commons.responses.OffsetBookingResponse
-commons/responses/TestResponse.java
- commons.responses.TestResponse
+commons/responses/Response.java
+ commons.responses.Response
 commons/requests/BookFacilityRequest.java
  commons.requests.BookFacilityRequest
-commons/rpc/TestClient.java
- commons.rpc.TestClient
+commons/responses/RegisterInterestResponse.java
+ commons.responses.RegisterInterestResponse
 server/managers/ObserverManager.java
  server.managers.ObserverManager
 commons/requests/QueryAvailabilityRequest.java
@@ -38,15 +38,15 @@ server/entities/Facility.java
  server.entities.Facility
 commons/responses/DeleteBookingResponse.java
  commons.responses.DeleteBookingResponse
-commons/responses/Response.java
- commons.responses.Response
+commons/rpc/ServerCommunicator.java
+ commons.rpc.ServerCommunicator
 server/entities/FacilityObserver.java
  server.entities.FacilityObserver
 server/entities/Booking.java
  server.entities.Booking
  server.entities.Booking$1
-commons/rpc/TestServer.java
- commons.rpc.TestServer
+commons/responses/UpdateBookingResponse.java
+ commons.responses.UpdateBookingResponse
 commons/requests/UpdateBookingRequest.java
  commons.requests.UpdateBookingRequest
 commons/requests/DeleteBookingRequest.java
@@ -55,17 +55,17 @@ commons/responses/BookFacilityResponse.java
  commons.responses.BookFacilityResponse
 commons/requests/RegisterInterestRequest.java
  commons.requests.RegisterInterestRequest
-commons/Serializer.java
- commons.Serializer
-commons/responses/RegisterInterestResponse.java
- commons.responses.RegisterInterestResponse
-commons/requests/TestRequest.java
- commons.requests.TestRequest
 commons/Deserializer.java
  commons.Deserializer
+commons/responses/TestResponse.java
+ commons.responses.TestResponse
+commons/rpc/TestClient.java
+ commons.rpc.TestClient
 commons/rpc/ClientCommunicator.java
  commons.rpc.ClientCommunicator
-commons/rpc/ServerCommunicator.java
- commons.rpc.ServerCommunicator
-commons/rpc/Communicator.java
- commons.rpc.Communicator
+commons/Serializer.java
+ commons.Serializer
+commons/requests/TestRequest.java
+ commons.requests.TestRequest
+commons/rpc/TestServer.java
+ commons.rpc.TestServer

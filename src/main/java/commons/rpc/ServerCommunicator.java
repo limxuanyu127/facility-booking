@@ -1,6 +1,7 @@
 package commons.rpc;
 
 import commons.Deserializer;
+import commons.requests.Request;
 import commons.requests.TestRequest;
 import commons.utils.ClientRequest;
 import commons.utils.Packet;
@@ -59,18 +60,21 @@ public class ServerCommunicator extends Communicator {
                 combinedMessageBuffer.put(currPacket.messageBuffer);
             }
         }
-//        byte[] testBuffer = combinedMessageBuffer.array();
-//        String quote = new String(testBuffer, 0, combinedMessageSize);
-//        System.out.println("Message Received: " + quote);
 
         combinedMessageBuffer.flip();
+        Object deserializedRequest = Deserializer.deserializeObject(combinedMessageBuffer);
+        deserializedRequest.getClass().cast(deserializedRequest);
 
-        //TODO fix casting
-        TestRequest tempReq = (TestRequest) Deserializer.deserializeObject(combinedMessageBuffer);
-        System.out.println(tempReq.testString);
+        ClientRequest clientRequest;
 
-        ClientRequest clientRequest = new ClientRequest(currPacket.senderAddress, currPacket.senderPort,
-                currPacket.requestID, combinedMessageBuffer);
+        if (deserializedRequest instanceof commons.requests.Request){
+             clientRequest = new ClientRequest(currPacket.senderAddress, currPacket.senderPort,
+                    currPacket.requestID, (Request) deserializedRequest);
+             System.out.println(((Request) deserializedRequest).name);
+        }
+        else{
+            throw new Error("Server only receives Requests");
+        }
 
         return clientRequest;
     }

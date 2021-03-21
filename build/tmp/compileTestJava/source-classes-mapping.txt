@@ -1,2 +1,4 @@
 server/managers/BookingManagerTest.java
  server.managers.BookingManagerTest
+commons/rpc/CommunicatorTest.java
+ commons.rpc.CommunicatorTest

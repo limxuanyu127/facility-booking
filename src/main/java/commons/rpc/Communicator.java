@@ -55,27 +55,8 @@ public class Communicator {
      */
     public void send(Object o, InetAddress destIP, int destPort){
 
-//        String className = o.getClass().getName();
-//        if (className == "commons.requests.TestRequest"){
-//            Request request = (Request) o;
-//            dataBuf = Serializer.serializeTestRequest(request);
-//        }
-//        else if (className == "commons.responses.TestResponse"){
-//            Response response = (Response) o;
-//            dataBuf = Serializer.serializeTestResponse(response);
-//        }
-//        else {
-//            System.out.println("unknown class");
-//            System.out.println(className);
-//        }
         ByteBuffer dataBuf = ByteBuffer.allocate(2000);
         Serializer.serializeObject(o, dataBuf);
-//        int lengthSerialized = temp.position();
-//        byte[] tempData = new byte[lengthSerialized];
-//        temp.position(0);
-//        temp.get(tempData, 0, lengthSerialized);
-//
-//        ByteBuffer dataBuf = ByteBuffer.wrap(tempData);
 
         int totalDatagramPackets = (int) Math.ceil(dataBuf.position() / (float) this.messageSize);
         int dataBufPtr = 0;
@@ -114,41 +95,7 @@ public class Communicator {
          */
         this.requestID += 1;
 
-
-
 //        System.out.println("Sending message" + " to " + destIP + " " + destPort);
-    }
-
-    /**
-     * Allows socket to listen for UDP packets
-     * @return ByteBuffer containing only message data
-     * @Todo: Add deserialization
-     */
-    public Object receive(){
-        System.out.println("receiving");
-        Packet currPacket = this.receivePacket();
-        int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
-        ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);
-        combinedMessageBuffer.put(currPacket.messageBuffer);
-
-        if (currPacket.totalDatagramPackets != 1){
-            while (currPacket.datagramNum < currPacket.totalDatagramPackets - 1) {
-                currPacket = this.receivePacket();
-                combinedMessageBuffer.put(currPacket.messageBuffer);
-            }
-        }
-//        byte[] testBuffer = combinedMessageBuffer.array();
-//        String quote = new String(testBuffer, 0, combinedMessageSize);
-//        System.out.println("Message Received: " + quote);
-
-        combinedMessageBuffer.flip();
-        TestRequest tempReq = (TestRequest) Deserializer.deserializeObject(combinedMessageBuffer);
-        System.out.println(tempReq.testString);
-
-        ClientRequest clientRequest = new ClientRequest(currPacket.senderAddress, currPacket.senderPort,
-                currPacket.requestID, combinedMessageBuffer);
-
-        return clientRequest;
     }
 
     /**

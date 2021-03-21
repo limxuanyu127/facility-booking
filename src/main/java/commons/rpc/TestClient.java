@@ -3,6 +3,7 @@ import commons.requests.TestRequest;
 
 import java.net.*;
 
+@Deprecated
 public class TestClient {
     public static void main(String[] argv) throws UnknownHostException {
         ClientCommunicator clientCommunicator = new ClientCommunicator(22);
