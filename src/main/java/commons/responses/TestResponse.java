@@ -1,8 +1,8 @@
 package commons.responses;
 
 public class TestResponse extends Response {
-    String testString;
-    int testInt;
+    public String testString;
+    public Integer testInt;
 
     public TestResponse() {
         this.name = "TestResponse";

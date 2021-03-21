@@ -1,13 +1,15 @@
 package commons.rpc;
 
 import commons.responses.TestResponse;
+import commons.utils.ClientRequest;
 
 import java.net.*;
 
+@Deprecated
 public class TestServer {
     public static void main(String[] argv) throws UnknownHostException {
 
-        Communicator communicator = new Communicator(17);
+        ServerCommunicator communicator = new ServerCommunicator(17);
         InetAddress address = InetAddress.getByName("localhost");
         TestResponse testResponse = new TestResponse();
         ClientRequestLog clientRequestLog = new ClientRequestLog();

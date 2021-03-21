@@ -1,16 +1,16 @@
-package commons.rpc;
+package commons.utils;
 
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
 public class Packet {
-    int requestID;
-    int datagramNum;
-    int totalDatagramPackets;
-    int messageSize;
-    InetAddress senderAddress;
-    int senderPort;
-    ByteBuffer messageBuffer;
+    public int requestID;
+    public int datagramNum;
+    public int totalDatagramPackets;
+    public int messageSize;
+    public InetAddress senderAddress;
+    public int senderPort;
+    public ByteBuffer messageBuffer;
 
     /**
      * Class to log the info of a UDP packet
