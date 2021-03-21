@@ -1,18 +1,32 @@
 package commons.rpc;
+
+import commons.Deserializer;
 import commons.Serializer;
 import commons.requests.Request;
+import commons.requests.TestRequest;
 import commons.responses.Response;
+import commons.utils.ClientRequest;
+import commons.utils.Packet;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 
 // To use, run TestServer on 1 terminal then run TestClient on another terminal
 
-public class Communicator {
+public class ServerCommunicator{
 
-    InetAddress address;
-    int port;
+    /**
+     * Creates a socket to send / receive UDP packets at specified port number
+     * Packetsize should be fixed across both client and main.java.server (hence its not an arg)
+     *
+     * @param port port number for UDP socket
+     */
+
+    int serverPort;
     int packetSize;
     int messageSize;
     int headerSize;
@@ -20,19 +34,15 @@ public class Communicator {
     DatagramSocket socket;
     int requestID;
 
-    /**
-     * Creates a socket to send / receive UDP packets at specified port number
-     * Packetsize should be fixed across both client and main.java.server (hence its not an arg)
-     * @param port port number for UDP socket
-     */
-    public Communicator(int port) {
-        try {
-            this.socket = new DatagramSocket(port);
-        } catch (SocketException e) {}
+    public ServerCommunicator(int serverPort) {
         this.requestID = 0;
         this.packetSize = 512;
         this.headerSize = 16;
         this.messageSize = this.packetSize - this.headerSize;
+        this.serverPort = serverPort;
+        try {
+            this.socket = new DatagramSocket(serverPort);
+        } catch (SocketException e) {}
         /**
          * 4 bytes for requestID
          * 4 bytes for the datagram number
@@ -41,28 +51,9 @@ public class Communicator {
          */
     }
 
-    /**
-     * Sends request / response to destIP and destPort
-     * @param o request / response object
-     * @param destIP destination IP
-     * @param destPort destination port
-     */
-    public void send(Object o, InetAddress destIP, int destPort){
-
-        String className = o.getClass().getName();
-        ByteBuffer dataBuf = null;
-        if (className == "commons.requests.TestRequest"){
-            Request request = (Request) o;
-            dataBuf = Serializer.serializeTestRequest(request);
-        }
-        else if (className == "commons.responses.TestResponse"){
-            Response response = (Response) o;
-            dataBuf = Serializer.serializeTestResponse(response);
-        }
-        else {
-            System.out.println("unknown class");
-            System.out.println(className);
-        }
+    public void send(Response r, InetAddress clientAddress, int clientPort) {
+        ByteBuffer dataBuf = ByteBuffer.allocate(2000);
+        Serializer.serializeObject(r, dataBuf);
 
         int totalDatagramPackets = (int) Math.ceil(dataBuf.position() / (float) this.messageSize);
         int dataBufPtr = 0;
@@ -88,7 +79,7 @@ public class Communicator {
                 dataBuf.get(packetByteArray, this.headerSize, this.messageSize);
                 dataBufPtr += this.messageSize;
             }
-            DatagramPacket message = new DatagramPacket(packetByteArray, packetByteArray.length, destIP, destPort);
+            DatagramPacket message = new DatagramPacket(packetByteArray, packetByteArray.length, clientAddress, clientPort);
 
             try {
                 this.socket.send(message);
@@ -101,44 +92,47 @@ public class Communicator {
          */
         this.requestID += 1;
 
-
-
 //        System.out.println("Sending message" + " to " + destIP + " " + destPort);
     }
 
     /**
      * Allows socket to listen for UDP packets
+     *
      * @return ByteBuffer containing only message data
-     * @Todo: Add deserialization
      */
-    public ClientRequest receive(){
+    public ClientRequest receive() {
         System.out.println("receiving");
         Packet currPacket = this.receivePacket();
         int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
         ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);
         combinedMessageBuffer.put(currPacket.messageBuffer);
 
-        if (currPacket.totalDatagramPackets != 1){
+        if (currPacket.totalDatagramPackets != 1) {
             while (currPacket.datagramNum < currPacket.totalDatagramPackets - 1) {
                 currPacket = this.receivePacket();
                 combinedMessageBuffer.put(currPacket.messageBuffer);
             }
         }
-        byte[] testBuffer = combinedMessageBuffer.array();
-        String quote = new String(testBuffer, 0, combinedMessageSize);
-        System.out.println("Message Received: " + quote);
 
-        ClientRequest clientRequest = new ClientRequest(currPacket.senderAddress, currPacket.senderPort,
-                currPacket.requestID, combinedMessageBuffer);
+        combinedMessageBuffer.flip();
+        Object deserializedRequest = Deserializer.deserializeObject(combinedMessageBuffer);
+        deserializedRequest.getClass().cast(deserializedRequest);
+
+        ClientRequest clientRequest;
+
+        if (deserializedRequest instanceof commons.requests.Request){
+             clientRequest = new ClientRequest(currPacket.senderAddress, currPacket.senderPort,
+                    currPacket.requestID, (Request) deserializedRequest);
+             System.out.println(((Request) deserializedRequest).name);
+        }
+        else{
+            throw new Error("Server only receives Requests");
+        }
 
         return clientRequest;
     }
 
-    /**
-     * Private method for this.receive() to use if the message size exceeds packet size
-     * @return Packet object containing message info
-     */
-    private Packet receivePacket(){
+    protected Packet receivePacket(){
         byte[] buffer = new byte[this.packetSize];
         DatagramPacket message = new DatagramPacket(buffer, buffer.length);
 
@@ -162,7 +156,5 @@ public class Communicator {
         messageBuffer.position(0);
 
         return new Packet(requestID, datagramNum, totalDatagramPackets, messageSize, senderAddress, senderPort, messageBuffer);
-
     }
-
 }

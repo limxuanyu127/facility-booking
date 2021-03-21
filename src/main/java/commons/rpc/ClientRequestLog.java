@@ -1,5 +1,7 @@
 package commons.rpc;
 
+import commons.utils.ClientRequest;
+
 import java.util.ArrayList;
 
 public class ClientRequestLog {
@@ -27,7 +29,7 @@ public class ClientRequestLog {
 
     private int hashClientRequest(ClientRequest clientRequest){
         int addressHash = clientRequest.clientAddress.hashCode();
-        int messageHash = clientRequest.message.hashCode();
+        int messageHash = clientRequest.request.hashCode();
         return addressHash + clientRequest.clientPort + clientRequest.requestID + messageHash;
     }
 }
