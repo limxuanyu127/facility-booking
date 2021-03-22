@@ -23,7 +23,7 @@ public class ServiceManager {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter facility name: ");
         String facilityName = scanner.nextLine();
-        System.out.println("Please enter list of dates [DD/MM/YYYY] separated by spaces: ");
+        System.out.println("Please enter list of days [1 - 7], separated by spaces: ");
         String dates = scanner.nextLine();
 
         List<Datetime> dateObjs = new ArrayList<>();
@@ -36,9 +36,9 @@ public class ServiceManager {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter facility name: ");
         String facilityName = scanner.nextLine();
-        System.out.println("Please enter start date and time [DD/MM/YYYY HH:MM]: ");
+        System.out.println("Please enter start day and time [D/HH/MM]: ");
         String startDatetime = scanner.nextLine();
-        System.out.println("Please enter end date and time [DD/MM/YYYY HH:MM]: ");
+        System.out.println("Please enter end day and time [D/HH/MM]: ");
         String endDatetime = scanner.nextLine();
 
         Request req = new BookFacilityRequest(
@@ -66,9 +66,9 @@ public class ServiceManager {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter booking ID: ");
         int bookingID = Integer.parseInt(scanner.nextLine());
-        System.out.println("Please enter start date and time [DD/MM/YYYY HH:MM]: ");
+        System.out.println("Please enter start day and time [D/HH/MM]: ");
         String startDatetime = scanner.nextLine();
-        System.out.println("Please enter end date and time [DD/MM/YYYY HH:MM]: ");
+        System.out.println("Please enter end day and time [D/HH/MM]: ");
         String endDatetime = scanner.nextLine();
 
         Request req = new UpdateBookingRequest(
@@ -88,41 +88,26 @@ public class ServiceManager {
         );
         request(router, req);
     }
-    // TODO: to think about callback -> spin up a new thread?
     public void registerInterest() {
-        System.out.println("Registering interest...");
+
     }
 
-//    TODO: implement
-    public static List<Datetime> getListOfDates(String dates){
+    public static List<Datetime> getListOfDates(String days){
         List<Datetime> dateObjs = new ArrayList<>();
-        String [] dateList = dates.split(" ");
-        for (String d: dateList) {
-            String[] dateParts = d.split("/");
-            Datetime dateObj = new Datetime(
-                    Integer.parseInt(dateParts[2]),
-                    Integer.parseInt(dateParts[1]),
-                    Integer.parseInt(dateParts[0]),
-                    0,
-                    0
-            );
+        String [] dayList = days.split(" ");
+        for (String d: dayList) {
+            Datetime dateObj = new Datetime(Integer.parseInt(d),0,0);
             dateObjs.add(dateObj);
         }
         return dateObjs;
     }
 
     public static Datetime getDatetimeFromString(String datetime) {
-        String[] parts = datetime.split(" ");
-        String date = parts[0];
-        String time = parts[1];
-        String[] dateParts = date.split("/");
-        String[] timeParts = time.split(":");
+        String[] datetimeParts = datetime.split("/");
         return new Datetime(
-                Integer.parseInt(dateParts[2]),
-                Integer.parseInt(dateParts[1]),
-                Integer.parseInt(dateParts[0]),
-                Integer.parseInt(timeParts[0]),
-                Integer.parseInt(timeParts[1])
+                Integer.parseInt(datetimeParts[0]),
+                Integer.parseInt(datetimeParts[1]),
+                Integer.parseInt(datetimeParts[2])
         );
     }
 

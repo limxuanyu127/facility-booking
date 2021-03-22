@@ -57,17 +57,15 @@ class ServiceManagerTest {
 
     @Test
     void getListOfDates() {
-        String dateString = "01/03/2021 02/03/2021";
+        String dateString = "1 2";
         List<Datetime> actualDateObjs = ServiceManager.getListOfDates(dateString);
 
-        Datetime dateOne = new Datetime(2021, 3, 1, 0, 0);
-        Datetime dateTwo = new Datetime(2021, 3, 2, 0, 0);
+        Datetime dateOne = new Datetime(1, 0, 0);
+        Datetime dateTwo = new Datetime(2, 0, 0);
         List<Datetime> expectedDateObjs = new ArrayList<Datetime>() {{add(dateOne);add(dateTwo);}};
         for (int i = 0; i < actualDateObjs.size(); i++) {
             Datetime actualDate = actualDateObjs.get(i);
             Datetime expectedDate = expectedDateObjs.get(i);
-            assertEquals(actualDate.year, expectedDate.year);
-            assertEquals(actualDate.month, expectedDate.month);
             assertEquals(actualDate.day, expectedDate.day);
             assertEquals(actualDate.hour, expectedDate.hour);
             assertEquals(actualDate.minute, expectedDate.minute);
@@ -77,11 +75,9 @@ class ServiceManagerTest {
 
     @Test
     void getDatetimeFromString() {
-        String datetimeString = "01/03/2021 13:30";
+        String datetimeString = "1/13/30";
         Datetime actualDatetime = ServiceManager.getDatetimeFromString(datetimeString);
-        Datetime expectedDatetime = new Datetime(2021,3,1,13,30);
-        assertEquals(actualDatetime.year, expectedDatetime.year);
-        assertEquals(actualDatetime.month, expectedDatetime.month);
+        Datetime expectedDatetime = new Datetime(1, 13, 30);
         assertEquals(actualDatetime.day, expectedDatetime.day);
         assertEquals(actualDatetime.hour, expectedDatetime.hour);
         assertEquals(actualDatetime.minute, expectedDatetime.minute);
