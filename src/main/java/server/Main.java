@@ -1,6 +1,6 @@
 package server;
 
-//import commons.rpc.Communicator;
+import commons.rpc.ServerCommunicator;
 import javafx.util.Pair;
 import server.entities.*;
 import server.managers.*;
@@ -12,10 +12,11 @@ import java.util.Hashtable;
 public class Main {
     public static void main(String[] args) {
 
+        int serverPort = 0; //TODO get server port
+
         Hashtable facilTable = new Hashtable<>();
         BookingManager bookingManager = new BookingManager();
-
-
+        ServerCommunicator serverCommunicator = new ServerCommunicator(serverPort);
 
     }
 }
