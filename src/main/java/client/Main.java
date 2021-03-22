@@ -15,7 +15,7 @@ public class Main {
             e.printStackTrace();
         }
         int serverPort = 5000;
-        ClientCommunicator router = new ClientCommunicator(3000, serverAddress, serverPort);
+        ClientCommunicator router = new ClientCommunicator(3000, serverAddress, serverPort, 3, 10);
         CLI.run(router, serverAddress, serverPort);
     }
 
