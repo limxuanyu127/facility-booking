@@ -8,7 +8,11 @@ import commons.rpc.ClientCommunicator;
 public class CLI {
     public static void run(ClientCommunicator router, InetAddress serverAddress, int serverPort) {
         ServiceManager serviceManager = new ServiceManager(router, serverAddress, serverPort);
-        String menu = "Please enter a number.\n" +
+        String startUp = "Hello!! Welcome to the facility booking system. These are the facilities you can book: \n\n" +
+                "Badminton Court \n" +
+                "...";
+        System.out.println(startUp);
+        String menu = "Please enter a number.\n\n" +
                 "1: Query for a facility's availability \n" +
                 "2: Book a facility \n" +
                 "3: Offset booking \n" +
