@@ -57,6 +57,8 @@ public class ServiceManager {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter booking ID: ");
         int bookingID = Integer.parseInt(scanner.nextLine());
+        System.out.println("Please enter facility name: ");
+        String facilityName =scanner.nextLine();
         System.out.println("Please enter offset in terms of number of 30-minute slots. \n " +
                 "1 = push back by 30 minutes \n" +
                 "2 = push back by 1 hour \n " +
@@ -64,13 +66,15 @@ public class ServiceManager {
                 "and so on. ");
         int offset = Integer.parseInt(scanner.nextLine());
 
-        Request req = new OffsetBookingRequest(bookingID, offset);
+        Request req = new OffsetBookingRequest(bookingID, facilityName, offset);
         request(router, req);
     }
     public void updateBooking() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter booking ID: ");
         int bookingID = Integer.parseInt(scanner.nextLine());
+        System.out.println("Please enter facility name: ");
+        String facilityName =scanner.nextLine();
         System.out.println("Please enter start day and time [D/HH/MM]: ");
         String startDatetime = scanner.nextLine();
         System.out.println("Please enter end day and time [D/HH/MM]: ");
@@ -78,6 +82,7 @@ public class ServiceManager {
 
         Request req = new UpdateBookingRequest(
                 bookingID,
+                facilityName,
                 getDatetimeFromString(startDatetime),
                 getDatetimeFromString(endDatetime)
         );
