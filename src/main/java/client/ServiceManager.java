@@ -1,12 +1,16 @@
 package client;
 
 import commons.requests.*;
-import commons.responses.Response;
+import commons.responses.*;
 import commons.rpc.ClientCommunicator;
 import commons.utils.Datetime;
+import jdk.jshell.spi.ExecutionControl;
+
+import javax.management.Query;
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -24,7 +28,7 @@ public class ServiceManager {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter facility name: ");
         String facilityName = scanner.nextLine();
-        System.out.println("Please enter list of days [1 - 7], separated by spaces: ");
+        System.out.println("Please enter list of days (Monday, Tuesday etc), separated by spaces: ");
         String dates = scanner.nextLine();
 
         List<Datetime> dateObjs = new ArrayList<>();
@@ -118,7 +122,7 @@ public class ServiceManager {
         List<Datetime> dateObjs = new ArrayList<>();
         String [] dayList = days.split(" ");
         for (String d: dayList) {
-            Datetime dateObj = new Datetime(Integer.parseInt(d),0,0);
+            Datetime dateObj = new Datetime(d,0,0);
             dateObjs.add(dateObj);
         }
         return dateObjs;
@@ -127,16 +131,94 @@ public class ServiceManager {
     public static Datetime getDatetimeFromString(String datetime) {
         String[] datetimeParts = datetime.split("/");
         return new Datetime(
-                Integer.parseInt(datetimeParts[0]),
+                datetimeParts[0],
                 Integer.parseInt(datetimeParts[1]),
                 Integer.parseInt(datetimeParts[2])
         );
     }
 
+    public static void generateBookingDetails(int bookingID, String facilityName, Datetime startTime, Datetime endTime) {
+        System.out.println("Booking Confirmation ID: " + bookingID);
+        System.out.println("Facility Name: " + facilityName);
+        String day = startTime.day;
+        String startHour = startTime.hour > 9 ? String.valueOf(startTime.hour) : "0" + startTime.hour;
+        String startMinute = startTime.minute > 0 ? String.valueOf(startTime.minute) : "00";
+        String endHour = endTime.hour > 9 ? String.valueOf(endTime.hour) : "0" + endTime.hour;
+        String endMinute = endTime.minute > 0 ? String.valueOf(endTime.minute) : "00";
+        String dayTime = day + " " + startHour + ":" + startMinute + " - " + endHour + ":" + endMinute;
+        System.out.println("Day and time: " + dayTime);
+    }
+
 //    TODO: implement parser for each response type, change input type to Response
-    public static void generateResponse(Response res) {
+    public static void generateResponse(Response genericResponse) {
         String message = "";
         System.out.println(message);
+        if (genericResponse instanceof QueryAvailabilityResponse) {
+            QueryAvailabilityResponse response = ((QueryAvailabilityResponse) genericResponse);
+            System.out.println(response.responseMessage.message);
+            if (response.responseMessage.statusCode == 200) {
+                System.out.println("======== AVAILABLITIY FOR " + response.facilityName + " ========");
+                for (List<Datetime> l : response.intervals) {
+                    for (Datetime d: l) {
+                        String day = d.day;
+                        String hour = d.hour > 9 ? String.valueOf(d.hour) : "0" + d.hour;
+                        String minute = d.minute > 0 ? String.valueOf(d.minute) : "00";
+                        System.out.println(day + " " + hour + ":" + minute);
+                    }
+                }
+            }
+
+        } else if (genericResponse instanceof BookFacilityResponse) {
+            BookFacilityResponse response = (BookFacilityResponse) genericResponse;
+            System.out.println(response.responseMessage.message);
+            if (response.responseMessage.statusCode == 200) {
+                System.out.println("======== NEW BOOKING CONFIRMATION ========");
+                generateBookingDetails(
+                        response.bookingID,
+                        response.facilityName,
+                        response.startTime,
+                        response.endTime
+                );
+            }
+
+        } else if (genericResponse instanceof OffsetBookingResponse) {
+            OffsetBookingResponse response = (OffsetBookingResponse) genericResponse;
+            System.out.println(response.responseMessage.message);
+            if (response.responseMessage.statusCode == 200) {
+                System.out.println("======== UPDATED BOOKING CONFIRMATION ========");
+                generateBookingDetails(
+                        response.bookingID,
+                        response.facilityName,
+                        response.startTime,
+                        response.endTime
+                );
+            }
+
+        } else if (genericResponse instanceof UpdateBookingResponse) {
+            UpdateBookingResponse response = (UpdateBookingResponse) genericResponse;
+            System.out.println(response.responseMessage.message);
+            if (response.responseMessage.statusCode == 200) {
+                System.out.println("======== UPDATED BOOKING CONFIRMATION ========");
+                generateBookingDetails(
+                        response.bookingID,
+                        response.facilityName,
+                        response.startTime,
+                        response.endTime
+                );
+
+            }
+
+        } else if (genericResponse instanceof DeleteBookingResponse) {
+            DeleteBookingResponse response = (DeleteBookingResponse) genericResponse;
+            System.out.println(response.responseMessage.message);
+
+        } else if (genericResponse instanceof RegisterInterestResponse) {
+            RegisterInterestResponse response = (RegisterInterestResponse) genericResponse;
+            System.out.println(response.responseMessage.message);
+
+        } else {
+            throw new Error("Not implemented");
+        }
     }
 
     public static void request(ClientCommunicator router, Request req) {
