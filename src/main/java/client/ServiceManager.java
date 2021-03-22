@@ -65,22 +65,19 @@ public class ServiceManager {
         Request req = new OffsetBookingRequest(bookingID, facilityName, offset);
         request(router, req);
     }
-    public void updateBooking() {
+    public void extendBooking() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter booking ID: ");
         int bookingID = Integer.parseInt(scanner.nextLine());
         System.out.println("Please enter facility name: ");
         String facilityName =scanner.nextLine();
-        System.out.println("Please enter start day and time [D/HH/MM]: ");
-        String startDatetime = scanner.nextLine();
-        System.out.println("Please enter end day and time [D/HH/MM]: ");
-        String endDatetime = scanner.nextLine();
+        System.out.println("Please enter number of 30-minute slots to extend by: ");
+        int extension = scanner.nextInt();
 
-        Request req = new UpdateBookingRequest(
+        Request req = new ExtendBookingRequest(
                 bookingID,
                 facilityName,
-                getDatetimeFromString(startDatetime),
-                getDatetimeFromString(endDatetime)
+                extension
         );
         request(router, req);
     }
@@ -88,9 +85,12 @@ public class ServiceManager {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter booking ID: ");
         int bookingID = Integer.parseInt(scanner.nextLine());
+        System.out.println("Please enter facility name: ");
+        String facilityName =scanner.nextLine();
 
         Request req = new DeleteBookingRequest(
-                bookingID
+                bookingID,
+                facilityName
         );
         request(router, req);
     }
@@ -195,8 +195,8 @@ public class ServiceManager {
                 );
             }
 
-        } else if (genericResponse instanceof UpdateBookingResponse) {
-            UpdateBookingResponse response = (UpdateBookingResponse) genericResponse;
+        } else if (genericResponse instanceof ExtendBookingResponse) {
+            ExtendBookingResponse response = (ExtendBookingResponse) genericResponse;
             System.out.println(response.responseMessage.message);
             if (response.responseMessage.statusCode == 200) {
                 System.out.println("======== UPDATED BOOKING CONFIRMATION ========");

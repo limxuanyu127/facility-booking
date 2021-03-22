@@ -40,7 +40,7 @@ public class CLI {
                     serviceManager.offsetBooking();
                     break;
                 case 4:
-                    serviceManager.updateBooking();
+                    serviceManager.extendBooking();
                     break;
                 case 5:
                     serviceManager.deleteBooking();
