@@ -57,11 +57,11 @@ class ServiceManagerTest {
 
     @Test
     void getListOfDates() {
-        String dateString = "1 2";
+        String dateString = "Monday Tuesday";
         List<Datetime> actualDateObjs = ServiceManager.getListOfDates(dateString);
 
-        Datetime dateOne = new Datetime(1, 0, 0);
-        Datetime dateTwo = new Datetime(2, 0, 0);
+        Datetime dateOne = new Datetime("Monday", 0, 0);
+        Datetime dateTwo = new Datetime("Tuesday", 0, 0);
         List<Datetime> expectedDateObjs = new ArrayList<Datetime>() {{add(dateOne);add(dateTwo);}};
         for (int i = 0; i < actualDateObjs.size(); i++) {
             Datetime actualDate = actualDateObjs.get(i);
@@ -75,9 +75,9 @@ class ServiceManagerTest {
 
     @Test
     void getDatetimeFromString() {
-        String datetimeString = "1/13/30";
+        String datetimeString = "Monday/13/30";
         Datetime actualDatetime = ServiceManager.getDatetimeFromString(datetimeString);
-        Datetime expectedDatetime = new Datetime(1, 13, 30);
+        Datetime expectedDatetime = new Datetime("Monday", 13, 30);
         assertEquals(actualDatetime.day, expectedDatetime.day);
         assertEquals(actualDatetime.hour, expectedDatetime.hour);
         assertEquals(actualDatetime.minute, expectedDatetime.minute);
