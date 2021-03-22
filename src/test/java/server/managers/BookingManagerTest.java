@@ -32,13 +32,13 @@ class BookingManagerTest {
         facilTable.put("gym", gym);
 
         //Populate booking
-        LocalDateTime startOne = LocalDateTime.of(2021, 3, 18, 14, 00);
-        LocalDateTime endOne = LocalDateTime.of(2021, 3, 18, 16, 00);
-        Booking bookingOne = new Booking(1, 100, "badmintoncourt", startOne, endOne);
+        LocalTime startOne = LocalTime.of(14, 00);
+        LocalTime endOne = LocalTime.of( 16, 00);
+        Booking bookingOne = new Booking("Tuesday",1, 100, "badmintoncourt", startOne, endOne);
 
-        LocalDateTime startTwo = LocalDateTime.of(2021, 3, 18, 20, 00);
-        LocalDateTime endTwo = LocalDateTime.of(2021, 3, 18, 22, 00);
-        Booking bookingTwo = new Booking(2, 100, "badmintoncourt", startTwo, endTwo);
+        LocalTime startTwo = LocalTime.of(20, 00);
+        LocalTime endTwo = LocalTime.of(22, 00);
+        Booking bookingTwo = new Booking("Tuesday", 2, 100, "badmintoncourt", startTwo, endTwo);
 
         Facility targetFacil = facilTable.get("badmintoncourt");
         targetFacil.addBooking(bookingOne);
@@ -53,19 +53,19 @@ class BookingManagerTest {
 
     @Test
     void queryAvailability_NoConflict_NoException() {
-        ArrayList<LocalDate> queryDates = new ArrayList<LocalDate>();
-        queryDates.add(LocalDate.of(2021, 3, 18));
-        Pair<ArrayList, Exception> queryResults = bookingManager.queryAvailability("badmintoncourt", queryDates, facilTable);
+        ArrayList<String> queryDays = new ArrayList<String>();
+        queryDays.add("Tuesday");
+        Pair<ArrayList, Exception> queryResults = bookingManager.queryAvailability("badmintoncourt", queryDays, facilTable);
         ArrayList outputBookings = queryResults.getKey();
         Exception outputException = queryResults.getValue();
 
         ArrayList expectedBookings = new ArrayList<>();
-        ArrayList<LocalDateTime> slotOne = new ArrayList<>();
-        ArrayList<LocalDateTime> slotTwo = new ArrayList<>();
-        slotOne.add(LocalDateTime.of(2021,3, 18, 8, 0, 0));
-        slotOne.add(LocalDateTime.of(2021,3, 18, 14, 0, 0));
-        slotTwo.add(LocalDateTime.of(2021,3, 18, 16, 0, 0));
-        slotTwo.add(LocalDateTime.of(2021,3, 18, 20, 0, 0));
+        ArrayList<LocalTime> slotOne = new ArrayList<>();
+        ArrayList<LocalTime> slotTwo = new ArrayList<>();
+        slotOne.add(LocalTime.of(8, 0));
+        slotOne.add(LocalTime.of(14, 0));
+        slotTwo.add(LocalTime.of(16, 0));
+        slotTwo.add(LocalTime.of(20, 0));
         expectedBookings.add(slotOne);
         expectedBookings.add(slotTwo);
         Exception expectedException = null;
@@ -80,12 +80,13 @@ class BookingManagerTest {
     void createBooking_NoConflict_NoException() {
         int bookingId = 1;
         int clientId = 100;
+        String day = "Tuesday";
         String facilName = "badmintoncourt";
 
-        LocalDateTime startThree = LocalDateTime.of(2021, 3, 18, 18, 00);
-        LocalDateTime endThree = LocalDateTime.of(2021, 3, 18, 20, 00);
+        LocalTime startThree = LocalTime.of( 18, 00);
+        LocalTime endThree = LocalTime.of(20, 00);
 
-        Pair<Booking, Exception> createBookingResults = bookingManager.createBooking(bookingId, clientId, facilName, startThree, endThree, facilTable);
+        Pair<Booking, Exception> createBookingResults = bookingManager.createBooking(day, bookingId, clientId, facilName, startThree, endThree, facilTable);
         Booking outputBooking = createBookingResults.getKey();
         Exception outputException = createBookingResults.getValue();
 
@@ -101,12 +102,13 @@ class BookingManagerTest {
     void createBooking_Conflict_Exception() {
         int bookingId = 1;
         int clientId = 100;
+        String day = "Tuesday";
         String facilName = "badmintoncourt";
 
-        LocalDateTime startThree = LocalDateTime.of(2021, 3, 18, 19, 00);
-        LocalDateTime endThree = LocalDateTime.of(2021, 3, 18, 21, 00);
+        LocalTime startThree = LocalTime.of(19, 00);
+        LocalTime endThree = LocalTime.of( 21, 00);
 
-        Pair<Booking, Exception> createBookingResults = bookingManager.createBooking(bookingId, clientId, facilName, startThree, endThree, facilTable);
+        Pair<Booking, Exception> createBookingResults = bookingManager.createBooking(day, bookingId, clientId, facilName, startThree, endThree, facilTable);
         Booking outputBooking = createBookingResults.getKey();
         Exception outputException = createBookingResults.getValue();
 
@@ -132,8 +134,8 @@ class BookingManagerTest {
         Booking outputBooking = results.getKey();
         Exception outputException = results.getValue();
 
-        assertEquals(outputBooking.getStart(), LocalDateTime.of(2021, 3, 18, 14, 30));
-        assertEquals(outputBooking.getEnd(), LocalDateTime.of(2021, 3, 18, 16, 30));
+        assertEquals(outputBooking.getStart(), LocalTime.of(14, 30));
+        assertEquals(outputBooking.getEnd(), LocalTime.of( 16, 30));
         assertEquals(outputBooking.getBookingId(), bookingId);
 
     }
@@ -154,26 +156,38 @@ class BookingManagerTest {
     }
 
     @Test
-    void updateBooking_NoConflict_NoException(){
+    void extendBooking_NoConflict_NoException(){
         int bookingId = 1;
         int clientId = 100;
+        int offset = 30;
         String facilName = "badmintoncourt";
-        LocalDateTime newStart = LocalDateTime.of(2021, 3, 18, 15, 00);
-        LocalDateTime newEnd = LocalDateTime.of(2021, 3, 18, 16, 30);
 
-        Pair<Booking, Exception> results =  bookingManager.updateBooking(facilName, bookingId, newStart, newEnd, this.facilTable);
+        Pair<Booking, Exception> results =  bookingManager.extendBooking(facilName, bookingId, offset, this.facilTable);
         Booking outputBooking = results.getKey();
         Exception outputException = results.getValue();
 
-//        ArrayList queryDates = new ArrayList<>();
-//        queryDates.add(newStart.toLocalDate());
-//        System.out.println(bookingManager.queryAvailability(facilName, queryDates, facilTable));
-
-        assertEquals(outputBooking.getStart(), LocalDateTime.of(2021, 3, 18, 15, 00));
-        assertEquals(outputBooking.getEnd(), LocalDateTime.of(2021, 3, 18, 16, 30));
-        assertEquals(outputBooking.getBookingId(), bookingId);
+        assertEquals(LocalTime.of( 14, 00), outputBooking.getStart());
+        assertEquals(LocalTime.of(16, 30),outputBooking.getEnd());
+        assertEquals(null, outputException);
 
     }
+
+    @Test
+    void extendBooking_TooLate_Exception(){
+        int bookingId = 2;
+        int clientId = 100;
+        int offset = 30;
+        String facilName = "badmintoncourt";
+
+        Pair<Booking, Exception> results =  bookingManager.extendBooking(facilName, bookingId, offset, this.facilTable);
+        Booking outputBooking = results.getKey();
+        Exception outputException = results.getValue();
+
+        assertEquals(String.format("Start time is before %s or End time is after %s", bookingManager.getOpenTime().toString(), bookingManager.getCloseTime().toString()), outputException.getMessage());
+
+    }
+
+
 
     @Test
     void deleteBooking_NoConflict_NoException(){
@@ -199,4 +213,27 @@ class BookingManagerTest {
 
 }
 
+
+
+//    @Test
+//    void updateBooking_NoConflict_NoException(){
+//        int bookingId = 1;
+//        int clientId = 100;
+//        String facilName = "badmintoncourt";
+//        LocalDateTime newStart = LocalDateTime.of(2021, 3, 18, 15, 00);
+//        LocalDateTime newEnd = LocalDateTime.of(2021, 3, 18, 16, 30);
+//
+//        Pair<Booking, Exception> results =  bookingManager.updateBooking(facilName, bookingId, newStart, newEnd, this.facilTable);
+//        Booking outputBooking = results.getKey();
+//        Exception outputException = results.getValue();
+//
+////        ArrayList queryDates = new ArrayList<>();
+////        queryDates.add(newStart.toLocalDate());
+////        System.out.println(bookingManager.queryAvailability(facilName, queryDates, facilTable));
+//
+//        assertEquals(outputBooking.getStart(), LocalDateTime.of(2021, 3, 18, 15, 00));
+//        assertEquals(outputBooking.getEnd(), LocalDateTime.of(2021, 3, 18, 16, 30));
+//        assertEquals(outputBooking.getBookingId(), bookingId);
+//
+//    }
 

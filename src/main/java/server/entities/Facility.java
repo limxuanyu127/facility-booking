@@ -8,7 +8,7 @@ import java.util.*;
 public class Facility {
     private ArrayList<FacilityObserver> observerList = new ArrayList<FacilityObserver>();
     private String name;
-    private Hashtable<LocalDate, ArrayList<Booking>> bookingsTable = new Hashtable<LocalDate, ArrayList<Booking>>();
+    private Hashtable<String, ArrayList<Booking>> bookingsTable = new Hashtable<String, ArrayList<Booking>>();
 
 
     public Facility(String name){
@@ -18,36 +18,28 @@ public class Facility {
     public void addBooking(Booking booking){
 
         //Check
-        LocalTime startTime = booking.getStart().toLocalTime();
-        LocalTime endTime = booking.getEnd().toLocalTime();
-        LocalDate startDate =booking.getStart().toLocalDate();
-        LocalDate endDate = booking.getEnd().toLocalDate();
-        //TODO should thre be a
+        LocalTime startTime = booking.getStart();
+        LocalTime endTime = booking.getEnd();
+        String day =booking.getDay();
+
         if((startTime.compareTo(BookingManager.getOpenTime()) <0) || endTime.compareTo(BookingManager.getCloseTime()) > 0){
             System.out.println("Booking invalid: start time is too early, or end time is too late");
             return;
         }
-        if (!startDate.toString().equals(endDate.toString()) ){
 
-            System.out.println("Booking invalid:start date and end date are different");
-            return;
-        }
-
-        LocalDate bookingDate =booking.getStart().toLocalDate();
-
-        if (this.bookingsTable.containsKey(bookingDate)){
-            this.bookingsTable.get(bookingDate).add(booking);
+        if (this.bookingsTable.containsKey(day)){
+            this.bookingsTable.get(day).add(booking);
         }
         else{
             ArrayList<Booking> newList = new ArrayList<>();
             newList.add(booking);
-            this.bookingsTable.put(bookingDate, newList);
+            this.bookingsTable.put(day, newList);
         }
     }
 
     public Exception removeBooking(Booking booking){
-        LocalDate bookingDate = booking.getStart().toLocalDate();
-        ArrayList bookingsList = this.bookingsTable.get(bookingDate);
+        String bookingDay = booking.getDay();
+        ArrayList bookingsList = this.bookingsTable.get(bookingDay);
         for (int i =0; i< bookingsList.size(); i++){
             Booking b = (Booking) bookingsList.get(i);
             if (b.getBookingId() == booking.getBookingId()){
@@ -73,8 +65,9 @@ public class Facility {
         //TODO
     }
 
-    public ArrayList<Booking> getBookingsByDate(LocalDate date){
-        return this.bookingsTable.get(date);
+
+    public ArrayList<Booking> getBookingsByDay(String day){
+        return this.bookingsTable.get(day);
     }
 
     public Booking getBookingById (int bookingId){
@@ -91,11 +84,5 @@ public class Facility {
         }
         return null;
     }
-
-
-    public String getName() {
-        return name;
-    }
-
 
 }
