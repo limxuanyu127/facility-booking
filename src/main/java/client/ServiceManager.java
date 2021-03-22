@@ -5,6 +5,7 @@ import commons.responses.Response;
 import commons.rpc.ClientCommunicator;
 import commons.utils.Datetime;
 import java.net.InetAddress;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -89,7 +90,28 @@ public class ServiceManager {
         request(router, req);
     }
     public void registerInterest() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Please enter facility name: ");
+        String facilityName = scanner.nextLine();
+        System.out.println("Please enter number of days you want to monitor: ");
+        int numDays = scanner.nextInt();
 
+        Request req = new RegisterInterestRequest(facilityName, numDays);
+        request(router, req);
+        System.out.println("=====================================");
+        System.out.println("Monitoring availability for " + facilityName);
+
+        // for demo purposes, we monitor in the magnitude of minutes instead (1 day = 1 minute)
+        LocalDateTime endTime = LocalDateTime.now().plusMinutes(numDays);
+        while (LocalDateTime.now().isBefore(endTime)) {
+            try {
+                // expecting QueryAvailabilityResponse; can use the same one because it is essentially a query for availability
+                Response res = router.receive();
+                generateResponse(res);
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static List<Datetime> getListOfDates(String days){
@@ -118,7 +140,7 @@ public class ServiceManager {
     }
 
     public static void request(ClientCommunicator router, Request req) {
-        router.send(req);
+        router.sendRequest(req);
         try {
             Response res = router.receive();
             generateResponse(res);
