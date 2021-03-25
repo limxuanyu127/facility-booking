@@ -19,21 +19,25 @@ public class BookingManager {
         return closeTime;
     }
 
-    public Pair<ArrayList, Exception> queryAvailability(String facilName, ArrayList<String> dates, Hashtable facilTable){
 
-        ArrayList results = new ArrayList<>();
+    //TODO check all functions that call this
+    public Pair<Hashtable, Exception> queryAvailability(String facilName, ArrayList<String> dates, Hashtable facilTable){
+
+        //TODO check what input i am give,is it dates or strings
+        Hashtable<String, ArrayList> allResults = new Hashtable<>();
         Facility currFacil = (Facility) facilTable.get(facilName);
         facilName = facilName.toLowerCase();
 
         //Checks
         if (!isValidFacil(facilName, facilTable)){
             Exception e = new NoSuchElementException("Facility does not exist"); //TODO review this exception
-            return new Pair<ArrayList, Exception>(results, e);
+            return new Pair<Hashtable, Exception>(null, e);
         }
 
         for (int j=0; j < dates.size();j++){
             String currDay = dates.get(j);
             ArrayList<Booking> bookingList = currFacil.getBookingsByDay(currDay);
+            ArrayList dayResults = new ArrayList<>();
 
             this.sortBookings(bookingList);
             LocalTime availStart = openTime;
@@ -54,22 +58,27 @@ public class BookingManager {
                 slot = new ArrayList<LocalTime>();
                 slot.add(availStart);
                 slot.add(availEnd);
-                results.add(slot);
+                dayResults.add(slot);
 
                 availStart = currBooking.getEnd();
             }
 
             // if the last booking ends at closing time
             if(availStart.compareTo(closeTime) == 0){
-                return new Pair<ArrayList, Exception>( results, null);
+                allResults.put(currDay, dayResults);
+                continue;
             }
-            slot = new ArrayList<LocalTime>();
-            slot.add(availStart);
-            slot.add(closeTime);
-            results.add(slot);
+            else{
+                slot = new ArrayList<LocalTime>();
+                slot.add(availStart);
+                slot.add(closeTime);
+                dayResults.add(slot);
+                allResults.put(currDay, dayResults);
+            }
+
         }
 
-        return new Pair<ArrayList, Exception>( results, null);
+        return new Pair<Hashtable, Exception>(allResults, null);
     }
 
 
@@ -90,7 +99,13 @@ public class BookingManager {
         //Booking procedure
         Booking b = new Booking(day, bookingId, clientId, facilName, newStart, newEnd);
         Facility f = (Facility) facilTable.get(facilName);
-        f.addBooking(b);
+
+        try{
+            f.addBooking(b);
+        }catch (Exception unexpectedE){
+            return new Pair<>(null,unexpectedE);
+        }
+
         return new Pair<Booking, Exception>(b, null);
     }
 
@@ -99,6 +114,7 @@ public class BookingManager {
         Exception e;
 
         Booking b = this.findFacilBookingById(facilName, bookingId, facilTable);
+        Facility f = (Facility) facilTable.get(facilName);
         String day = b.getDay();
 
         LocalTime newStart = b.getStart().plusMinutes(offset);
@@ -116,9 +132,7 @@ public class BookingManager {
         if (e != null){
             return new Pair<Booking, Exception>(null, e);
         }
-
-        b.setStart(newStart);
-        b.setEnd(newEnd);
+        f.offsetBooking(b, newStart, newEnd);
 
         return new Pair<Booking, Exception>(b, null);
 
@@ -127,6 +141,7 @@ public class BookingManager {
         //FIXME offset should be in minutes
         Exception e;
         Booking b = findFacilBookingById(facilName, bookingId, facilTable);
+        Facility f = (Facility) facilTable.get(facilName);
         LocalTime bStart = b.getStart();
         LocalTime bEnd = b.getEnd();
         LocalTime newEnd = bEnd.plusMinutes(offset);
@@ -145,7 +160,7 @@ public class BookingManager {
             return new Pair<Booking, Exception>(null, e);
         }
 
-        b.setEnd(newEnd);
+        f.extendBooking(b, newEnd);
         return new Pair<Booking, Exception>(b, null);
     }
 
@@ -162,7 +177,12 @@ public class BookingManager {
             return e;
         }
 
-        e = facil.removeBooking(b);
+        try {
+            facil.removeBooking(b);
+        }
+        catch (Exception unexpectedE){
+            return unexpectedE;
+        }
         return e;
     }
 
@@ -193,8 +213,10 @@ public class BookingManager {
         ArrayList<String> queryDates = new ArrayList<>();
         queryDates.add(day);
 
-        Pair<ArrayList, Exception> queryResults = this.queryAvailability(facilName, queryDates, facilTable);
-        ArrayList availStartEnd = queryResults.getKey();
+
+        Pair<Hashtable, Exception> queryResults = this.queryAvailability(facilName, queryDates, facilTable);
+        Hashtable queryTable = queryResults.getKey();
+        ArrayList availStartEnd = (ArrayList) queryTable.get(day);
 
         boolean isAvailable = false;
         for (int i =0; i< availStartEnd.size(); i++){
