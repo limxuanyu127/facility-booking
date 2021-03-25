@@ -1,5 +1,6 @@
 package commons.requests;
 
+
 public class RegisterInterestRequest extends Request{
     public String facilityName;
     public int numDays;

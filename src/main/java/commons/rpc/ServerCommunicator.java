@@ -241,4 +241,7 @@ public class ServerCommunicator {
         return hash;
     }
 
+    public void close() {
+        this.socket.close();
+    }
 }

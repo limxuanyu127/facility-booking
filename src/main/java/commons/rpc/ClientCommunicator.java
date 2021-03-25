@@ -234,4 +234,8 @@ public class ClientCommunicator {
 
         return new Packet(requestID, datagramNum, totalDatagramPackets, messageSize, senderAddress, senderPort, messageBuffer);
     }
+
+    public void close(){
+        this.socket.close();
+    }
 }
