@@ -1,10 +1,17 @@
 package server.managers;
 
+import commons.rpc.ServerCommunicator;
 import server.entities.*;
 import java.time.*;
 import java.util.Hashtable;
 
 public class ObserverManager {
+
+    private ServerCommunicator serverCommunicator;
+
+    public ObserverManager(ServerCommunicator serverCommunicator){
+        this.serverCommunicator = serverCommunicator;
+    }
 
     public void attachObserver(int clientId, String facilName, int numDays, Hashtable facilTable){
 
