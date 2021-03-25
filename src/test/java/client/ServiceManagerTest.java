@@ -55,23 +55,21 @@ class ServiceManagerTest {
 //        ServiceManager.request(this.clientCommunicator, req);
 //    }
 
-    @Test
-    void getListOfDates() {
-        String dateString = "Monday Tuesday";
-        List<Datetime> actualDateObjs = ServiceManager.getListOfDates(dateString);
-
-        Datetime dateOne = new Datetime("Monday", 0, 0);
-        Datetime dateTwo = new Datetime("Tuesday", 0, 0);
-        List<Datetime> expectedDateObjs = new ArrayList<Datetime>() {{add(dateOne);add(dateTwo);}};
-        for (int i = 0; i < actualDateObjs.size(); i++) {
-            Datetime actualDate = actualDateObjs.get(i);
-            Datetime expectedDate = expectedDateObjs.get(i);
-            assertEquals(actualDate.day, expectedDate.day);
-            assertEquals(actualDate.hour, expectedDate.hour);
-            assertEquals(actualDate.minute, expectedDate.minute);
-
-        }
-    }
+//    @Test
+//    void getListOfDates() {
+//        String dateString = "Monday Tuesday";
+//        List<Datetime> actualDateObjs = ServiceManager.getListOfDates(dateString);
+//        Datetime dateOne = new Datetime("Monday", 0, 0);
+//        Datetime dateTwo = new Datetime("Tuesday", 0, 0);
+//        List<Datetime> expectedDateObjs = new ArrayList<Datetime>() {{add(dateOne);add(dateTwo);}};
+//        for (int i = 0; i < actualDateObjs.size(); i++) {
+//            Datetime actualDate = actualDateObjs.get(i);
+//            Datetime expectedDate = expectedDateObjs.get(i);
+//            assertEquals(actualDate.day, expectedDate.day);
+//            assertEquals(actualDate.hour, expectedDate.hour);
+//            assertEquals(actualDate.minute, expectedDate.minute);
+//        }
+//    }
 
     @Test
     void getDatetimeFromString() {
