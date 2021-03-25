@@ -3,9 +3,11 @@ import commons.Deserializer;
 import commons.Serializer;
 import commons.requests.Request;
 import commons.requests.TestRequest;
+import commons.responses.NullResponse;
 import commons.responses.Response;
 import commons.responses.TestResponse;
 import commons.utils.Packet;
+import commons.utils.ResponseMessage;
 
 import java.io.*;
 import java.net.*;
@@ -60,13 +62,16 @@ public class ClientCommunicator {
     public static void main(String[] args) {
         // Success
         InetAddress serverAddress = null;
+        String hostname = args[0];
+        int serverPort = Integer.parseInt(args[1]);
         try {
-            serverAddress = InetAddress.getByName("localhost");
+            serverAddress = InetAddress.getByName(hostname);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
+
         System.out.println("\n###### Testing Successful Request #######");
-        ClientCommunicator clientCommunicator = new ClientCommunicator(22, serverAddress, 5000, 3, 5000);
+        ClientCommunicator clientCommunicator = new ClientCommunicator(22, serverAddress, serverPort, 3, 5000);
         TestRequest request = new TestRequest();
         Response response = clientCommunicator.sendRequest(request);
         System.out.println("Client Hash: " + request.hashCode());
@@ -119,7 +124,8 @@ public class ClientCommunicator {
             System.out.println("No response from server after all retries exceeded");
         }
         this.requestID += 1;
-        return response;
+        ResponseMessage responseMessage = new ResponseMessage(500, "Request Timeout while waiting for reply.");
+        return new NullResponse(responseMessage);
     }
 
     //To send duplicate requests
@@ -144,7 +150,8 @@ public class ClientCommunicator {
         if (currTries == this.maxTries){
             System.out.println("No response from server after all retries exceeded");
         }
-        return response;
+        ResponseMessage responseMessage = new ResponseMessage(500, "Request Timeout while waiting for reply.");
+        return new NullResponse(responseMessage);
     }
 
     public void send(ByteBuffer dataBuf, int requestID) {
