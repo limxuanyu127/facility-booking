@@ -2,7 +2,9 @@ package commons;
 
 import commons.requests.BookFacilityRequest;
 import commons.requests.TestRequest;
+import commons.responses.BookFacilityResponse;
 import commons.utils.Datetime;
+import commons.utils.ResponseMessage;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import commons.requests.QueryAvailabilityRequest;
@@ -17,9 +19,7 @@ class DeserializerTest {
 
     @Test
     void deserializeQueryAvailabilityRequest() {
-        Datetime dateOne = new Datetime("Monday", 0,0);
-        Datetime dateTwo = new Datetime("Tuesday", 0,0);
-        List<Datetime> days = new ArrayList<Datetime>(Arrays.asList(dateOne, dateTwo));
+        List<String> days = new ArrayList<String>(Arrays.asList("Monday", "Tuesday"));
         QueryAvailabilityRequest request = new QueryAvailabilityRequest("badminton court", days);
         ByteBuffer bb = ByteBuffer.allocate(2000);
         Serializer.serializeObject(request, bb);
@@ -64,12 +64,46 @@ class DeserializerTest {
 
     }
     @Test
-    void deserialiseDatetime(){
+    void deserializeDatetime(){
         Datetime expectedDate = new Datetime("Monday", 13, 30);
         ByteBuffer bb = ByteBuffer.allocate(2000);
         Serializer.serializeObject(expectedDate, bb);
         bb.flip();
         Object actualDate = Deserializer.deserializeObject(bb);
         assertEquals(((Datetime) actualDate).day, expectedDate.day);
+    }
+
+    @Test
+    void deserializeResponseMessage(){
+        ResponseMessage expected = new ResponseMessage(200, "Successful");
+        ByteBuffer bb = ByteBuffer.allocate(2000);
+        Serializer.serializeObject(expected, bb);
+        bb.flip();
+        Object actual = Deserializer.deserializeObject(bb);
+        assertEquals(((ResponseMessage) actual).message, expected.message);
+        assertEquals(((ResponseMessage) actual).statusCode, expected.statusCode);
+    }
+
+    @Test
+    void deserializeBookFacilityResponse() {
+        ResponseMessage responseMessage = new ResponseMessage(200, "Successful");
+        Datetime startTime = new Datetime("Monday", 13,30);
+        Datetime endTime = new Datetime("Monday", 14,30);
+        BookFacilityResponse response = new BookFacilityResponse(1, "badminton court", startTime, endTime, responseMessage);
+        ByteBuffer bb = ByteBuffer.allocate(2000);
+        Serializer.serializeObject(response, bb);
+        bb.flip();
+        Object deserialisedResponse = Deserializer.deserializeObject(bb);
+        assert deserialisedResponse != null;
+        assertEquals(response.facilityName, ((BookFacilityResponse) deserialisedResponse).facilityName);
+        assertEquals(response.startTime.day, ((BookFacilityResponse) deserialisedResponse).startTime.day);
+        assertEquals(response.startTime.hour, ((BookFacilityResponse) deserialisedResponse).startTime.hour);
+        assertEquals(response.startTime.minute, ((BookFacilityResponse) deserialisedResponse).startTime.minute);
+        assertEquals(response.endTime.day, ((BookFacilityResponse) deserialisedResponse).endTime.day);
+        assertEquals(response.endTime.hour, ((BookFacilityResponse) deserialisedResponse).endTime.hour);
+        assertEquals(response.endTime.minute, ((BookFacilityResponse) deserialisedResponse).endTime.minute);
+        assertEquals(response.responseMessage.statusCode, ((BookFacilityResponse) deserialisedResponse).responseMessage.statusCode);
+        assertEquals(response.responseMessage.message, ((BookFacilityResponse) deserialisedResponse).responseMessage.message);
+
     }
 }
