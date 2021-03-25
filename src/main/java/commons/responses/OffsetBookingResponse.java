@@ -4,11 +4,13 @@ import commons.utils.Datetime;
 import commons.utils.ResponseMessage;
 
 public class OffsetBookingResponse extends Response{
-    public int bookingID;
+    public Integer bookingID;
     public String facilityName;
     public Datetime startTime;
     public Datetime endTime;
     public ResponseMessage responseMessage;
+
+    public OffsetBookingResponse(){}
 
     public OffsetBookingResponse(int bookingID, String facilityName, Datetime startTime, Datetime endTime, ResponseMessage responseMessage){
         this.bookingID = bookingID;

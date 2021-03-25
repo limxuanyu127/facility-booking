@@ -9,6 +9,8 @@ public class QueryAvailabilityResponse extends Response{
     public List<List<Datetime>> intervals;
     public ResponseMessage responseMessage;
 
+    public QueryAvailabilityResponse(){}
+
     public QueryAvailabilityResponse(String facilityName, List<List<Datetime>> intervals, ResponseMessage responseMessage){
         this.facilityName = facilityName;
         this.intervals = intervals;

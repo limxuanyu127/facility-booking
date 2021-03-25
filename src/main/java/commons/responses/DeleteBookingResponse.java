@@ -5,6 +5,8 @@ import commons.utils.ResponseMessage;
 public class DeleteBookingResponse extends Response{
     public ResponseMessage responseMessage;
 
+    public DeleteBookingResponse(){}
+
     public DeleteBookingResponse(ResponseMessage responseMessage){
         this.responseMessage = responseMessage;
     }

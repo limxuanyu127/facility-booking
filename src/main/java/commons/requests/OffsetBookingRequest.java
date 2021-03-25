@@ -2,9 +2,11 @@ package commons.requests;
 
 
 public class OffsetBookingRequest extends Request{
-    public int bookingID;
+    public Integer bookingID;
     public String facilityName;
-    public int offset;
+    public Integer offset;
+
+    public OffsetBookingRequest(){}
 
     public OffsetBookingRequest(int bookingID, String facilityName, int offset) {
         this.bookingID = bookingID;
