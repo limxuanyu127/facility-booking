@@ -7,6 +7,7 @@ import commons.utils.Datetime;
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -25,12 +26,11 @@ public class ServiceManager {
         System.out.println("Please enter facility name: ");
         String facilityName = scanner.nextLine();
         System.out.println("Please enter list of days (Monday, Tuesday etc), separated by spaces: ");
-        String dates = scanner.nextLine();
+        String daysString = scanner.nextLine();
 
-        List<Datetime> dateObjs = new ArrayList<>();
-        dateObjs.addAll(getListOfDates(dates));
+        List<String> days = new ArrayList<>(Arrays.asList(daysString.split(" ")));
 
-        Request req = new QueryAvailabilityRequest(facilityName, dateObjs);
+        Request req = new QueryAvailabilityRequest(facilityName, days);
         request(router, req);
     }
     public void bookFacility() {
@@ -118,7 +118,7 @@ public class ServiceManager {
             }
         }
     }
-
+    @Deprecated
     public static List<Datetime> getListOfDates(String days){
         List<Datetime> dateObjs = new ArrayList<>();
         String [] dayList = days.split(" ");
