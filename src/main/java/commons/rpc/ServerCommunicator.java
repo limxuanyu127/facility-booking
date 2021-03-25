@@ -60,7 +60,7 @@ public class ServerCommunicator {
         }
     }
 
-    public void receive() {
+    public ClientRequest receive() {
         System.out.println("receiving");
         Packet currPacket = this.receivePacket();
         int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
@@ -84,63 +84,63 @@ public class ServerCommunicator {
         else{
             throw new Error("Server only receives Requests");
         }
-        processClientRequest(clientRequest);
+        return clientRequest;
     }
 
     // to test timeout
-    public void receive(int timeout) {
+    public ClientRequest receive(int timeout) {
         try {
             Thread.sleep(timeout);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        this.receive();
+        return this.receive();
     }
-    
-    private void processClientRequest(ClientRequest clientRequest){
-        int duplicateIndex = checkDuplicateRequest(clientRequest);
-        if (duplicateIndex == -999){
-            Request r = clientRequest.request;
-            Response response = null;
 
-            //TODO add server functions
-            switch(r.getClass().getName()){
-                case "commons.requests.BookFacilityRequest":
-                    System.out.println("Book Facility Received, calling Server Function...");
-                    break;
-                case "commons.requests.DeleteBookingRequest":
-                    System.out.println("Delete Booking Received, calling Server Function...");
-                    break;
-                case "commons.requests.OffsetBookingRequest":
-                    System.out.println("Offset Booking Request Received, calling Server Function...");
-                    break;
-                case "commons.requests.QueryAvailabilityRequest":
-                    System.out.println("Query Availability Request Received, calling Server Function...");
-                    response = new TestResponse();
-                    break;
-                case "commons.requests.RegisterInterestRequest":
-                    System.out.println("Register Interest Request Received, calling Server Function...");
-                    break;
-                case "commons.requests.UpdateBookingRequest":
-                    System.out.println("Update Booking Request Received, calling Server Function...");
-                    break;
-                case "commons.requests.TestRequest":
-                    System.out.println("Test Request Received, calling Server Function...");
-                    response = new TestResponse();
-                    break;
-                default:
-                    System.out.println("Invalid Request Received");
-                    throw new RuntimeException("Invalid Request Type");
-            }
 
-            clientRequest.setSentResponse(response);
-            send(response, clientRequest.clientAddress, clientRequest.clientPort);
-        }
-        else{ //Duplicate Request - send original reply
-            ClientRequest orgRequest = this.clientRequests.get(duplicateIndex);
-            send(orgRequest.sentResponse, clientRequest.clientAddress, clientRequest.clientPort);
-        }
-    }
+//    private void processClientRequest(ClientRequest clientRequest){
+//        int duplicateIndex = checkDuplicateRequest(clientRequest);
+//        if (duplicateIndex == -999){
+//            Request r = clientRequest.request;
+//            Response response = null;
+//
+//            //TODO add server functions
+//            switch(r.getClass().getName()){
+//                case "commons.requests.BookFacilityRequest":
+//                    System.out.println("Book Facility Received, calling Server Function...");
+//                    break;
+//                case "commons.requests.DeleteBookingRequest":
+//                    System.out.println("Delete Booking Received, calling Server Function...");
+//                    break;
+//                case "commons.requests.OffsetBookingRequest":
+//                    System.out.println("Offset Booking Request Received, calling Server Function...");
+//                    break;
+//                case "commons.requests.QueryAvailabilityRequest":
+//                    System.out.println("Query Availability Request Received, calling Server Function...");
+//                    break;
+//                case "commons.requests.RegisterInterestRequest":
+//                    System.out.println("Register Interest Request Received, calling Server Function...");
+//                    break;
+//                case "commons.requests.UpdateBookingRequest":
+//                    System.out.println("Update Booking Request Received, calling Server Function...");
+//                    break;
+//                case "commons.requests.TestRequest":
+//                    System.out.println("Test Request Received, calling Server Function...");
+//                    response = new TestResponse();
+//                    break;
+//                default:
+//                    System.out.println("Invalid Request Received");
+//                    throw new RuntimeException("Invalid Request Type");
+//            }
+//
+//            clientRequest.setSentResponse(response);
+//            send(response, clientRequest.clientAddress, clientRequest.clientPort);
+//        }
+//        else{ //Duplicate Request - send original reply
+//            ClientRequest orgRequest = this.clientRequests.get(duplicateIndex);
+//            send(orgRequest.sentResponse, clientRequest.clientAddress, clientRequest.clientPort);
+//        }
+//    }
 
     public void send(Response r, InetAddress clientAddress, int clientPort) {
         ByteBuffer dataBuf = ByteBuffer.allocate(2000);
