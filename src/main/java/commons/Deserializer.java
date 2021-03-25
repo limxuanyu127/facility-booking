@@ -15,25 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Deserializer {
-    public static void main(String[] args) {
-        TestRequest r = new TestRequest();
-        Datetime dateOne = new Datetime("Monday", 0,0);
-        Datetime dateTwo = new Datetime("Tuesday", 0,0);
-        List<Datetime> days = new ArrayList<Datetime>(Arrays.asList(dateOne, dateTwo));
-        QueryAvailabilityRequest queryReq = new QueryAvailabilityRequest("badminton", days);
-        ByteBuffer bb = ByteBuffer.allocate(2000);
-        Serializer.serializeObject(queryReq, bb);
-        bb.flip();
-        Object o = deserializeObject(bb);
-        System.out.println(o.getClass().getName());
-        System.out.println(((QueryAvailabilityRequest) o).days);
-        System.out.println(((QueryAvailabilityRequest) o).facilityName);
-
-//        System.out.println(((TestRequest) o).testString);
-//        System.out.println(((TestRequest) o).testInt);
-//        System.out.println(((TestRequest) o).testList);
-//        System.out.println(((TestRequest) o).testNestedList);
-    }
     public static Object deserializeObject(ByteBuffer bb) {
         String className = deserializeString(bb);
         int numFields = deserializeInteger(bb);
