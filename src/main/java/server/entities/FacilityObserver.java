@@ -1,11 +1,20 @@
 package server.entities;
 
-import java.util.Date;
+import java.time.*;
 
 public class FacilityObserver {
     private int clientId;
     private String facilityName;
-    private Date endTime;
+
+
+
+    private LocalDateTime endDate;
+
+    public FacilityObserver(int clientId, String facilityName, LocalDateTime endDate){
+        this.clientId = clientId;
+        this.facilityName = facilityName;
+        this.endDate = endDate;
+    }
 
     public int getClientId() {
         return clientId;
@@ -23,11 +32,9 @@ public class FacilityObserver {
         this.facilityName = facilityName;
     }
 
-    public Date getEndTime() {
-        return endTime;
+
+    public LocalDateTime getEndDate() {
+        return endDate;
     }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
 }

@@ -22,10 +22,15 @@ public class Facility {
         LocalTime endTime = booking.getEnd();
         String day =booking.getDay();
 
-        if((startTime.compareTo(BookingManager.getOpenTime()) <0) || endTime.compareTo(BookingManager.getCloseTime()) > 0){
-            System.out.println("Booking invalid: start time is too early, or end time is too late");
-            return;
-        }
+        // All timing related checks are done in booking manager
+//        if((startTime.compareTo(BookingManager.getOpenTime()) <0)){
+//            e = new NoSuchElementException("Booking invalid: start time is too early");
+//            return e;
+//        }
+//        else if (endTime.compareTo(BookingManager.getCloseTime()) > 0){
+//            e = new NoSuchElementException("Booking invalid: end time is too late");
+//            return e;
+//        }
 
         if (this.bookingsTable.containsKey(day)){
             this.bookingsTable.get(day).add(booking);
@@ -35,34 +40,72 @@ public class Facility {
             newList.add(booking);
             this.bookingsTable.put(day, newList);
         }
+
     }
 
-    public Exception removeBooking(Booking booking){
+    public void removeBooking(Booking booking){
         String bookingDay = booking.getDay();
         ArrayList bookingsList = this.bookingsTable.get(bookingDay);
         for (int i =0; i< bookingsList.size(); i++){
             Booking b = (Booking) bookingsList.get(i);
             if (b.getBookingId() == booking.getBookingId()){
                 bookingsList.remove(b);
-                return null;
+//                return null;
             }
         }
-        Exception e = new NoSuchElementException("Unable to find booking to remove");
-        return e;
+//        Exception e = new NoSuchElementException("Unable to find booking to remove");
+//        return e;
     }
 
+    public void offsetBooking(Booking booking, LocalTime newStart, LocalTime newEnd){
+        String bookingDay = booking.getDay();
+        ArrayList bookingsList = this.bookingsTable.get(bookingDay);
+        for (int i =0; i< bookingsList.size(); i++){
+            Booking b = (Booking) bookingsList.get(i);
+            if (b.getBookingId() == booking.getBookingId()){
+                b.setStart(newStart);
+                b.setEnd(newEnd);
+            }
+        }
+    }
 
-
-    public ArrayList<FacilityObserver> getObserverList() {
-        return observerList;
+    public void extendBooking(Booking booking, LocalTime newEnd){
+        String bookingDay = booking.getDay();
+        ArrayList bookingsList = this.bookingsTable.get(bookingDay);
+        for (int i =0; i< bookingsList.size(); i++){
+            Booking b = (Booking) bookingsList.get(i);
+            if (b.getBookingId() == booking.getBookingId()){
+                b.setEnd(newEnd);
+            }
+        }
     }
 
     public void attach(FacilityObserver o){
         observerList.add(o);
     }
 
-    public void notifyObservers(){
-        //TODO
+    public void notifyObservers(BookingManager bm){
+        for (FacilityObserver o: observerList){
+            if (!isValidObserver(o)){
+                continue;
+            }
+            else{
+//                bm.queryAvailability(String facilName, ArrayList<String> dates, Hashtable facilTable)
+                //TODO incorporate the sending request thing, maybe create a new class to notifyObserver()
+            }
+        }
+    }
+
+    private Boolean isValidObserver(FacilityObserver o){
+
+        if (o.getEndDate().compareTo(LocalDateTime.now()) <0 ){
+            observerList.remove(o);
+            return false;
+        }
+        else{
+            return true;
+        }
+
     }
 
 
