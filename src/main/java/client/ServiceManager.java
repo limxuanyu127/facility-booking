@@ -217,7 +217,11 @@ public class ServiceManager {
             RegisterInterestResponse response = (RegisterInterestResponse) genericResponse;
             System.out.println(response.responseMessage.message);
 
-        } else {
+        } else if (genericResponse instanceof TestResponse){
+            TestResponse response = (TestResponse) genericResponse;
+            System.out.println(response.testString);
+        }
+        else {
             throw new Error("Not implemented");
         }
     }
