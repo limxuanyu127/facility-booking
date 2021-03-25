@@ -54,7 +54,7 @@ public class ServerCommunicator {
 
 
     public static void main(String[] args) {
-        ServerCommunicator serverCommunicator = new ServerCommunicator(17);
+        ServerCommunicator serverCommunicator = new ServerCommunicator(5000);
         while (true){
             serverCommunicator.receive(10);
         }
@@ -117,6 +117,7 @@ public class ServerCommunicator {
                     break;
                 case "commons.requests.QueryAvailabilityRequest":
                     System.out.println("Query Availability Request Received, calling Server Function...");
+                    response = new TestResponse();
                     break;
                 case "commons.requests.RegisterInterestRequest":
                     System.out.println("Register Interest Request Received, calling Server Function...");

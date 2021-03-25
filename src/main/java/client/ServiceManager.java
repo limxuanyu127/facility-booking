@@ -223,9 +223,8 @@ public class ServiceManager {
     }
 
     public static void request(ClientCommunicator router, Request req) {
-        router.sendRequest(req);
         try {
-            Response res = router.receive();
+            Response res = router.sendRequest(req);
             generateResponse(res);
         } catch (RuntimeException e){
             e.printStackTrace();

@@ -66,7 +66,7 @@ public class ClientCommunicator {
             e.printStackTrace();
         }
         System.out.println("\n###### Testing Successful Request #######");
-        ClientCommunicator clientCommunicator = new ClientCommunicator(22, serverAddress, 17, 3, 5000);
+        ClientCommunicator clientCommunicator = new ClientCommunicator(22, serverAddress, 5000, 3, 5000);
         TestRequest request = new TestRequest();
         Response response = clientCommunicator.sendRequest(request);
         System.out.println("Client Hash: " + request.hashCode());
