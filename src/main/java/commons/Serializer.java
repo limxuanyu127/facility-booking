@@ -27,6 +27,7 @@ public class Serializer {
             System.out.println("Serializing " + className);
             serializeString(className, bb);
             Field[] fields = o.getClass().getDeclaredFields();
+            serializeInteger(fields.length, bb);
             for (Field f: fields) {
                 serializeString(f.getName(), bb);
                 try {

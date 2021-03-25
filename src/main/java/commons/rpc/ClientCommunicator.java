@@ -66,7 +66,7 @@ public class ClientCommunicator {
             e.printStackTrace();
         }
         System.out.println("\n###### Testing Successful Request #######");
-        ClientCommunicator clientCommunicator = new ClientCommunicator(22, serverAddress, 17, 3, 5000);
+        ClientCommunicator clientCommunicator = new ClientCommunicator(22, serverAddress, 5000, 3, 5000);
         TestRequest request = new TestRequest();
         Response response = clientCommunicator.sendRequest(request);
         System.out.println("Client Hash: " + request.hashCode());
@@ -233,5 +233,9 @@ public class ClientCommunicator {
         messageBuffer.position(0);
 
         return new Packet(requestID, datagramNum, totalDatagramPackets, messageSize, senderAddress, senderPort, messageBuffer);
+    }
+
+    public void close(){
+        this.socket.close();
     }
 }

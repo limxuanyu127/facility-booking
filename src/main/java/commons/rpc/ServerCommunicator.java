@@ -54,7 +54,7 @@ public class ServerCommunicator {
 
 
     public static void main(String[] args) {
-        ServerCommunicator serverCommunicator = new ServerCommunicator(17);
+        ServerCommunicator serverCommunicator = new ServerCommunicator(5000);
         while (true){
             serverCommunicator.receive(10);
         }
@@ -241,4 +241,7 @@ public class ServerCommunicator {
         return hash;
     }
 
+    public void close() {
+        this.socket.close();
+    }
 }
