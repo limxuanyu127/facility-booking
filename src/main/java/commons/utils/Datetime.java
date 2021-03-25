@@ -2,8 +2,10 @@ package commons.utils;
 
 public class Datetime {
     public String day;
-    public int hour;
-    public int minute;
+    public Integer hour;
+    public Integer minute;
+
+    public Datetime(){}
 
     public Datetime(String day, int hour, int minute) {
         this.day = day;
