@@ -2,9 +2,11 @@ package commons.requests;
 
 
 public class ExtendBookingRequest extends Request{
-    public int bookingID;
+    public Integer bookingID;
     public String facilityName;
-    public int extension;
+    public Integer extension;
+
+    public ExtendBookingRequest(){}
 
     public ExtendBookingRequest(int bookingID, String facilityName, int extension) {
         this.bookingID = bookingID;

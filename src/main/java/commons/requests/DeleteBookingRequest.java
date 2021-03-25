@@ -4,8 +4,10 @@ import commons.utils.Datetime;
 
 
 public class DeleteBookingRequest extends Request{
-    public int bookingID;
+    public Integer bookingID;
     public String facilityName;
+
+    public DeleteBookingRequest(){}
 
     public DeleteBookingRequest(int bookingID, String facilityName){
         this.bookingID = bookingID;
