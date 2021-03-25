@@ -53,25 +53,32 @@ class BookingManagerTest {
 
     @Test
     void queryAvailability_NoConflict_NoException() {
+
+        String expectedDay = "Tuesday";
         ArrayList<String> queryDays = new ArrayList<String>();
-        queryDays.add("Tuesday");
-        Pair<ArrayList, Exception> queryResults = bookingManager.queryAvailability("badmintoncourt", queryDays, facilTable);
-        ArrayList outputBookings = queryResults.getKey();
+        queryDays.add(expectedDay);
+        Pair<Hashtable, Exception> queryResults = bookingManager.queryAvailability("badmintoncourt", queryDays, facilTable);
+        Hashtable outputBookings = queryResults.getKey();
+        ArrayList outputBookingsList =(ArrayList) outputBookings.get(expectedDay);
         Exception outputException = queryResults.getValue();
 
-        ArrayList expectedBookings = new ArrayList<>();
+        System.out.println(outputBookings);
+
+        ArrayList expectedBookingsList = new ArrayList<>();
         ArrayList<LocalTime> slotOne = new ArrayList<>();
         ArrayList<LocalTime> slotTwo = new ArrayList<>();
         slotOne.add(LocalTime.of(8, 0));
         slotOne.add(LocalTime.of(14, 0));
         slotTwo.add(LocalTime.of(16, 0));
         slotTwo.add(LocalTime.of(20, 0));
-        expectedBookings.add(slotOne);
-        expectedBookings.add(slotTwo);
+        expectedBookingsList.add(slotOne);
+        expectedBookingsList.add(slotTwo);
         Exception expectedException = null;
 
-        assertEquals(outputBookings, expectedBookings);
+
+        assertEquals(outputBookingsList, expectedBookingsList);
         assertEquals(outputException, expectedException);
+        assertEquals(1, outputBookings.size());
     }
 
 
