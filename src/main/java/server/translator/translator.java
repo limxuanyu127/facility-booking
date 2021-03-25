@@ -11,7 +11,7 @@ import java.lang.reflect.Array;
 import java.util.*;
 import java.time.*;
 
-public class Translator {
+import java.util.*;
 
 
     private ArrayList<String> allDays = new ArrayList<String>();
