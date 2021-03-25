@@ -1,12 +1,19 @@
 package server.translator;
 
-import commons.responses.Response;
-import commons.responses.TestResponse;
+import commons.requests.*;
+import commons.responses.*;
+import javafx.util.Pair;
+import server.managers.BookingManager;
 
-public class Translator {
+import java.util.*;
 
-    public Response dummy(){
-        return new TestResponse();
-    };
+public class translator {
+    public QueryAvailabilityResponse queryAvailability(QueryAvailabilityRequest r, BookingManager bookingManager, Hashtable facilTable){
 
+        String facilName = r.facilityName;
+        ArrayList days = (ArrayList) r.days;
+
+        Pair<Hashtable, Exception> output = bookingManager.queryAvailability(facilName, days, facilTable);
+
+    }
 }
