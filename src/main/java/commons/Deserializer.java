@@ -1,28 +1,42 @@
 package commons;
 
 import commons.Serializer;
+import commons.requests.DeleteBookingRequest;
+import commons.requests.QueryAvailabilityRequest;
 import commons.requests.TestRequest;
+import commons.utils.Datetime;
+
+import javax.management.Query;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 public class Deserializer {
     public static void main(String[] args) {
         TestRequest r = new TestRequest();
+        Datetime dateOne = new Datetime("Monday", 0,0);
+        Datetime dateTwo = new Datetime("Tuesday", 0,0);
+        List<Datetime> days = new ArrayList<Datetime>(Arrays.asList(dateOne, dateTwo));
+        QueryAvailabilityRequest queryReq = new QueryAvailabilityRequest("badminton", days);
         ByteBuffer bb = ByteBuffer.allocate(2000);
-        Serializer.serializeObject(r, bb);
+        Serializer.serializeObject(queryReq, bb);
         bb.flip();
         Object o = deserializeObject(bb);
         System.out.println(o.getClass().getName());
-        System.out.println(((TestRequest) o).testString);
-        System.out.println(((TestRequest) o).testInt);
-        System.out.println(((TestRequest) o).testList);
-        System.out.println(((TestRequest) o).testNestedList);
+        System.out.println(((QueryAvailabilityRequest) o).days);
+        System.out.println(((QueryAvailabilityRequest) o).facilityName);
+
+//        System.out.println(((TestRequest) o).testString);
+//        System.out.println(((TestRequest) o).testInt);
+//        System.out.println(((TestRequest) o).testList);
+//        System.out.println(((TestRequest) o).testNestedList);
     }
     public static Object deserializeObject(ByteBuffer bb) {
         String className = deserializeString(bb);
+        int numFields = deserializeInteger(bb);
         System.out.println(className);
         try {
             Class<?> c = Class.forName(className);
@@ -33,7 +47,8 @@ public class Deserializer {
             for (Field f: fields) {
                 fieldTypeMap.put(f.getName(), f.getType());
             }
-            while (bb.hasRemaining()) {
+            System.out.println(fieldTypeMap);
+            for (int i = 0; i < numFields; i++) {
                 String fieldName = deserializeString(bb);
                 Object val;
                 System.out.println(fieldTypeMap.get(fieldName));
@@ -45,7 +60,7 @@ public class Deserializer {
                     val = deserializeList(bb);
                 }
                 else {
-                    val = null;
+                    val = Deserializer.deserializeObject(bb);
                 }
                 try {
                     o.getClass().getDeclaredField(fieldName).set(o, val);
