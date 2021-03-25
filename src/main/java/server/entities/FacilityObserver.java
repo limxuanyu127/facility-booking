@@ -1,10 +1,13 @@
 package server.entities;
 
+import java.net.InetAddress;
 import java.time.*;
 
 public class FacilityObserver {
     private int clientId;
     private String facilityName;
+    InetAddress ip;
+    int port;
 
 
 
