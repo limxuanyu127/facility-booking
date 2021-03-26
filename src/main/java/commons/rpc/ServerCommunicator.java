@@ -9,10 +9,7 @@ import commons.utils.Packet;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -25,7 +22,7 @@ public class ServerCommunicator {
     int packetSize;
     int messageSize;
     int headerSize;
-    DatagramSocket socket;
+    public DatagramSocket socket;
     int requestID;
     boolean atMostOnce;
 
@@ -54,11 +51,10 @@ public class ServerCommunicator {
      * To Test, run ServerCommunicator then run ClientCommunicator
      */
 
-
     public static void main(String[] args) {
         ServerCommunicator serverCommunicator = new ServerCommunicator(5000, true);
         while (true){
-            serverCommunicator.receive(10);
+            serverCommunicator.receive(100);
         }
     }
 
@@ -94,7 +90,7 @@ public class ServerCommunicator {
         }
         else{ // duplicate request
             if (this.atMostOnce){ // at most once implementation
-                System.out.println("At Most Once Implementation - sending Original Request...");
+                System.out.println("At Most Once Implementation - sending Original Response...");
                 ClientRequest orgRequest = this.clientRequests.get(duplicateIndex);
                 send(orgRequest.sentResponse, clientRequest.clientAddress, clientRequest.clientPort);
                 return Optional.empty();
@@ -104,63 +100,25 @@ public class ServerCommunicator {
                 return Optional.of(clientRequest);
             }
         }
-
     }
 
     // to test timeout
     public Optional<ClientRequest> receive(int timeout) {
         try {
-            Thread.sleep(timeout);
-        } catch (InterruptedException e) {
+            this.socket.setSoTimeout(timeout);
+        } catch (SocketException e) {
             e.printStackTrace();
         }
-        return this.receive();
+
+        try{
+            return this.receive();
+        } catch (RuntimeException e){
+            if (e.getCause() instanceof SocketTimeoutException) {
+                System.out.println("Socket Timeout");
+            }
+        }
+        return Optional.empty();
     }
-
-
-//    private void processClientRequest(ClientRequest clientRequest){
-//        int duplicateIndex = checkDuplicateRequest(clientRequest);
-//        if (duplicateIndex == -999){
-//            Request r = clientRequest.request;
-//            Response response = null;
-//
-//            //TODO add server functions
-//            switch(r.getClass().getName()){
-//                case "commons.requests.BookFacilityRequest":
-//                    System.out.println("Book Facility Received, calling Server Function...");
-//                    break;
-//                case "commons.requests.DeleteBookingRequest":
-//                    System.out.println("Delete Booking Received, calling Server Function...");
-//                    break;
-//                case "commons.requests.OffsetBookingRequest":
-//                    System.out.println("Offset Booking Request Received, calling Server Function...");
-//                    break;
-//                case "commons.requests.QueryAvailabilityRequest":
-//                    System.out.println("Query Availability Request Received, calling Server Function...");
-//                    break;
-//                case "commons.requests.RegisterInterestRequest":
-//                    System.out.println("Register Interest Request Received, calling Server Function...");
-//                    break;
-//                case "commons.requests.UpdateBookingRequest":
-//                    System.out.println("Update Booking Request Received, calling Server Function...");
-//                    break;
-//                case "commons.requests.TestRequest":
-//                    System.out.println("Test Request Received, calling Server Function...");
-//                    response = new TestResponse();
-//                    break;
-//                default:
-//                    System.out.println("Invalid Request Received");
-//                    throw new RuntimeException("Invalid Request Type");
-//            }
-//
-//            clientRequest.setSentResponse(response);
-//            send(response, clientRequest.clientAddress, clientRequest.clientPort);
-//        }
-//        else{ //Duplicate Request - send original reply
-//            ClientRequest orgRequest = this.clientRequests.get(duplicateIndex);
-//            send(orgRequest.sentResponse, clientRequest.clientAddress, clientRequest.clientPort);
-//        }
-//    }
 
     public void send(Response r, InetAddress clientAddress, int clientPort) {
         ByteBuffer dataBuf = ByteBuffer.allocate(2000);
@@ -203,7 +161,7 @@ public class ServerCommunicator {
          */
 //        this.requestID += 1;
 
-//        System.out.println("Sending message" + " to " + destIP + " " + destPort);
+        System.out.println("Sending message" + " to Address: " + clientAddress + ", Port: " + clientPort);
     }
 
     private Packet receivePacket(){
@@ -213,7 +171,7 @@ public class ServerCommunicator {
         try {
             this.socket.receive(message);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         ByteBuffer received_bb = ByteBuffer.wrap(buffer);
@@ -234,7 +192,7 @@ public class ServerCommunicator {
 
     private int checkDuplicateRequest(ClientRequest clientRequest){
         int clientRequestHash = hashClientRequest(clientRequest);
-        System.out.println("Hashed: " + clientRequestHash);
+//        System.out.println("Hashed: " + clientRequestHash);
         if (clientRequestsHashed.contains(clientRequestHash)){
             System.out.println("Duplicate request received");
             int index = clientRequestsHashed.indexOf(clientRequestHash);
@@ -262,6 +220,7 @@ public class ServerCommunicator {
     }
 
     public void close() {
+        System.out.println("Closing socket");
         this.socket.close();
     }
 }

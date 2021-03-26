@@ -21,8 +21,9 @@ import java.util.Optional;
 public class Server {
     BookingManager bookingManager;
     ServerCommunicator serverCommunicator;
-//    Translator translator;
-    boolean atMostOnce;
+    //    Translator translator;
+    int testCounter = 0;
+
 
     public Server(int serverPort, boolean atMostOnce) {
         this.bookingManager = new BookingManager();
@@ -35,12 +36,19 @@ public class Server {
         boolean atMostOnce = Boolean.parseBoolean(args[1]);
         Server server = new Server(serverPort, atMostOnce);
         while (true) {
-            server.run();
+            server.run(0);
         }
     }
 
-    private void run() {
-        Optional<ClientRequest> optionalClientRequest = serverCommunicator.receive();
+    void run(int timeout) {
+        Optional<ClientRequest> optionalClientRequest;
+        if (timeout == 0){
+            optionalClientRequest = serverCommunicator.receive();
+        }
+        else{
+            optionalClientRequest = serverCommunicator.receive(timeout);
+        }
+
         if (optionalClientRequest.isPresent()) {
             ClientRequest clientRequest = optionalClientRequest.get();
             Request request = clientRequest.request;
@@ -62,7 +70,7 @@ public class Server {
                     break;
                 case "commons.requests.QueryAvailabilityRequest":
                     System.out.println("Query Availability Request Received, calling Translator Function...");
-//                    response = translator.test();
+                    response = new TestResponse();
                     break;
                 case "commons.requests.RegisterInterestRequest":
                     System.out.println("Register Interest Request Received, calling Translator Function...");
@@ -74,6 +82,7 @@ public class Server {
                     break;
                 case "commons.requests.TestRequest":
                     System.out.println("Test Request Received, calling Translator Function...");
+                    this.testCounter++;
                     response = new TestResponse();
                     break;
                 default:
@@ -85,20 +94,12 @@ public class Server {
         }
     }
 
+    public int getTestCounter() {
+        return testCounter;
+    }
 
+    public void setTestCounter(int testCounter) {
+        this.testCounter = testCounter;
+    }
 }
 
-
-    //    int port = 5005;
-    //    int packetSize = 512;
-    //    byte[] buffer = new byte[packetSize];
-//        DatagramPacket message = new DatagramPacket(buffer, buffer.length);
-//        DatagramSocket sock;
-//
-//        try{
-//            sock = new DatagramSocket(port);
-//            System.out.println("main.java.server listening");
-//            sock.receive(message);
-//        } catch (IOException e){
-//            e.printStackTrace();
-//        }
