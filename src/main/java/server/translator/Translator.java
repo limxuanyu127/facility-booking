@@ -8,12 +8,18 @@ import server.managers.BookingManager;
 import java.util.*;
 
 public class translator {
-    public QueryAvailabilityResponse queryAvailability(QueryAvailabilityRequest r, BookingManager bookingManager, Hashtable facilTable){
+//    public QueryAvailabilityResponse queryAvailability(QueryAvailabilityRequest r, BookingManager bookingManager, Hashtable facilTable){
+//
+//        String facilName = r.facilityName;
+//        ArrayList days = (ArrayList) r.days;
+//
+//        Pair<Hashtable, Exception> output = bookingManager.queryAvailability(facilName, days, facilTable);
+//
+//        return new QueryAvailabilityResponse()
 
-        String facilName = r.facilityName;
-        ArrayList days = (ArrayList) r.days;
+//    }
 
-        Pair<Hashtable, Exception> output = bookingManager.queryAvailability(facilName, days, facilTable);
-
+    public Response test(){
+        return new TestResponse();
     }
 }

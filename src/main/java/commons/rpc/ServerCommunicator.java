@@ -4,7 +4,6 @@ import commons.Deserializer;
 import commons.Serializer;
 import commons.requests.Request;
 import commons.responses.Response;
-import commons.responses.TestResponse;
 import commons.utils.ClientRequest;
 import commons.utils.Packet;
 
@@ -16,6 +15,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class ServerCommunicator {
     ArrayList<ClientRequest> clientRequests;
@@ -27,8 +27,9 @@ public class ServerCommunicator {
     int headerSize;
     DatagramSocket socket;
     int requestID;
+    boolean atMostOnce;
 
-    public ServerCommunicator(int serverPort) {
+    public ServerCommunicator(int serverPort, boolean atMostOnce) {
         this.clientRequests = new ArrayList<>();
         this.clientRequestsHashed = new ArrayList<>();
         this.requestID = 0;
@@ -36,6 +37,7 @@ public class ServerCommunicator {
         this.headerSize = 16;
         this.messageSize = this.packetSize - this.headerSize;
         this.serverPort = serverPort;
+        this.atMostOnce = atMostOnce;
         try {
             this.socket = new DatagramSocket(serverPort);
         } catch (SocketException e) {}
@@ -54,13 +56,13 @@ public class ServerCommunicator {
 
 
     public static void main(String[] args) {
-        ServerCommunicator serverCommunicator = new ServerCommunicator(5000);
+        ServerCommunicator serverCommunicator = new ServerCommunicator(5000, true);
         while (true){
             serverCommunicator.receive(10);
         }
     }
 
-    public ClientRequest receive() {
+    public Optional<ClientRequest> receive() {
         System.out.println("receiving");
         Packet currPacket = this.receivePacket();
         int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
@@ -84,11 +86,29 @@ public class ServerCommunicator {
         else{
             throw new Error("Server only receives Requests");
         }
-        return clientRequest;
+
+        int duplicateIndex = checkDuplicateRequest(clientRequest);
+
+        if (duplicateIndex == -999){ // original request
+            return Optional.of(clientRequest);
+        }
+        else{ // duplicate request
+            if (this.atMostOnce){ // at most once implementation
+                System.out.println("At Most Once Implementation - sending Original Request...");
+                ClientRequest orgRequest = this.clientRequests.get(duplicateIndex);
+                send(orgRequest.sentResponse, clientRequest.clientAddress, clientRequest.clientPort);
+                return Optional.empty();
+            }
+            else{ // at least once implementation
+                System.out.println("At least Once Implementation - processing Request...");
+                return Optional.of(clientRequest);
+            }
+        }
+
     }
 
     // to test timeout
-    public ClientRequest receive(int timeout) {
+    public Optional<ClientRequest> receive(int timeout) {
         try {
             Thread.sleep(timeout);
         } catch (InterruptedException e) {
