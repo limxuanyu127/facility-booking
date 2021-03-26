@@ -1,4 +1,3 @@
-package commons.rpc;
 
 import commons.Deserializer;
 import commons.Serializer;
