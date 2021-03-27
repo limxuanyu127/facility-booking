@@ -96,8 +96,7 @@ public class ServerCommunicator {
         }
         this.receive();
     }
-
-
+    
     private void processClientRequest(ClientRequest clientRequest){
         int duplicateIndex = checkDuplicateRequest(clientRequest);
         if (duplicateIndex == -999){

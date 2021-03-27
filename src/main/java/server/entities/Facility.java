@@ -128,4 +128,8 @@ public class Facility {
         return null;
     }
 
+    public Hashtable getBookingsTable(){
+        return this.bookingsTable;
+    }
+
 }

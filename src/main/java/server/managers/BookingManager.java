@@ -1,6 +1,7 @@
 package server.managers;
 
 import server.entities.*;
+import commons.utils.Datetime;
 
 import java.util.*;
 import java.time.*;
@@ -21,10 +22,11 @@ public class BookingManager {
 
 
     //TODO check all functions that call this
+    //TODO change response to list of hanzhe's datetime object
+
     public Pair<Hashtable, Exception> queryAvailability(String facilName, ArrayList<String> dates, Hashtable facilTable){
 
-        //TODO check what input i am give,is it dates or strings
-        Hashtable<String, ArrayList> allResults = new Hashtable<>();
+        Hashtable allResults = new Hashtable();
         Facility currFacil = (Facility) facilTable.get(facilName);
         facilName = facilName.toLowerCase();
 
@@ -36,8 +38,19 @@ public class BookingManager {
 
         for (int j=0; j < dates.size();j++){
             String currDay = dates.get(j);
-            ArrayList<Booking> bookingList = currFacil.getBookingsByDay(currDay);
             ArrayList dayResults = new ArrayList<>();
+
+            if(!currFacil.getBookingsTable().containsKey(currDay)){
+
+                ArrayList slot = new ArrayList();
+                slot.add(openTime);
+                slot.add(closeTime);
+                dayResults.add(slot);
+                allResults.put(currDay, dayResults);
+                continue;
+            }
+
+            ArrayList<Booking> bookingList = currFacil.getBookingsByDay(currDay);
 
             this.sortBookings(bookingList);
             LocalTime availStart = openTime;
@@ -75,12 +88,9 @@ public class BookingManager {
                 dayResults.add(slot);
                 allResults.put(currDay, dayResults);
             }
-
         }
-
         return new Pair<Hashtable, Exception>(allResults, null);
     }
-
 
 
     public Pair<Booking, Exception> createBooking(String day, int bookingId, int clientId, String facilName, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
@@ -353,4 +363,25 @@ public class BookingManager {
 //            facil.addBooking(newBooking);
 //            return new Pair<Booking, Exception>(newBooking, null);
 //        }
+//    }
+
+
+
+//    public ArrayList localToDatetime(ArrayList results, String day){
+//        ArrayList convertedResults = new ArrayList();
+//        for (ArrayList slot:(ArrayList<ArrayList>)results){
+//            ArrayList newSlot = new ArrayList();
+//            LocalTime start = (LocalTime) newSlot.get(0);
+//            LocalTime end = (LocalTime) newSlot.get(1);
+//
+//            Datetime newStart = new Datetime(day, start.getHour(), start.getMinute());
+//            Datetime newEnd = new Datetime(day, end.getHour(), end.getMinute());
+//
+//            newSlot.add(newStart);
+//            newSlot.add(newEnd);
+//
+//            convertedResults.add(newSlot);
+//        }
+//
+//        return convertedResults;
 //    }

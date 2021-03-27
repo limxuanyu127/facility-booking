@@ -220,6 +220,10 @@ public class ServiceManager {
         } else if (genericResponse instanceof TestResponse){
             TestResponse response = (TestResponse) genericResponse;
             System.out.println(response.testString);
+
+        } else if (genericResponse instanceof NullResponse){
+            NullResponse response = (NullResponse) genericResponse;
+            System.out.println(response.responseMessage.message);
         }
         else {
             throw new Error("Not implemented");
@@ -229,7 +233,9 @@ public class ServiceManager {
     public static void request(ClientCommunicator router, Request req) {
         try {
             Response res = router.sendRequest(req);
+//            System.out.println(res.getClass().getName());
             generateResponse(res);
+            System.out.println(res.getClass().getName());
         } catch (RuntimeException e){
             e.printStackTrace();
         }
