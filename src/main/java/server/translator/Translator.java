@@ -1,24 +1,24 @@
 package server.translator;
 
-import commons.requests.*;
-import commons.responses.*;
+import commons.requests.QueryAvailabilityRequest;
+import commons.responses.QueryAvailabilityResponse;
 import commons.utils.Datetime;
 import commons.utils.ResponseMessage;
 import javafx.util.Pair;
 import server.managers.BookingManager;
 
-import java.lang.reflect.Array;
-import java.util.*;
-import java.time.*;
-
-import java.util.*;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.List;
 
 public class Translator {
     private ArrayList<String> allDays = new ArrayList<String>();
 
     public Translator(){
-            List<String> days = Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");
-            allDays.addAll(days);
+        List<String> days = Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");
+        allDays.addAll(days);
     }
 
     public QueryAvailabilityResponse queryAvailability(QueryAvailabilityRequest r, BookingManager bookingManager, Hashtable facilTable) {
