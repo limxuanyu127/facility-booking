@@ -59,7 +59,7 @@ public class ServerCommunicator {
     }
 
     public Optional<ClientRequest> receive() {
-        System.out.println("receiving");
+//        System.out.println("receiving");
         Packet currPacket = this.receivePacket();
         int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
         ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);
@@ -111,10 +111,11 @@ public class ServerCommunicator {
         }
 
         try{
+            System.out.println("Listening for " + timeout + "ms");
             return this.receive();
         } catch (RuntimeException e){
             if (e.getCause() instanceof SocketTimeoutException) {
-                System.out.println("Socket Timeout");
+                System.out.println("Socket Timeout, no Request received");
             }
         }
         return Optional.empty();
@@ -161,7 +162,7 @@ public class ServerCommunicator {
          */
 //        this.requestID += 1;
 
-        System.out.println("Sending message" + " to Address: " + clientAddress + ", Port: " + clientPort);
+        System.out.println("Sending message" + " to Client at Address: " + clientAddress + ", Port: " + clientPort);
     }
 
     private Packet receivePacket(){

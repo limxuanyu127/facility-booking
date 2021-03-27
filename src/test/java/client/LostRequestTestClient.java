@@ -28,6 +28,8 @@ class LostRequestTestClient {
 
     @Test
     void main() {
+        System.out.println("Lost Request Test with At Most Once Semantics");
+        System.out.println("##################");
         InetAddress serverAddress = null;
         String hostname = "localhost";
         int serverPort = 5000;

@@ -17,7 +17,8 @@ import java.util.List;
 class LostResponseNonIdempotentTestClient {
     @Test
     void main() {
-        System.out.println("Lost Response Test");
+        System.out.println("Lost Response Test with At Least Once Semantics");
+        System.out.println("##################");
         InetAddress serverAddress = null;
         String hostname = "localhost";
         int serverPort = 5000;

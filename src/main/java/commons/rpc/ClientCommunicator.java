@@ -109,6 +109,7 @@ public class ClientCommunicator {
 
         while (currTries < this.maxTries){
             currTries += 1;
+            System.out.println("Sending request " + currTries);
             this.send(dataBuf, this.requestID);
             try{
                 response = this.receive();
@@ -116,7 +117,7 @@ public class ClientCommunicator {
                 return response;
             } catch (RuntimeException e){
                 if (e.getCause() instanceof SocketTimeoutException) {
-                    System.out.println("Socket Timeout");
+                    System.out.println("Socket Timeout, no response received");
                 }
             }
         }
@@ -143,7 +144,7 @@ public class ClientCommunicator {
                 return response;
             } catch (RuntimeException e){
                 if (e.getCause() instanceof SocketTimeoutException) {
-                    System.out.println("Socket Timeout");
+                    System.out.println("Socket Timeout, no response received");
                 }
             }
         }
@@ -196,7 +197,11 @@ public class ClientCommunicator {
      * @return ByteBuffer containing only message data
      */
     public Response receive() {
-        System.out.println("receiving");
+        try {
+            System.out.println("listening for " + this.socket.getSoTimeout() + "ms");
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
         Packet currPacket = this.receivePacket();
         int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
         ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);

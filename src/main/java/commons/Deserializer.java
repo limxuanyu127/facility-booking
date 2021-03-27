@@ -18,7 +18,7 @@ public class Deserializer {
     public static Object deserializeObject(ByteBuffer bb) {
         String className = deserializeString(bb);
         int numFields = deserializeInteger(bb);
-        System.out.println(className);
+//        System.out.println(className);
         try {
             Class<?> c = Class.forName(className);
             Object o = c.newInstance();

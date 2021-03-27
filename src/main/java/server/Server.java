@@ -82,7 +82,7 @@ public class Server {
                     break;
                 case "commons.requests.TestRequest":
                     System.out.println("Test Request Received, calling Translator Function...");
-                    this.testCounter++;
+                    this.query();
                     response = new TestResponse();
                     break;
                 default:
@@ -92,6 +92,16 @@ public class Server {
             clientRequest.setSentResponse(response);
             serverCommunicator.send(response, clientRequest.clientAddress, clientRequest.clientPort);
         }
+    }
+
+    private void add(){
+        System.out.println("Incrementing Counter");
+        this.testCounter++;
+    }
+
+    private void query(){
+        System.out.println("Querying Counter");
+        System.out.println("Counter Value: " + this.testCounter);
     }
 
     public int getTestCounter() {
