@@ -13,7 +13,7 @@ import java.time.*;
 
 import java.util.*;
 
-
+public class Translator {
     private ArrayList<String> allDays = new ArrayList<String>();
 
     public Translator(){
