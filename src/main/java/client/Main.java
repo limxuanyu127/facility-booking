@@ -20,9 +20,10 @@ public class Main {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-
-        ClientCommunicator router = new ClientCommunicator(3000, serverAddress, serverPort, 3, 10);
+        ClientCommunicator router = new ClientCommunicator(3000, serverAddress, serverPort, 3, 1000);
         CLI.run(router, serverAddress, serverPort);
     }
+
+
 
 }
