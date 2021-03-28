@@ -99,7 +99,6 @@ class BookingManagerTest {
 
         assertEquals(outputException, null);
         assertEquals(outputBooking.getBookingId(), bookingId);
-        assertEquals(outputBooking.getClientId(), clientId);
         assertEquals(outputBooking.getFacilityName(), facilName);
         assertEquals(outputBooking.getStart(), startThree);
         assertEquals(outputBooking.getEnd(), endThree);
