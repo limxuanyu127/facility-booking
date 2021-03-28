@@ -21,9 +21,6 @@ public class BookingManager {
     }
 
 
-    //TODO check all functions that call this
-    //TODO change response to list of hanzhe's datetime object
-
     public Pair<Hashtable, Exception> queryAvailability(String facilName, ArrayList<String> dates, Hashtable facilTable){
 
         Hashtable allResults = new Hashtable();

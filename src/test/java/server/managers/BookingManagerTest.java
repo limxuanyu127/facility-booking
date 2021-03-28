@@ -216,31 +216,5 @@ class BookingManagerTest {
         assertEquals("Booking does not exist", outputException.getMessage());
     }
 
-
-
 }
-
-
-
-//    @Test
-//    void updateBooking_NoConflict_NoException(){
-//        int bookingId = 1;
-//        int clientId = 100;
-//        String facilName = "badmintoncourt";
-//        LocalDateTime newStart = LocalDateTime.of(2021, 3, 18, 15, 00);
-//        LocalDateTime newEnd = LocalDateTime.of(2021, 3, 18, 16, 30);
-//
-//        Pair<Booking, Exception> results =  bookingManager.updateBooking(facilName, bookingId, newStart, newEnd, this.facilTable);
-//        Booking outputBooking = results.getKey();
-//        Exception outputException = results.getValue();
-//
-////        ArrayList queryDates = new ArrayList<>();
-////        queryDates.add(newStart.toLocalDate());
-////        System.out.println(bookingManager.queryAvailability(facilName, queryDates, facilTable));
-//
-//        assertEquals(outputBooking.getStart(), LocalDateTime.of(2021, 3, 18, 15, 00));
-//        assertEquals(outputBooking.getEnd(), LocalDateTime.of(2021, 3, 18, 16, 30));
-//        assertEquals(outputBooking.getBookingId(), bookingId);
-//
-//    }
 

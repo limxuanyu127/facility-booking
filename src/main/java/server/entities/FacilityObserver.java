@@ -4,27 +4,18 @@ import java.net.InetAddress;
 import java.time.*;
 
 public class FacilityObserver {
-    private int clientId;
     private String facilityName;
+    private LocalDateTime endDate;
+
     InetAddress ip;
     int port;
 
 
-
-    private LocalDateTime endDate;
-
-    public FacilityObserver(int clientId, String facilityName, LocalDateTime endDate){
-        this.clientId = clientId;
+    public FacilityObserver(String facilityName, LocalDateTime endDate, InetAddress ip, int port){
         this.facilityName = facilityName;
         this.endDate = endDate;
-    }
-
-    public int getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(int clientId) {
-        this.clientId = clientId;
+        this.ip = ip;
+        this.port = port;
     }
 
     public String getFacilityName() {
@@ -38,6 +29,14 @@ public class FacilityObserver {
 
     public LocalDateTime getEndDate() {
         return endDate;
+    }
+
+    public InetAddress getIp() {
+        return ip;
+    }
+
+    public int getPort() {
+        return port;
     }
 
 }

@@ -1,6 +1,11 @@
 package server;
 
+import commons.requests.DeleteBookingRequest;
+import commons.requests.QueryAvailabilityRequest;
 import commons.requests.Request;
+
+import commons.requests.*;
+import commons.responses.*;
 import commons.responses.Response;
 import commons.responses.TestResponse;
 import commons.rpc.ServerCommunicator;
@@ -8,27 +13,35 @@ import commons.utils.ClientRequest;
 import javafx.util.Pair;
 import server.entities.*;
 import server.managers.*;
-//import server.translator.Translator;
+import server.translator.Translator;
 
-import java.awt.print.Book;
+
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.time.*;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Optional;
 
+//TODO implement bookId count
+//TODO remove client id from bookings(?)
+
 public class Server {
     BookingManager bookingManager;
+    ObserverManager observerManager;
+    Hashtable<String, Facility> facilTable;
     ServerCommunicator serverCommunicator;
-    //    Translator translator;
+    Translator translator;
+
     int testCounter = 0;
+    int bookingIdCounter;
 
 
     public Server(int serverPort, boolean atMostOnce) {
         this.bookingManager = new BookingManager();
+        this.observerManager = new ObserverManager();
+        this.facilTable = new Hashtable<>();
         this.serverCommunicator = new ServerCommunicator(serverPort, atMostOnce);
-//        this.translator = new Translator();
+        this.translator = new Translator(serverCommunicator);
+
+        bookingIdCounter =0;
     }
 
     public static void main(String[] args) {
@@ -53,32 +66,65 @@ public class Server {
             ClientRequest clientRequest = optionalClientRequest.get();
             Request request = clientRequest.request;
             Response response = null;
+            String facilName = null;
+            Exception e = null;
 
-            //TODO add server functions
+            //TODO for the addObserver function, figure out how to get inet addr + port number
+            // Run tests to see if type castings (eg. BookingFacilityResponse to Reponse) is valid
+            // For translator -> bookingManager + entities, there are some that still takes in client id, but those should be removed
+            // Update translator.notifyObservers() function to send notifications
             switch(request.getClass().getName()){
                 case "commons.requests.BookFacilityRequest":
                     System.out.println("Book Facility Received, calling Translator Function...");
-//                    response = translator.test();
+                    BookFacilityResponse createResponse =translator.createBooking((BookFacilityRequest)request, bookingIdCounter, 0, bookingManager, facilTable);
+                    bookingIdCounter +=1;
+
+                    facilName = createResponse.facilityName;
+                    e = translator.notifyObservers(facilName, bookingManager, observerManager, facilTable);
+                    response = (Response) createResponse;
                     break;
                 case "commons.requests.DeleteBookingRequest":
                     System.out.println("Delete Booking Received, calling Translator Function...");
-//                    response = translator.test();
+                    DeleteBookingResponse deleteResponse = translator.deleteBooking((DeleteBookingRequest) request, bookingManager, facilTable);
+
+                    facilName = deleteResponse.facilityName;
+                    e = translator.notifyObservers(facilName, bookingManager, observerManager, facilTable);
+                    response = (Response) deleteResponse;
                     break;
                 case "commons.requests.OffsetBookingRequest":
                     System.out.println("Offset Booking Request Received, calling Translator Function...");
-//                    response = translator.test();
+                    OffsetBookingResponse offsetResponse = translator.offsetBooking((OffsetBookingRequest) request, bookingManager, facilTable);
+
+                    facilName = offsetResponse.facilityName;
+                    e = translator.notifyObservers(facilName, bookingManager, observerManager, facilTable);
+                    response = (Response) offsetResponse;
                     break;
                 case "commons.requests.QueryAvailabilityRequest":
                     System.out.println("Query Availability Request Received, calling Translator Function...");
-                    response = new TestResponse();
+                    QueryAvailabilityResponse queryResponse = translator.queryAvailability((QueryAvailabilityRequest) request, bookingManager, facilTable);
+
+                    response = (Response) queryResponse;
                     break;
                 case "commons.requests.RegisterInterestRequest":
                     System.out.println("Register Interest Request Received, calling Translator Function...");
-//                    response = translator.test();
+                    InetAddress ip = null;
+                    int port = 22;
+                    try {
+                        ip = InetAddress.getByName("127.0.0.1");
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                    RegisterInterestResponse registerResponse = translator.addObserver((RegisterInterestRequest) request, observerManager, facilTable, ip, 0);
+
+                    response = (Response) registerResponse;
                     break;
-                case "commons.requests.UpdateBookingRequest":
-                    System.out.println("Update Booking Request Received, calling Translator Function...");
-//                    response = translator.test();
+                case "commons.requests.ExtendBookingRequest":
+                    System.out.println("Extend Booking Request Received, calling Translator Function...");
+                    ExtendBookingResponse extendResponse = translator.extendBooking((ExtendBookingRequest) request, bookingManager, facilTable);
+
+                    facilName = extendResponse.facilityName;
+                    e = translator.notifyObservers(facilName, bookingManager, observerManager, facilTable);
+                    response = (Response) extendResponse;
                     break;
                 case "commons.requests.TestRequest":
                     System.out.println("Test Request Received, calling Translator Function...");
@@ -93,6 +139,7 @@ public class Server {
             serverCommunicator.send(response, clientRequest.clientAddress, clientRequest.clientPort);
         }
     }
+
 
     public int getTestCounter() {
         return testCounter;

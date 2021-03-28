@@ -23,14 +23,6 @@ public class Facility {
         String day =booking.getDay();
 
         // All timing related checks are done in booking manager
-//        if((startTime.compareTo(BookingManager.getOpenTime()) <0)){
-//            e = new NoSuchElementException("Booking invalid: start time is too early");
-//            return e;
-//        }
-//        else if (endTime.compareTo(BookingManager.getCloseTime()) > 0){
-//            e = new NoSuchElementException("Booking invalid: end time is too late");
-//            return e;
-//        }
 
         if (this.bookingsTable.containsKey(day)){
             this.bookingsTable.get(day).add(booking);
@@ -80,26 +72,30 @@ public class Facility {
         }
     }
 
-    public void attach(FacilityObserver o){
+    public void addObserver(FacilityObserver o){
         observerList.add(o);
     }
 
-    public void notifyObservers(BookingManager bm){
+    public ArrayList<FacilityObserver> getUpdatedObservers(){
+
+        ArrayList<FacilityObserver> observersToRemove = new ArrayList<>();
+
         for (FacilityObserver o: observerList){
             if (!isValidObserver(o)){
-                continue;
-            }
-            else{
-//                bm.queryAvailability(String facilName, ArrayList<String> dates, Hashtable facilTable)
-                //TODO incorporate the sending request thing, maybe create a new class to notifyObserver()
+                observersToRemove.add(o);
             }
         }
+
+        for (FacilityObserver o: observersToRemove){
+            observerList.remove(o);
+        }
+
+        return observerList;
     }
 
     private Boolean isValidObserver(FacilityObserver o){
 
         if (o.getEndDate().compareTo(LocalDateTime.now()) <0 ){
-            observerList.remove(o);
             return false;
         }
         else{
