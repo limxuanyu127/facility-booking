@@ -1,7 +1,6 @@
 package server.managers;
 
 import server.entities.*;
-import commons.utils.Datetime;
 
 import java.util.*;
 import java.time.*;
@@ -104,7 +103,7 @@ public class BookingManager {
         }
 
         //Booking procedure
-        Booking b = new Booking(day, bookingId, clientId, facilName, newStart, newEnd);
+        Booking b = new Booking(day, bookingId, facilName, newStart, newEnd);
         Facility f = (Facility) facilTable.get(facilName);
 
         try{

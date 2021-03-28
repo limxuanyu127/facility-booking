@@ -13,7 +13,6 @@ import server.managers.BookingManager;
 import server.managers.ObserverManager;
 
 
-import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -51,11 +50,11 @@ class TranslatorTest {
         //Populate booking
         LocalTime startOne = LocalTime.of(14, 00);
         LocalTime endOne = LocalTime.of( 16, 00);
-        Booking bookingOne = new Booking("Tuesday",1, 100, "badmintoncourt", startOne, endOne);
+        Booking bookingOne = new Booking("Tuesday",1, "badmintoncourt", startOne, endOne);
 
         LocalTime startTwo = LocalTime.of(20, 00);
         LocalTime endTwo = LocalTime.of(22, 00);
-        Booking bookingTwo = new Booking("Tuesday", 2, 100, "badmintoncourt", startTwo, endTwo);
+        Booking bookingTwo = new Booking("Tuesday", 2, "badmintoncourt", startTwo, endTwo);
 
         Facility targetFacil = facilTable.get("badmintoncourt");
         targetFacil.addBooking(bookingOne);
@@ -213,7 +212,7 @@ class TranslatorTest {
         //Populate booking
         LocalTime startOne = LocalTime.of(16, 00);
         LocalTime endOne = LocalTime.of( 17, 00);
-        Booking bookingOne = new Booking("Tuesday",3, 100, "badmintoncourt", startOne, endOne);
+        Booking bookingOne = new Booking("Tuesday",3, "badmintoncourt", startOne, endOne);
         Facility targetFacil = facilTable.get("badmintoncourt");
         targetFacil.addBooking(bookingOne);
 
@@ -257,7 +256,7 @@ class TranslatorTest {
         //Populate booking
         LocalTime startOne = LocalTime.of(16, 00);
         LocalTime endOne = LocalTime.of( 17, 00);
-        Booking bookingOne = new Booking("Tuesday",3, 100, "badmintoncourt", startOne, endOne);
+        Booking bookingOne = new Booking("Tuesday",3, "badmintoncourt", startOne, endOne);
         Facility targetFacil = facilTable.get("badmintoncourt");
         targetFacil.addBooking(bookingOne);
 

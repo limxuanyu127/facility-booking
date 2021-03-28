@@ -14,10 +14,9 @@ public class Booking {
     private LocalTime end;
 
 
-    public Booking(String day, int bookingId, int clientId, String facilityName, LocalTime start, LocalTime end) {
+    public Booking(String day, int bookingId, String facilityName, LocalTime start, LocalTime end) {
         this.day = day;
         this.bookingId = bookingId;
-        this.clientId = clientId;
         this.facilityName = facilityName;
         this.start = start;
         this.end = end;
