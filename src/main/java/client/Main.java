@@ -12,7 +12,7 @@ public class Main {
 
         String hostname = args[0];
         int serverPort = Integer.parseInt(args[1]);
-        int clientPort = 3000;
+        int clientPort = Integer.parseInt(args[2]); //3000
         int timeout = 1000; // in ms
         int maxTries = 3;
         

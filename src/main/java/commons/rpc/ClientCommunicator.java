@@ -47,6 +47,7 @@ public class ClientCommunicator {
         this.headerSize = 16;
         this.messageSize = this.packetSize - this.headerSize;
         this.maxTries = maxTries;
+        System.out.println(clientPort);
         try {
             this.socket = new DatagramSocket(clientPort);
             this.socket.setSoTimeout(timeout);

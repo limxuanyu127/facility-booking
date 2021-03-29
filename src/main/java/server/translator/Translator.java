@@ -202,11 +202,11 @@ public class Translator {
             InetAddress ip = o.getIp();
             int port = o.getPort();
             //TODO try this
-//            try{
-//                serverCommunicator.send(response, ip, port);
-//            }catch(Exception newE){
-//                e = newE;
-//            }
+            try{
+                serverCommunicator.send(response, ip, port);
+            }catch(Exception newE){
+                e = newE;
+            }
             System.out.println(ip);
             System.out.println(port);
 

@@ -6,11 +6,14 @@ import commons.rpc.ClientCommunicator;
 import commons.utils.Datetime;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import static java.lang.Math.toIntExact;
 
 public class ServiceManager {
     ClientCommunicator router;
@@ -110,13 +113,17 @@ public class ServiceManager {
         // for demo purposes, we monitor in the magnitude of minutes instead (1 day = 1 minute)
         LocalDateTime endTime = LocalDateTime.now().plusMinutes(numDays);
         while (LocalDateTime.now().isBefore(endTime)) {
+            int timeout = toIntExact(LocalDateTime.now().until(endTime, ChronoUnit.MILLIS));
+            System.out.println("Time left: " + timeout);
             try {
                 // expecting QueryAvailabilityResponse; can use the same one because it is essentially a query for availability
-                router.setSocketTimeout(0); // allow socket to listen indefinitely
+                router.setSocketTimeout(timeout); // allow socket to listen for the duration of the listen
                 Response res = router.receive();
                 generateResponse(res);
             } catch (RuntimeException e) {
-                e.printStackTrace();
+                if (e.getCause() instanceof SocketTimeoutException) {
+                    System.out.println("Listening Duration Over");
+                }
             }
         }
         router.setSocketTimeout(router.socketTimeout); //reset socket to default timeout
