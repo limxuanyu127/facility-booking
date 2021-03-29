@@ -30,9 +30,9 @@ public class Translator {
         this.serverCommunicator = serverCommunicator;
     }
 
-    public QueryAvailabilityResponse queryAvailability(QueryAvailabilityRequest r, BookingManager bookingManager, Hashtable facilTable) {
+    public Response queryAvailability(QueryAvailabilityRequest r, BookingManager bookingManager, Hashtable facilTable) {
 
-        QueryAvailabilityResponse response;
+        Response response;
         ResponseMessage responseMessage;
 
         String facilName = r.facilityName;
@@ -43,8 +43,8 @@ public class Translator {
         Exception outputException = outputPair.getValue();
 
         if (outputException != null){
-            responseMessage = new ResponseMessage(400, outputException.getMessage()) ;
-            response = new QueryAvailabilityResponse(facilName, null, responseMessage);
+            responseMessage = new ResponseMessage(400, outputException.getMessage());
+            response = new ErrorResponse(responseMessage);
         }
         else{
             responseMessage = new ResponseMessage(200, "success") ;
@@ -56,12 +56,9 @@ public class Translator {
 
     }
 
+    public Response createBooking(BookFacilityRequest r, int bookingId, int clientId, BookingManager bookingManager, Hashtable facilTable){
 
-
-
-    public BookFacilityResponse createBooking(BookFacilityRequest r, int bookingId, int clientId, BookingManager bookingManager, Hashtable facilTable){
-
-        BookFacilityResponse response;
+        Response response;
         ResponseMessage responseMessage;
 
         Datetime requestStart = r.startTime;
@@ -78,7 +75,7 @@ public class Translator {
 
         if (outputException != null){
             responseMessage = new ResponseMessage(400, outputException.getMessage()) ;
-            response = new BookFacilityResponse(-1, facilName, null, null, responseMessage);
+            response = new ErrorResponse(responseMessage);
 
         }
         else{
@@ -92,9 +89,9 @@ public class Translator {
 
     }
 
-    public OffsetBookingResponse offsetBooking(OffsetBookingRequest r, BookingManager bookingManager,Hashtable facilTable ){
+    public Response offsetBooking(OffsetBookingRequest r, BookingManager bookingManager,Hashtable facilTable ){
 
-        OffsetBookingResponse response;
+        Response response;
         ResponseMessage responseMessage;
 
         String facilName = r.facilityName;
@@ -108,7 +105,7 @@ public class Translator {
 
         if (outputException != null){
             responseMessage = new ResponseMessage(400, outputException.getMessage()) ;
-            response = new OffsetBookingResponse(bookingId, facilName, null, null, responseMessage);
+            response = new ErrorResponse(responseMessage);
 
         }
         else{
@@ -122,8 +119,8 @@ public class Translator {
         return response;
     }
 
-    public ExtendBookingResponse extendBooking(ExtendBookingRequest r, BookingManager bookingManager,Hashtable facilTable){
-        ExtendBookingResponse response;
+    public Response extendBooking(ExtendBookingRequest r, BookingManager bookingManager,Hashtable facilTable){
+        Response response;
         ResponseMessage responseMessage;
 
         String facilName = r.facilityName;
@@ -137,7 +134,7 @@ public class Translator {
 
         if (outputException != null){
             responseMessage = new ResponseMessage(400, outputException.getMessage()) ;
-            response = new ExtendBookingResponse(bookingId, facilName, null, null, responseMessage);
+            response = new ErrorResponse(responseMessage);
 
         }
         else{
@@ -151,8 +148,8 @@ public class Translator {
         return response;
     }
 
-    public DeleteBookingResponse deleteBooking(DeleteBookingRequest r, BookingManager bookingManager, Hashtable facilTable){
-        DeleteBookingResponse response;
+    public Response deleteBooking(DeleteBookingRequest r, BookingManager bookingManager, Hashtable facilTable){
+        Response response;
         ResponseMessage responseMessage;
 
         String facilName = r.facilityName;
@@ -161,7 +158,7 @@ public class Translator {
         Exception outputException = bookingManager.deleteBooking(facilName, bookingId, facilTable);
         if (outputException != null){
             responseMessage = new ResponseMessage(400, outputException.getMessage()) ;
-            response = new DeleteBookingResponse(responseMessage, facilName);
+            response = new ErrorResponse(responseMessage);
 
         }
         else{
@@ -171,8 +168,8 @@ public class Translator {
         return response;
     }
 
-    public RegisterInterestResponse addObserver(RegisterInterestRequest r, ObserverManager observerManager, Hashtable facilTable, InetAddress ip, int port){
-        RegisterInterestResponse response;
+    public Response addObserver(RegisterInterestRequest r, ObserverManager observerManager, Hashtable facilTable, InetAddress ip, int port){
+        Response response;
         ResponseMessage responseMessage;
 
         String facilName = r.facilityName;
@@ -182,7 +179,7 @@ public class Translator {
 
         if (outputException != null){
             responseMessage = new ResponseMessage(400, outputException.getMessage()) ;
-            response = new RegisterInterestResponse(responseMessage);
+            response = new ErrorResponse(responseMessage);
 
         }
         else{
