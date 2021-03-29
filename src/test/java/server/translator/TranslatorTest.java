@@ -13,6 +13,7 @@ import server.managers.BookingManager;
 import server.managers.ObserverManager;
 
 
+import java.awt.print.Book;
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -105,9 +106,9 @@ class TranslatorTest {
 
         QueryAvailabilityRequest request = new QueryAvailabilityRequest(facilName, days);
 
-        QueryAvailabilityResponse response = translator.queryAvailability(request, bookingManager, facilTable);
-
-        List availabilities =  response.intervals;
+        Response response = translator.queryAvailability(request, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.QueryAvailabilityResponse");
+        List availabilities =  ((QueryAvailabilityResponse) response).intervals;
 
         //TODO make the check check minutes also maybe
         for (ArrayList dayAvail: (ArrayList<ArrayList>) availabilities){
@@ -135,13 +136,12 @@ class TranslatorTest {
 
         QueryAvailabilityRequest request = new QueryAvailabilityRequest(facilName, days);
 
-        QueryAvailabilityResponse response = translator.queryAvailability(request, bookingManager, facilTable);
-
-        List availabilities =  response.intervals;
-        String message = response.responseMessage.message;
-
-        assertEquals(expectedInterval, outputInterval);
-        assertEquals(null, availabilities);
+        Response response = translator.queryAvailability(request, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
+        String message = ((ErrorResponse) response).responseMessage.message;
+        int statusCode = ((ErrorResponse) response).responseMessage.statusCode;
+        assertEquals(statusCode, 400);
+        assertEquals(message, "Facility does not exist");
     }
 
     @Test
@@ -157,14 +157,14 @@ class TranslatorTest {
 
         BookFacilityRequest request = new BookFacilityRequest(facilName, start, end);
 
-        BookFacilityResponse response = translator.createBooking(request, bookingId, clientId, bookingManager, facilTable);
+        Response response = translator.createBooking(request, bookingId, clientId, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.BookFacilityResponse");
+        assertEquals(start.hour, ((BookFacilityResponse) response).startTime.hour);
+        assertEquals(start.minute, ((BookFacilityResponse) response).startTime.minute);
+        assertEquals(end.hour, ((BookFacilityResponse) response).endTime.hour);
+        assertEquals(end.minute, ((BookFacilityResponse) response).endTime.minute);
 
-        assertEquals(start.hour, response.startTime.hour);
-        assertEquals(start.minute, response.startTime.minute);
-        assertEquals(end.hour, response.endTime.hour);
-        assertEquals(end.minute, response.endTime.minute);
-
-        assertEquals("success", response.responseMessage.message);
+        assertEquals("success", ((BookFacilityResponse) response).responseMessage.message);
 
     }
 
@@ -181,9 +181,9 @@ class TranslatorTest {
 
         BookFacilityRequest request = new BookFacilityRequest(facilName, start, end);
 
-        BookFacilityResponse response = translator.createBooking(request, bookingId, clientId, bookingManager, facilTable);
-
-        assertEquals("Timeslot is not available", response.responseMessage.message);
+        Response response = translator.createBooking(request, bookingId, clientId, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
+        assertEquals("Timeslot is not available", ((ErrorResponse) response).responseMessage.message);
 
     }
 
@@ -198,12 +198,12 @@ class TranslatorTest {
 
         OffsetBookingRequest request = new OffsetBookingRequest(bookingId, facilName, offset);
 
-        OffsetBookingResponse response = translator.offsetBooking(request, bookingManager, facilTable);
-
-        assertEquals(14, response.startTime.hour);
-        assertEquals(30, response.startTime.minute);
-        assertEquals(16, response.endTime.hour);
-        assertEquals(30, response.endTime.minute);
+        Response response = translator.offsetBooking(request, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.OffsetBookingResponse");
+        assertEquals(14, ((OffsetBookingResponse) response).startTime.hour);
+        assertEquals(30, ((OffsetBookingResponse) response).startTime.minute);
+        assertEquals(16, ((OffsetBookingResponse) response).endTime.hour);
+        assertEquals(30, ((OffsetBookingResponse) response).endTime.minute);
     }
 
     @Test
@@ -225,9 +225,9 @@ class TranslatorTest {
 
         OffsetBookingRequest request = new OffsetBookingRequest(bookingId, facilName, offset);
 
-        OffsetBookingResponse response = translator.offsetBooking(request, bookingManager, facilTable);
-
-        assertEquals("Timeslot is not available", response.responseMessage.message);
+        Response response = translator.offsetBooking(request, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
+        assertEquals("Timeslot is not available", ((ErrorResponse) response).responseMessage.message);
     }
 
 
@@ -242,12 +242,12 @@ class TranslatorTest {
 
         ExtendBookingRequest request = new ExtendBookingRequest(bookingId, facilName, extension);
 
-        ExtendBookingResponse response = translator.extendBooking(request, bookingManager, facilTable);
-
-        assertEquals(14, response.startTime.hour);
-        assertEquals(00, response.startTime.minute);
-        assertEquals(16, response.endTime.hour);
-        assertEquals(30, response.endTime.minute);
+        Response response = translator.extendBooking(request, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(),"commons.responses.ExtendBookingResponse");
+        assertEquals(14, ((ExtendBookingResponse) response).startTime.hour);
+        assertEquals(00, ((ExtendBookingResponse) response).startTime.minute);
+        assertEquals(16, ((ExtendBookingResponse) response).endTime.hour);
+        assertEquals(30, ((ExtendBookingResponse) response).endTime.minute);
     }
 
     @Test
@@ -268,8 +268,9 @@ class TranslatorTest {
 
         ExtendBookingRequest request = new ExtendBookingRequest(bookingId, facilName, extension);
 
-        ExtendBookingResponse response = translator.extendBooking(request, bookingManager, facilTable);
-        assertEquals("Timeslot is not available", response.responseMessage.message);
+        Response response = translator.extendBooking(request, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
+        assertEquals("Timeslot is not available", ((ErrorResponse) response).responseMessage.message);
     }
 
     @Test
@@ -280,8 +281,9 @@ class TranslatorTest {
 
         DeleteBookingRequest request = new DeleteBookingRequest(bookingId, facilName);
 
-        DeleteBookingResponse response = translator.deleteBooking(request, bookingManager, facilTable);
-        assertEquals("success", response.responseMessage.message);
+        Response response = translator.deleteBooking(request, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.DeleteBookingResponse");
+        assertEquals("success", ((DeleteBookingResponse) response).responseMessage.message);
     }
 
     @Test
@@ -292,8 +294,9 @@ class TranslatorTest {
 
         DeleteBookingRequest request = new DeleteBookingRequest(bookingId, facilName);
 
-        DeleteBookingResponse response = translator.deleteBooking(request, bookingManager, facilTable);
-        assertEquals("Booking does not exist", response.responseMessage.message);
+        Response response = translator.deleteBooking(request, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
+        assertEquals("Booking does not exist", ((ErrorResponse) response).responseMessage.message);
     }
 
     @Test
@@ -311,9 +314,9 @@ class TranslatorTest {
 
         RegisterInterestRequest request = new RegisterInterestRequest(facilNameOne, numDays);
 
-        RegisterInterestResponse response = translator.addObserver(request, observerManager, facilTable, ipOne, portOne);
-
-        assertEquals("success", response.responseMessage.message);
+        Response response = translator.addObserver(request, observerManager, facilTable, ipOne, portOne);
+        assertEquals(response.getClass().getName(), "commons.responses.RegisterInterestResponse");
+        assertEquals("success", ((RegisterInterestResponse) response).responseMessage.message);
     }
 
     //TODO test it through client-server communication

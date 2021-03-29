@@ -85,34 +85,35 @@ public class Server {
             switch(request.getClass().getName()){
                 case "commons.requests.BookFacilityRequest":
                     System.out.println("Book Facility Received, calling Translator Function...");
-                    BookFacilityResponse createResponse = translator.createBooking((BookFacilityRequest)request, bookingIdCounter, 0, bookingManager, facilTable);
-                    bookingIdCounter +=1;
-
-                    facilName = createResponse.facilityName;
-                    e = translator.notifyObservers(facilName, bookingManager, observerManager, facilTable);
-                    response = (Response) createResponse;
+                    Response createResponse = translator.createBooking((BookFacilityRequest)request, bookingIdCounter, 0, bookingManager, facilTable);
+                    if (createResponse instanceof BookFacilityResponse) {
+                        bookingIdCounter +=1;
+                        facilName = ((BookFacilityRequest) request).facilityName;
+                        e = translator.notifyObservers(facilName, bookingManager, observerManager, facilTable);
+                    }
+                    response = createResponse;
                     break;
                 case "commons.requests.DeleteBookingRequest":
                     System.out.println("Delete Booking Received, calling Translator Function...");
-                    DeleteBookingResponse deleteResponse = translator.deleteBooking((DeleteBookingRequest) request, bookingManager, facilTable);
-
-                    facilName = deleteResponse.facilityName;
-                    e = translator.notifyObservers(facilName, bookingManager, observerManager, facilTable);
-                    response = (Response) deleteResponse;
+                    Response deleteResponse = translator.deleteBooking((DeleteBookingRequest) request, bookingManager, facilTable);
+                    if (deleteResponse instanceof DeleteBookingResponse) {
+                        facilName = ((DeleteBookingRequest) request).facilityName;
+                        e = translator.notifyObservers(facilName, bookingManager, observerManager, facilTable);
+                    }
+                    response = deleteResponse;
                     break;
                 case "commons.requests.OffsetBookingRequest":
                     System.out.println("Offset Booking Request Received, calling Translator Function...");
-                    OffsetBookingResponse offsetResponse = translator.offsetBooking((OffsetBookingRequest) request, bookingManager, facilTable);
-
-                    facilName = offsetResponse.facilityName;
-                    e = translator.notifyObservers(facilName, bookingManager, observerManager, facilTable);
-                    response = (Response) offsetResponse;
+                    Response offsetResponse = translator.offsetBooking((OffsetBookingRequest) request, bookingManager, facilTable);
+                    if (offsetResponse instanceof  OffsetBookingResponse){
+                        facilName = ((OffsetBookingRequest) request).facilityName;
+                        e = translator.notifyObservers(facilName, bookingManager, observerManager, facilTable);
+                    }
+                    response = offsetResponse;
                     break;
                 case "commons.requests.QueryAvailabilityRequest":
                     System.out.println("Query Availability Request Received, calling Translator Function...");
-                    QueryAvailabilityResponse queryResponse = translator.queryAvailability((QueryAvailabilityRequest) request, bookingManager, facilTable);
-
-                    response = (Response) queryResponse;
+                    response = translator.queryAvailability((QueryAvailabilityRequest) request, bookingManager, facilTable);
                     break;
                 case "commons.requests.RegisterInterestRequest":
                     System.out.println("Register Interest Request Received, calling Translator Function...");
@@ -123,17 +124,16 @@ public class Server {
 //                    } catch (Exception ex) {
 //                        System.out.println(ex.getMessage());
 //                    }
-                    RegisterInterestResponse registerResponse = translator.addObserver((RegisterInterestRequest) request, observerManager, facilTable, clientAddress, clientPort);
-
-                    response = (Response) registerResponse;
+                    response = translator.addObserver((RegisterInterestRequest) request, observerManager, facilTable, clientAddress, clientPort);
                     break;
                 case "commons.requests.ExtendBookingRequest":
                     System.out.println("Extend Booking Request Received, calling Translator Function...");
-                    ExtendBookingResponse extendResponse = translator.extendBooking((ExtendBookingRequest) request, bookingManager, facilTable);
-
-                    facilName = extendResponse.facilityName;
-                    e = translator.notifyObservers(facilName, bookingManager, observerManager, facilTable);
-                    response = (Response) extendResponse;
+                    Response extendResponse = translator.extendBooking((ExtendBookingRequest) request, bookingManager, facilTable);
+                    if (extendResponse instanceof  ExtendBookingResponse){
+                        facilName = ((ExtendBookingRequest) request).facilityName;
+                        e = translator.notifyObservers(facilName, bookingManager, observerManager, facilTable);
+                    }
+                    response = extendResponse;
                     break;
                 case "commons.requests.TestRequest":
                     System.out.println("Test Request Received, calling Translator Function...");

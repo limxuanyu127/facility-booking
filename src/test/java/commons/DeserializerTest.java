@@ -3,6 +3,7 @@ package commons;
 import commons.requests.BookFacilityRequest;
 import commons.requests.TestRequest;
 import commons.responses.BookFacilityResponse;
+import commons.responses.ErrorResponse;
 import commons.utils.Datetime;
 import commons.utils.ResponseMessage;
 import org.junit.jupiter.api.Test;
@@ -106,6 +107,18 @@ class DeserializerTest {
         assertEquals(response.endTime.minute, ((BookFacilityResponse) deserialisedResponse).endTime.minute);
         assertEquals(response.responseMessage.statusCode, ((BookFacilityResponse) deserialisedResponse).responseMessage.statusCode);
         assertEquals(response.responseMessage.message, ((BookFacilityResponse) deserialisedResponse).responseMessage.message);
+    }
 
+    @Test
+    void deserializeErrorResponse(){
+        ResponseMessage responseMessage = new ResponseMessage(200, "Successful");
+        ErrorResponse response = new ErrorResponse(responseMessage);
+        ByteBuffer bb = ByteBuffer.allocate(2000);
+        Serializer.serializeObject(response, bb);
+        bb.flip();
+        Object deserialisedResponse = Deserializer.deserializeObject(bb);
+        assert deserialisedResponse != null;
+        assertEquals(response.responseMessage.message, ((ErrorResponse) response).responseMessage.message);
+        assertEquals(response.responseMessage.statusCode, ((ErrorResponse) response).responseMessage.statusCode);
     }
 }
