@@ -232,6 +232,20 @@ class TranslatorTest {
 
 
     @Test
+    void offsetBooking_NoBookingNoFacil_Exception(){
+        int bookingId = 100;
+        int clientId = 100;
+        int offset = 1;
+        String facilName = "pop";
+
+        OffsetBookingRequest request = new OffsetBookingRequest(bookingId, facilName, offset);
+
+        Response response = translator.offsetBooking(request, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
+    }
+
+
+    @Test
     void extendBooking_NoConflict_NoException(){
 
         int bookingId = 1;
@@ -271,6 +285,20 @@ class TranslatorTest {
         Response response = translator.extendBooking(request, bookingManager, facilTable);
         assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
         assertEquals("Timeslot is not available", ((ErrorResponse) response).responseMessage.message);
+    }
+
+    @Test
+    void extendBooking_NoBookingNoFacil_Exception(){
+        int bookingId = 100;
+        int clientId = 100;
+        int offset = 1;
+        String facilName = "pop";
+
+        ExtendBookingRequest request = new ExtendBookingRequest(bookingId, facilName, offset);
+
+        Response response = translator.extendBooking(request, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
+        assertEquals("Facility does not exist",((ErrorResponse)response).responseMessage.message);
     }
 
     @Test
