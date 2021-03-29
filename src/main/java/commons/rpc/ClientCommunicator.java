@@ -12,6 +12,8 @@ import commons.utils.ResponseMessage;
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Random;
 
 // To use, run TestServer on 1 terminal then run TestClient on another terminal
 
@@ -54,7 +56,8 @@ public class ClientCommunicator {
         } catch (SocketException e) {
             e.printStackTrace();
         }
-        this.requestID = 0;
+        Random r = new Random();
+        this.requestID = r.nextInt();
         this.socketTimeout = timeout;
     }
 
@@ -202,14 +205,19 @@ public class ClientCommunicator {
         System.out.println("receiving");
         Packet currPacket = this.receivePacket();
         int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
+        System.out.println("total packets" + currPacket.totalDatagramPackets);
+
+        ArrayList<Packet> packetsOrdered = new ArrayList<>(currPacket.totalDatagramPackets);
+        packetsOrdered.add(currPacket.datagramNum, currPacket);
         ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);
-        combinedMessageBuffer.put(currPacket.messageBuffer);
+//        combinedMessageBuffer.put(currPacket.messageBuffer);
 
         if (currPacket.totalDatagramPackets != 1) {
             while (currPacket.datagramNum < currPacket.totalDatagramPackets - 1) {
                 try{
                     currPacket = this.receivePacket();
-                    combinedMessageBuffer.put(currPacket.messageBuffer);
+                    packetsOrdered.add(currPacket.datagramNum, currPacket);
+//                    combinedMessageBuffer.put(currPacket.messageBuffer);
                 } catch (RuntimeException e){
                     if (e.getCause() instanceof SocketTimeoutException) {
                         System.out.println("Socket Timeout");
@@ -218,6 +226,12 @@ public class ClientCommunicator {
             }
         }
 
+        for (Packet p : packetsOrdered){
+            System.out.println("datagram no. " + p.datagramNum);
+            combinedMessageBuffer.put(p.messageBuffer);
+        }
+
+//        System.out.println(combinedMessageBuffer.position(), combinedMessageBuffer.limit());
         combinedMessageBuffer.flip();
         Response response = (Response) Deserializer.deserializeObject(combinedMessageBuffer);
         System.out.println(response.getClass().getName());
@@ -226,6 +240,7 @@ public class ClientCommunicator {
     }
 
     private Packet receivePacket(){
+        System.out.println("Receive packet");
         byte[] buffer = new byte[this.packetSize];
         DatagramPacket message = new DatagramPacket(buffer, buffer.length);
         try {

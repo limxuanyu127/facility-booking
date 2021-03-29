@@ -207,8 +207,8 @@ public class Translator {
             }catch(Exception newE){
                 e = newE;
             }
-            System.out.println(ip);
-            System.out.println(port);
+//            System.out.println(ip);
+//            System.out.println(port);
 
         }
 

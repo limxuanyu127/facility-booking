@@ -121,12 +121,15 @@ public class ServerCommunicator {
     }
 
     public void send(Response r, InetAddress clientAddress, int clientPort) {
-        ByteBuffer dataBuf = ByteBuffer.allocate(2000);
+        System.out.println("Sending " + r.getClass().getName() + " to " + clientAddress + " port " + clientPort);
+        ByteBuffer dataBuf = ByteBuffer.allocate(20000);
         Serializer.serializeObject(r, dataBuf);
 
         int totalDatagramPackets = (int) Math.ceil(dataBuf.position() / (float) this.messageSize);
         int dataBufPtr = 0;
         int dataBufMaxPos = dataBuf.position();
+
+        System.out.println("total packets " + totalDatagramPackets);
 
         for (int i = 0; i < totalDatagramPackets; i++){
             ByteBuffer packetBuf = ByteBuffer.allocate(this.packetSize);
@@ -161,7 +164,7 @@ public class ServerCommunicator {
          */
 //        this.requestID += 1;
 
-        System.out.println("Sending message" + " to Address: " + clientAddress + ", Port: " + clientPort);
+        System.out.println("Sent" + " to Address: " + clientAddress + ", Port: " + clientPort);
     }
 
     private Packet receivePacket(){
