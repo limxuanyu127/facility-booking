@@ -69,9 +69,11 @@ public class Deserializer {
     }
 
     public static List<Object> deserializeList(ByteBuffer bb) {
-        String listObjectType = deserializeString(bb);
-//        System.out.println("List object type is " + listObjectType);
         int length = deserializeInteger(bb);
+        if (length == 0) {
+            return new ArrayList<>();
+        }
+        String listObjectType = deserializeString(bb);
         List<Object> l = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             if (listObjectType.equals("java.lang.String")) {
