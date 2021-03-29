@@ -263,6 +263,9 @@ public class ServiceManager {
         } else if (genericResponse instanceof NullResponse){
             NullResponse response = (NullResponse) genericResponse;
             System.out.println(response.responseMessage.message);
+        } else if (genericResponse instanceof ErrorResponse){
+            ErrorResponse response = (ErrorResponse) genericResponse;
+            System.out.println(response.responseMessage.message);
         }
         else {
             throw new Error("Not implemented");
