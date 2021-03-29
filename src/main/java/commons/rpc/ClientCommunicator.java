@@ -25,6 +25,7 @@ public class ClientCommunicator {
     DatagramSocket socket;
     int maxTries;
     int requestID;
+    public int socketTimeout;
 
     /**
      * Creates a socket to send / receive UDP packets at specified port number
@@ -53,6 +54,7 @@ public class ClientCommunicator {
             e.printStackTrace();
         }
         this.requestID = 0;
+        this.socketTimeout = timeout;
     }
 
     /**
@@ -204,14 +206,20 @@ public class ClientCommunicator {
 
         if (currPacket.totalDatagramPackets != 1) {
             while (currPacket.datagramNum < currPacket.totalDatagramPackets - 1) {
-                currPacket = this.receivePacket();
-                combinedMessageBuffer.put(currPacket.messageBuffer);
+                try{
+                    currPacket = this.receivePacket();
+                    combinedMessageBuffer.put(currPacket.messageBuffer);
+                } catch (RuntimeException e){
+                    if (e.getCause() instanceof SocketTimeoutException) {
+                        System.out.println("Socket Timeout");
+                    }
+                }
             }
         }
 
         combinedMessageBuffer.flip();
-        Response response = (TestResponse) Deserializer.deserializeObject(combinedMessageBuffer);
-        System.out.println(((TestResponse) response).testString);
+        Response response = (Response) Deserializer.deserializeObject(combinedMessageBuffer);
+        System.out.println(response.getClass().getName());
 
         return response;
     }
@@ -219,7 +227,6 @@ public class ClientCommunicator {
     private Packet receivePacket(){
         byte[] buffer = new byte[this.packetSize];
         DatagramPacket message = new DatagramPacket(buffer, buffer.length);
-
         try {
             this.socket.receive(message);
         } catch (IOException e) {
@@ -244,5 +251,13 @@ public class ClientCommunicator {
 
     public void close(){
         this.socket.close();
+    }
+
+    public void setSocketTimeout(int timeout){
+        try {
+            this.socket.setSoTimeout(timeout);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
     }
 }

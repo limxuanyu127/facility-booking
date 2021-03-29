@@ -12,6 +12,9 @@ public class Main {
 
         String hostname = args[0];
         int serverPort = Integer.parseInt(args[1]);
+        int clientPort = 3000;
+        int timeout = 1000; // in ms
+        int maxTries = 3;
         
 //        String hostname = "localhost";
         //        int serverPort = 5000;
@@ -20,7 +23,7 @@ public class Main {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        ClientCommunicator router = new ClientCommunicator(3000, serverAddress, serverPort, 3, 1000);
+        ClientCommunicator router = new ClientCommunicator(clientPort, serverAddress, serverPort, maxTries, timeout);
         CLI.run(router, serverAddress, serverPort);
     }
 
