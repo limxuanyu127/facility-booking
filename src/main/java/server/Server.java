@@ -69,14 +69,18 @@ public class Server {
             String facilName = null;
             Exception e = null;
 
-            //TODO for the addObserver function, figure out how to get inet addr + port number
-            // Run tests to see if type castings (eg. BookingFacilityResponse to Reponse) is valid
+            //TODO
+            // Run tests to see if type castings (eg. BookingFacilityResponse to Response) is valid
             // For translator -> bookingManager + entities, there are some that still takes in client id, but those should be removed
             // Update translator.notifyObservers() function to send notifications
+
+            //DONE
+            //for the addObserver function, figure out how to get inet addr + port number
+
             switch(request.getClass().getName()){
                 case "commons.requests.BookFacilityRequest":
                     System.out.println("Book Facility Received, calling Translator Function...");
-                    BookFacilityResponse createResponse =translator.createBooking((BookFacilityRequest)request, bookingIdCounter, 0, bookingManager, facilTable);
+                    BookFacilityResponse createResponse = translator.createBooking((BookFacilityRequest)request, bookingIdCounter, 0, bookingManager, facilTable);
                     bookingIdCounter +=1;
 
                     facilName = createResponse.facilityName;
@@ -107,14 +111,14 @@ public class Server {
                     break;
                 case "commons.requests.RegisterInterestRequest":
                     System.out.println("Register Interest Request Received, calling Translator Function...");
-                    InetAddress ip = null;
-                    int port = 22;
-                    try {
-                        ip = InetAddress.getByName("127.0.0.1");
-                    } catch (Exception ex) {
-                        System.out.println(ex.getMessage());
-                    }
-                    RegisterInterestResponse registerResponse = translator.addObserver((RegisterInterestRequest) request, observerManager, facilTable, ip, 0);
+                    InetAddress clientAddress = clientRequest.clientAddress;
+                    int clientPort = clientRequest.clientPort;
+//                    try {
+//                        ip = InetAddress.getByName("127.0.0.1");
+//                    } catch (Exception ex) {
+//                        System.out.println(ex.getMessage());
+//                    }
+                    RegisterInterestResponse registerResponse = translator.addObserver((RegisterInterestRequest) request, observerManager, facilTable, clientAddress, clientPort);
 
                     response = (Response) registerResponse;
                     break;
@@ -136,6 +140,7 @@ public class Server {
                     throw new RuntimeException("Invalid Request Type");
             }
             clientRequest.setSentResponse(response);
+            System.out.println(response.getClass().getName());
             serverCommunicator.send(response, clientRequest.clientAddress, clientRequest.clientPort);
         }
     }
