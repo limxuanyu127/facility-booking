@@ -164,12 +164,15 @@ public class ServiceManager {
                 System.out.println("======== AVAILABLITIY FOR " + response.facilityName + " ========");
                 for (List<List<Datetime>> l : response.intervals) {
                     for (List<Datetime> m : l){
-                        for (Datetime d: m) {
-                            String day = d.day;
-                            String hour = d.hour > 9 ? String.valueOf(d.hour) : "0" + d.hour;
-                            String minute = d.minute > 0 ? String.valueOf(d.minute) : "00";
-                            System.out.println(day + " " + hour + ":" + minute);
-                        }
+                        Datetime startDatetime = m.get(0);
+                        Datetime endDatetime = m.get(1);
+                        String day = startDatetime.day;
+                        String startHour = startDatetime.hour > 9 ? String.valueOf(startDatetime.hour) : "0" + startDatetime.hour;
+                        String startMinute = startDatetime.minute > 0 ? String.valueOf(startDatetime.minute) : "00";
+                        String endHour = endDatetime.hour > 9 ? String.valueOf(endDatetime.hour) : "0" + endDatetime.hour;
+                        String endMinute = endDatetime.minute > 0 ? String.valueOf(endDatetime.minute) : "00";
+                        System.out.println(day + " " + startHour + ":" + startMinute + " - " + endHour + ":" + endMinute);
+
                     }
                 }
             }
