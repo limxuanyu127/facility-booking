@@ -25,7 +25,6 @@ public class BookingManager {
         Exception e;
         Hashtable allResults = new Hashtable();
         Facility currFacil = (Facility) facilTable.get(facilName);
-        facilName = facilName.toLowerCase();
 
         //Checks
         e= doValidFacilCheck(facilName, facilTable);
@@ -94,6 +93,13 @@ public class BookingManager {
 
         Exception e;
 
+        Facility f = (Facility) facilTable.get(facilName);
+        e = doValidFacilCheck(facilName, facilTable);
+        if(e != null){
+            return new Pair<Booking, Exception>(null, e);
+        }
+
+
         e = doBookingCheck(facilName,newStart,newEnd,facilTable);
         if (e != null){
             return new Pair<Booking, Exception>(null, e);
@@ -105,11 +111,6 @@ public class BookingManager {
 
         //Booking procedure
         Booking b = new Booking(day, bookingId, facilName, newStart, newEnd);
-        Facility f = (Facility) facilTable.get(facilName);
-        e = doValidFacilCheck(facilName, facilTable);
-        if(e != null){
-            return new Pair<Booking, Exception>(null, e);
-        }
 
         try{
             f.addBooking(b);
