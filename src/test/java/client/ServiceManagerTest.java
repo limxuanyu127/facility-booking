@@ -1,5 +1,7 @@
 package client;
 
+import commons.exceptions.InvalidDateException;
+import commons.exceptions.InvalidDayException;
 import commons.requests.QueryAvailabilityRequest;
 import commons.requests.Request;
 import commons.rpc.ClientCommunicator;
@@ -74,11 +76,17 @@ class ServiceManagerTest {
     @Test
     void getDatetimeFromString() {
         String datetimeString = "Monday/13/30";
-        Datetime actualDatetime = ServiceManager.getDatetimeFromString(datetimeString);
-        Datetime expectedDatetime = new Datetime("Monday", 13, 30);
-        assertEquals(actualDatetime.day, expectedDatetime.day);
-        assertEquals(actualDatetime.hour, expectedDatetime.hour);
-        assertEquals(actualDatetime.minute, expectedDatetime.minute);
+        Datetime actualDatetime;
+        try {
+            actualDatetime = ServiceManager.getDatetimeFromString(datetimeString);
+            Datetime expectedDatetime = new Datetime("Monday", 13, 30);
+            assertEquals(actualDatetime.day, expectedDatetime.day);
+            assertEquals(actualDatetime.hour, expectedDatetime.hour);
+            assertEquals(actualDatetime.minute, expectedDatetime.minute);
+        } catch (InvalidDateException | InvalidDayException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

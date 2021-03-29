@@ -1,5 +1,7 @@
 package client;
 
+import commons.exceptions.InvalidDateException;
+import commons.exceptions.InvalidDayException;
 import commons.requests.*;
 import commons.responses.*;
 import commons.rpc.ClientCommunicator;
@@ -19,6 +21,8 @@ public class ServiceManager {
     ClientCommunicator router;
     InetAddress serverAddress;
     int serverPort;
+    static final List<String> daysOfWeek = Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");
+
 
     public ServiceManager(ClientCommunicator router, InetAddress serverAddress, int serverPort) {
         this.router = router;
@@ -33,7 +37,16 @@ public class ServiceManager {
         String daysString = scanner.nextLine();
 
         List<String> days = new ArrayList<>(Arrays.asList(daysString.split(" ")));
-
+        for (String d : days) {
+            try {
+                if (checkValidDay(d)) {
+                    continue;
+                }
+            } catch (InvalidDayException e) {
+                System.out.println(e.getMessage());
+                return;
+            }
+        }
         Request req = new QueryAvailabilityRequest(facilityName, days);
         request(router, req);
     }
@@ -45,12 +58,17 @@ public class ServiceManager {
         String startDatetime = scanner.nextLine();
         System.out.println("Please enter end day and time [D/HH/MM]: ");
         String endDatetime = scanner.nextLine();
-
-        Request req = new BookFacilityRequest(
-                facilityName,
-                getDatetimeFromString(startDatetime),
-                getDatetimeFromString(endDatetime)
-        );
+        Request req;
+        try {
+            req = new BookFacilityRequest(
+                    facilityName,
+                    getDatetimeFromString(startDatetime),
+                    getDatetimeFromString(endDatetime)
+            );
+        } catch (InvalidDateException | InvalidDayException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
         request(router, req);
     }
     public void offsetBooking() {
@@ -59,7 +77,7 @@ public class ServiceManager {
         int bookingID = Integer.parseInt(scanner.nextLine());
         System.out.println("Please enter facility name: ");
         String facilityName =scanner.nextLine();
-        System.out.println("Please enter offset in terms of number of 30-minute slots. \n " +
+        System.out.println("Please enter offset in terms of number of 30-minute slots. \n" +
                 "1 = push back by 30 minutes \n" +
                 "2 = push back by 1 hour \n " +
                 "-1 = push forward by 30 minutes \n" +
@@ -139,8 +157,14 @@ public class ServiceManager {
         return dateObjs;
     }
 
-    public static Datetime getDatetimeFromString(String datetime) {
+    public static Datetime getDatetimeFromString(String datetime) throws InvalidDateException, InvalidDayException {
         String[] datetimeParts = datetime.split("/");
+        if (datetimeParts.length != 3) {
+            throw new InvalidDateException();
+        }
+        if (!daysOfWeek.contains(datetimeParts[0])) {
+            throw new InvalidDayException();
+        }
         return new Datetime(
                 datetimeParts[0],
                 Integer.parseInt(datetimeParts[1]),
@@ -254,5 +278,12 @@ public class ServiceManager {
         } catch (RuntimeException e){
             e.printStackTrace();
         }
+    }
+
+    public static boolean checkValidDay(String day) throws InvalidDayException {
+        if (!daysOfWeek.contains(day)) {
+            throw new InvalidDayException();
+        }
+        return true;
     }
 }
