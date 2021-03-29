@@ -1,13 +1,14 @@
 package client;
 
 import commons.exceptions.InvalidDateException;
+import commons.exceptions.InvalidDateFormatException;
 import commons.exceptions.InvalidDayException;
+import commons.exceptions.InvalidIntervalException;
 import commons.requests.*;
 import commons.responses.*;
 import commons.rpc.ClientCommunicator;
 import commons.utils.Datetime;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+
+import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
 
 public class ServiceManager {
@@ -55,20 +58,33 @@ public class ServiceManager {
         System.out.println("Please enter facility name: ");
         String facilityName = scanner.nextLine();
         System.out.println("Please enter start day and time [D/HH/MM]: ");
-        String startDatetime = scanner.nextLine();
+        String startDatetimeStr = scanner.nextLine();
         System.out.println("Please enter end day and time [D/HH/MM]: ");
-        String endDatetime = scanner.nextLine();
-        Request req;
+        String endDatetimeStr = scanner.nextLine();
+        Datetime startDatetime = null;
+        Datetime endDatetime = null;
         try {
-            req = new BookFacilityRequest(
-                    facilityName,
-                    getDatetimeFromString(startDatetime),
-                    getDatetimeFromString(endDatetime)
-            );
-        } catch (InvalidDateException | InvalidDayException e) {
+            startDatetime = getDatetimeFromString(startDatetimeStr);
+        } catch (InvalidDayException | InvalidDateFormatException e) {
             System.out.println(e.getMessage());
-            return;
         }
+        try {
+            endDatetime = getDatetimeFromString(endDatetimeStr);
+        } catch (InvalidDayException | InvalidDateFormatException e) {
+            System.out.println(e.getMessage());
+        }
+        try {
+            checkValidStartEnd(startDatetime, endDatetime);
+        } catch (InvalidIntervalException e) {
+            System.out.println(e.getMessage());
+        }
+
+        Request req;
+        req = new BookFacilityRequest(
+                facilityName,
+                startDatetime,
+                endDatetime
+            );
         request(router, req);
     }
     public void offsetBooking() {
@@ -157,13 +173,19 @@ public class ServiceManager {
         return dateObjs;
     }
 
-    public static Datetime getDatetimeFromString(String datetime) throws InvalidDateException, InvalidDayException {
+    public static Datetime getDatetimeFromString(String datetime) throws InvalidDateFormatException, InvalidDayException {
         String[] datetimeParts = datetime.split("/");
         if (datetimeParts.length != 3) {
-            throw new InvalidDateException();
+            throw new InvalidDateFormatException();
         }
         if (!daysOfWeek.contains(datetimeParts[0])) {
             throw new InvalidDayException();
+        }
+        try {
+            checkValidHour(datetimeParts[1]);
+            checkValidMinute(datetimeParts[2]);
+        } catch (InvalidDateException e) {
+            System.out.println(e.getMessage());
         }
         return new Datetime(
                 datetimeParts[0],
@@ -288,5 +310,40 @@ public class ServiceManager {
             throw new InvalidDayException();
         }
         return true;
+    }
+
+    public static boolean checkValidHour(String hour) throws InvalidDateException {
+        try {
+            int hourInt = Integer.parseInt(hour);
+            if (hourInt < 0 || hourInt > 23)  {
+                throw new InvalidDateException();
+            }
+        } catch (NumberFormatException e) {
+            throw new InvalidDateException();
+        }
+        return true;
+    }
+
+    public static boolean checkValidMinute(String minute) throws InvalidDateException {
+        try {
+            int minuteInt = Integer.parseInt(minute);
+            if (!(minuteInt == 0 || minuteInt == 30)){
+                throw new InvalidDateException();
+            }
+        } catch (NumberFormatException e) {
+            throw new InvalidDateException();
+        }
+        return true;
+    }
+
+    public static boolean checkValidStartEnd(Datetime startTime, Datetime endTime) throws InvalidIntervalException {
+        if (!(isBefore(startTime.day, endTime.day) &&  (startTime.hour * 60 + startTime.minute < endTime.hour * 60 + endTime.minute))) {
+            throw new InvalidIntervalException();
+        }
+        return true;
+    }
+
+    public static boolean isBefore(String start, String end) {
+        return daysOfWeek.indexOf(start) < daysOfWeek.indexOf(end);
     }
 }

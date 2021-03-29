@@ -1,23 +1,10 @@
 package client;
 
-import commons.exceptions.InvalidDateException;
+import commons.exceptions.InvalidDateFormatException;
 import commons.exceptions.InvalidDayException;
-import commons.requests.QueryAvailabilityRequest;
-import commons.requests.Request;
-import commons.rpc.ClientCommunicator;
-import commons.rpc.ServerCommunicator;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import commons.utils.Datetime;
-import client.ServiceManager;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 class ServiceManagerTest {
 //    ServerCommunicator serverCommunicator;
@@ -83,7 +70,7 @@ class ServiceManagerTest {
             assertEquals(actualDatetime.day, expectedDatetime.day);
             assertEquals(actualDatetime.hour, expectedDatetime.hour);
             assertEquals(actualDatetime.minute, expectedDatetime.minute);
-        } catch (InvalidDateException | InvalidDayException e) {
+        } catch (InvalidDateFormatException | InvalidDayException e) {
             e.printStackTrace();
         }
 

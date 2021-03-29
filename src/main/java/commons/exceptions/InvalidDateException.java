@@ -1,7 +1,7 @@
 package commons.exceptions;
 
 public class InvalidDateException extends Exception {
-    public InvalidDateException() {
-        super("Date format provided is invalid. Please provide date in the following format: [D/HH/MM] where D = day of the week");
+    public InvalidDateException(){
+        super("Date is invalid. HH should be between 00 and 23 inclusive and MM should be either 00 or 30");
     }
 }

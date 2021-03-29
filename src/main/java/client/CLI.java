@@ -17,7 +17,7 @@ public class CLI {
                     "1: Query for a facility's availability \n" +
                     "2: Book a facility \n" +
                     "3: Offset booking \n" +
-                    "4: Update booking \n" +
+                    "4: Extend booking \n" +
                     "5: Delete booking \n" +
                     "6: Register interest for a facility \n";
             System.out.println(menu);
