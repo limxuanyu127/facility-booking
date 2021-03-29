@@ -100,22 +100,7 @@ public class Translator {
         String facilName = r.facilityName;
         int bookingId = r.bookingID;
         int offset = r.offset;
-        int offsetMin = 0;
-        System.out.println();
-
-        switch (offset){
-            case 1:
-                offsetMin = 30;
-                break;
-            case 2:
-                offsetMin = 60;
-                break;
-            case -1:
-                offsetMin = -30;
-                break;
-        }
-
-        System.out.println(offsetMin);
+        int offsetMin = offset*30;
 
         Pair<Booking, Exception> outputPair = bookingManager.offsetBooking(facilName, bookingId, offsetMin, facilTable);
         Booking outputBooking = outputPair.getKey();
