@@ -5,6 +5,7 @@ import commons.responses.*;
 import commons.rpc.ClientCommunicator;
 import commons.utils.Datetime;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,12 +112,14 @@ public class ServiceManager {
         while (LocalDateTime.now().isBefore(endTime)) {
             try {
                 // expecting QueryAvailabilityResponse; can use the same one because it is essentially a query for availability
+                router.setSocketTimeout(0); // allow socket to listen indefinitely
                 Response res = router.receive();
                 generateResponse(res);
             } catch (RuntimeException e) {
                 e.printStackTrace();
             }
         }
+        router.setSocketTimeout(router.socketTimeout); //reset socket to default timeout
     }
     @Deprecated
     public static List<Datetime> getListOfDates(String days){
@@ -159,12 +162,14 @@ public class ServiceManager {
             System.out.println(response.responseMessage.message);
             if (response.responseMessage.statusCode == 200) {
                 System.out.println("======== AVAILABLITIY FOR " + response.facilityName + " ========");
-                for (List<Datetime> l : response.intervals) {
-                    for (Datetime d: l) {
-                        String day = d.day;
-                        String hour = d.hour > 9 ? String.valueOf(d.hour) : "0" + d.hour;
-                        String minute = d.minute > 0 ? String.valueOf(d.minute) : "00";
-                        System.out.println(day + " " + hour + ":" + minute);
+                for (List<List<Datetime>> l : response.intervals) {
+                    for (List<Datetime> m : l){
+                        for (Datetime d: m) {
+                            String day = d.day;
+                            String hour = d.hour > 9 ? String.valueOf(d.hour) : "0" + d.hour;
+                            String minute = d.minute > 0 ? String.valueOf(d.minute) : "00";
+                            System.out.println(day + " " + hour + ":" + minute);
+                        }
                     }
                 }
             }

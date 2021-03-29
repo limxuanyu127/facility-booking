@@ -1,18 +1,21 @@
 package server.entities;
 
-import java.util.Date;
+import java.net.InetAddress;
+import java.time.*;
 
 public class FacilityObserver {
-    private int clientId;
     private String facilityName;
-    private Date endTime;
+    private LocalDateTime endDate;
 
-    public int getClientId() {
-        return clientId;
-    }
+    InetAddress ip;
+    int port;
 
-    public void setClientId(int clientId) {
-        this.clientId = clientId;
+
+    public FacilityObserver(String facilityName, LocalDateTime endDate, InetAddress ip, int port){
+        this.facilityName = facilityName;
+        this.endDate = endDate;
+        this.ip = ip;
+        this.port = port;
     }
 
     public String getFacilityName() {
@@ -23,11 +26,17 @@ public class FacilityObserver {
         this.facilityName = facilityName;
     }
 
-    public Date getEndTime() {
-        return endTime;
+
+    public LocalDateTime getEndDate() {
+        return endDate;
     }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+    public InetAddress getIp() {
+        return ip;
     }
+
+    public int getPort() {
+        return port;
+    }
+
 }

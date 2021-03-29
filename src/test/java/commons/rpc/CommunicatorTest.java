@@ -30,11 +30,9 @@ class CommunicatorTest {
         }
     }
 
-
     @BeforeEach
     void setUp() {
-
-        this.serverCommunicator = new ServerCommunicator(this.serverPort);
+        this.serverCommunicator = new ServerCommunicator(this.serverPort, true);
         this.clientCommunicator = new ClientCommunicator(this.clientPort, this.serverAddress, this.serverPort, 1, 1000);
     }
 
@@ -63,7 +61,7 @@ class CommunicatorTest {
 
     @Test
     void serverToClientBasic() {
-        System.out.println("\n Server To Client Test: sending Test Response to Client");
+        System.out.println("\nServer To Client Test: sending Test Response to Client");
         TestResponse testResponse = new TestResponse();
         serverCommunicator.send(testResponse, clientAddress, clientPort);
 

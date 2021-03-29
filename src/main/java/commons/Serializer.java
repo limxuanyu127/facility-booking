@@ -47,7 +47,7 @@ public class Serializer {
     public static void serializeString(String s, ByteBuffer bb) {
         byte[] sBytes = s.getBytes();
         Integer length = sBytes.length;
-        System.out.println("serializing string " + s + " with length " + length);
+//        System.out.println("serializing string " + s + " with length " + length);
         bb.putInt(length);
         bb.put(sBytes);
     }

@@ -28,11 +28,11 @@ public class Deserializer {
             for (Field f: fields) {
                 fieldTypeMap.put(f.getName(), f.getType());
             }
-            System.out.println(fieldTypeMap);
+//            System.out.println(fieldTypeMap);
             for (int i = 0; i < numFields; i++) {
                 String fieldName = deserializeString(bb);
                 Object val;
-                System.out.println(fieldTypeMap.get(fieldName));
+//                System.out.println(fieldTypeMap.get(fieldName));
                 if (fieldTypeMap.get(fieldName).equals(String.class)) {
                     val = deserializeString(bb);
                 } else if (fieldTypeMap.get(fieldName).equals(Integer.class)) {
@@ -74,7 +74,6 @@ public class Deserializer {
             return new ArrayList<>();
         }
         String listObjectType = deserializeString(bb);
-        System.out.println("List object type is " + listObjectType);
         List<Object> l = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             if (listObjectType.equals("java.lang.String")) {
