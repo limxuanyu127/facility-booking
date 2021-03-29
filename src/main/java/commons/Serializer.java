@@ -54,9 +54,14 @@ public class Serializer {
 
     public static void serializeList(List<?> l, ByteBuffer bb) {
         Integer length = l.size();
+        serializeInteger(length, bb);
+        if (length == 0){
+            return;
+        }
+
         String listObjectType = l.get(0).getClass().getName();
         serializeString(listObjectType, bb);
-        bb.putInt(length);
+
         for (Object o: l) {
             serializeObject(o, bb);
         }

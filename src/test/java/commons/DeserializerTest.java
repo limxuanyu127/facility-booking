@@ -61,6 +61,8 @@ class DeserializerTest {
         assertEquals(request.testString, ((TestRequest) deserialisedRequest).testString);
         assertEquals(request.testList, ((TestRequest) deserialisedRequest).testList);
         assertEquals(request.testNestedList, ((TestRequest) deserialisedRequest).testNestedList);
+        System.out.println(request.testNestedList);
+        System.out.println(((TestRequest) deserialisedRequest).testNestedList);
 
     }
     @Test
