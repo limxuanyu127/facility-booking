@@ -11,7 +11,7 @@ public class CLI {
         while (true) {
             String startUp = "Hello!! Welcome to the facility booking system. These are the facilities you can book: \n\n" +
                     "Badminton Court \n" +
-                    "...";
+                    "Gym";
             System.out.println(startUp);
             String menu = "Please enter a number.\n\n" +
                     "1: Query for a facility's availability \n" +
@@ -51,6 +51,12 @@ public class CLI {
                 default:
                     System.out.println("Invalid number!! Please enter a number from 1 to 6.");
                     break;
+            }
+            System.out.println("Continue? Y/N");
+            String toContinue = scanner.nextLine();
+            if (toContinue.equals("N") || toContinue.equals("n")) {
+                System.out.println("Exiting program...");
+                System.exit(0);
             }
         }
     }
