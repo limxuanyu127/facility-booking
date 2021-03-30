@@ -1,13 +1,14 @@
 package client;
 
-import commons.exceptions.InvalidDateException;
+import commons.exceptions.InvalidTimeException;
+import commons.exceptions.InvalidDateFormatException;
 import commons.exceptions.InvalidDayException;
+import commons.exceptions.InvalidIntervalException;
 import commons.requests.*;
 import commons.responses.*;
 import commons.rpc.ClientCommunicator;
 import commons.utils.Datetime;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+
+import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
 
 public class ServiceManager {
@@ -29,7 +32,7 @@ public class ServiceManager {
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
     }
-    public void queryAvailability() {
+    public void queryAvailability() throws InvalidDayException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter facility name: ");
         String facilityName = scanner.nextLine();
@@ -38,37 +41,50 @@ public class ServiceManager {
 
         List<String> days = new ArrayList<>(Arrays.asList(daysString.split(" ")));
         for (String d : days) {
-            try {
-                if (checkValidDay(d)) {
-                    continue;
-                }
-            } catch (InvalidDayException e) {
-                System.out.println(e.getMessage());
-                return;
+            if (!checkValidDay(d)) {
+                throw new InvalidDayException();
             }
         }
         Request req = new QueryAvailabilityRequest(facilityName, days);
         request(router, req);
     }
-    public void bookFacility() {
+    public void bookFacility() throws InvalidDateFormatException, InvalidDayException, InvalidTimeException, InvalidIntervalException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter facility name: ");
         String facilityName = scanner.nextLine();
         System.out.println("Please enter start day and time [D/HH/MM]: ");
-        String startDatetime = scanner.nextLine();
-        System.out.println("Please enter end day and time [D/HH/MM]: ");
-        String endDatetime = scanner.nextLine();
-        Request req;
-        try {
-            req = new BookFacilityRequest(
-                    facilityName,
-                    getDatetimeFromString(startDatetime),
-                    getDatetimeFromString(endDatetime)
-            );
-        } catch (InvalidDateException | InvalidDayException e) {
-            System.out.println(e.getMessage());
-            return;
+        String startDatetimeStr = scanner.nextLine();
+        if (!checkValidDateFormat(startDatetimeStr)) {
+            throw new InvalidDateFormatException();
         }
+        Datetime startDatetime = getDatetimeFromString(startDatetimeStr);
+        if (!checkValidDay(startDatetime.day)) {
+            throw new InvalidDayException();
+        }
+        if (!checkValidHour(startDatetime.hour) || !checkValidMinute(startDatetime.minute)) {
+            throw new InvalidTimeException();
+        }
+        System.out.println("Please enter end day and time [D/HH/MM]: ");
+        String endDatetimeStr = scanner.nextLine();
+        Datetime endDatetime = getDatetimeFromString(endDatetimeStr);
+        if (!checkValidDateFormat(endDatetimeStr)) {
+            throw new InvalidDateFormatException();
+        }
+        if (!checkValidDay(endDatetime.day)) {
+            throw new InvalidDayException();
+        }
+        if (!checkValidHour(endDatetime.hour) || !checkValidMinute(endDatetime.minute)) {
+            throw new InvalidTimeException();
+        }
+
+        if (!checkValidStartEnd(startDatetime, endDatetime)) {
+            throw new InvalidIntervalException();
+        }
+        Request req = new BookFacilityRequest(
+                facilityName,
+                startDatetime,
+                endDatetime
+            );
         request(router, req);
     }
     public void offsetBooking() {
@@ -157,14 +173,8 @@ public class ServiceManager {
         return dateObjs;
     }
 
-    public static Datetime getDatetimeFromString(String datetime) throws InvalidDateException, InvalidDayException {
+    public static Datetime getDatetimeFromString(String datetime) {
         String[] datetimeParts = datetime.split("/");
-        if (datetimeParts.length != 3) {
-            throw new InvalidDateException();
-        }
-        if (!daysOfWeek.contains(datetimeParts[0])) {
-            throw new InvalidDayException();
-        }
         return new Datetime(
                 datetimeParts[0],
                 Integer.parseInt(datetimeParts[1]),
@@ -282,11 +292,31 @@ public class ServiceManager {
             e.printStackTrace();
         }
     }
+    public static boolean checkValidDateFormat(String datetime) {
+        String[] datetimeParts = datetime.split("/");
+        return datetimeParts.length == 3;
+    }
 
-    public static boolean checkValidDay(String day) throws InvalidDayException {
-        if (!daysOfWeek.contains(day)) {
-            throw new InvalidDayException();
+    public static boolean checkValidDay(String day) {
+        return daysOfWeek.contains(day);
+    }
+
+    public static boolean checkValidHour(int hour) {
+        return (hour >= 0 && hour <= 23);
+    }
+
+    public static boolean checkValidMinute(int minute) {
+        return (minute == 0 || minute == 30);
+    }
+
+    public static boolean checkValidStartEnd(Datetime startTime, Datetime endTime) {
+        if (isDayBeforeOrEqual(startTime.day, endTime.day)) {
+            return (startTime.hour * 60 + startTime.minute < endTime.hour * 60 + endTime.minute);
         }
-        return true;
+        return false;
+    }
+
+    public static boolean isDayBeforeOrEqual(String start, String end) {
+        return daysOfWeek.indexOf(start) <= daysOfWeek.indexOf(end);
     }
 }
