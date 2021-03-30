@@ -26,12 +26,22 @@ public class ServiceManager {
     int serverPort;
     static final List<String> daysOfWeek = Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");
 
-
+    /**
+     * Constructor for ServiceManager
+     * @param router ClientCommunicator object for sending and receving of packets
+     * @param serverAddress IP address of server
+     * @param serverPort Port number of server
+     */
     public ServiceManager(ClientCommunicator router, InetAddress serverAddress, int serverPort) {
         this.router = router;
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
     }
+
+    /**
+     * Sends a request to query for availability for a particular facility over a given list of days
+     * @throws InvalidDayException thrown when input day is not a valid day of the week
+     */
     public void queryAvailability() throws InvalidDayException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter facility name: ");
@@ -48,6 +58,14 @@ public class ServiceManager {
         Request req = new QueryAvailabilityRequest(facilityName, days);
         request(router, req);
     }
+
+    /**
+     * Sends a request to book a particular facility for a given interval
+     * @throws InvalidDateFormatException thrown when input date format is invalid (i.e. violate this expression DAY/HH/MM)
+     * @throws InvalidDayException thrown when input day is not a valid day of the week
+     * @throws InvalidTimeException thrown when hour or minute invalid
+     * @throws InvalidIntervalException thrown when the interval provided is invalid
+     */
     public void bookFacility() throws InvalidDateFormatException, InvalidDayException, InvalidTimeException, InvalidIntervalException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter facility name: ");
@@ -87,6 +105,10 @@ public class ServiceManager {
             );
         request(router, req);
     }
+
+    /**
+     * Sends a request to offset an existing booking
+     */
     public void offsetBooking() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter booking ID: ");
@@ -103,6 +125,10 @@ public class ServiceManager {
         Request req = new OffsetBookingRequest(bookingID, facilityName, offset);
         request(router, req);
     }
+
+    /**
+     * Sends a request to extend the end time of an existing booking
+     */
     public void extendBooking() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter booking ID: ");
@@ -119,6 +145,10 @@ public class ServiceManager {
         );
         request(router, req);
     }
+
+    /**
+     * Sends a request to delete an existing booking
+     */
     public void deleteBooking() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter booking ID: ");
@@ -132,6 +162,10 @@ public class ServiceManager {
         );
         request(router, req);
     }
+
+    /**
+     * Sends a request to register interest for availability updates for a particular facility over a given interval
+     */
     public void registerInterest() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter facility name: ");
@@ -162,17 +196,12 @@ public class ServiceManager {
         }
         router.setSocketTimeout(router.socketTimeout); //reset socket to default timeout
     }
-    @Deprecated
-    public static List<Datetime> getListOfDates(String days){
-        List<Datetime> dateObjs = new ArrayList<>();
-        String [] dayList = days.split(" ");
-        for (String d: dayList) {
-            Datetime dateObj = new Datetime(d,0,0);
-            dateObjs.add(dateObj);
-        }
-        return dateObjs;
-    }
 
+    /**
+     * Returns a Datetime object given a string
+     * @param datetime string representation of datetime given by the user
+     * @return Datetime object
+     */
     public static Datetime getDatetimeFromString(String datetime) {
         String[] datetimeParts = datetime.split("/");
         return new Datetime(
@@ -182,6 +211,13 @@ public class ServiceManager {
         );
     }
 
+    /**
+     * Prints to standard output the booking details returned by the server
+     * @param bookingID unique identifier of the booking
+     * @param facilityName faciliy name for the booking
+     * @param startTime start time for the booking
+     * @param endTime end time for the booking
+     */
     public static void generateBookingDetails(int bookingID, String facilityName, Datetime startTime, Datetime endTime) {
         System.out.println("Booking Confirmation ID: " + bookingID);
         System.out.println("Facility Name: " + facilityName);
@@ -194,7 +230,10 @@ public class ServiceManager {
         System.out.println("Day and time: " + dayTime);
     }
 
-//    TODO: implement parser for each response type, change input type to Response
+    /**
+     * Generic method to generate response depending on type of Response object
+     * @param genericResponse Response object
+     */
     public static void generateResponse(Response genericResponse) {
         String message = "";
         System.out.println(message);
@@ -282,6 +321,11 @@ public class ServiceManager {
         }
     }
 
+    /**
+     * Helper method to send a request to the server via the communicator module
+     * @param router ClientCommunicator object initialised with server configurations
+     * @param req Request object
+     */
     public static void request(ClientCommunicator router, Request req) {
         try {
             Response res = router.sendRequest(req);
@@ -292,23 +336,50 @@ public class ServiceManager {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Returns a boolean indicating validity of the input date format
+     * @param datetime string representation of datetime given by user
+     * @return true if format is valid
+     */
     public static boolean checkValidDateFormat(String datetime) {
         String[] datetimeParts = datetime.split("/");
         return datetimeParts.length == 3;
     }
 
+    /**
+     * Returns a boolean indicating validity of input day
+     * @param day day of the week provided by user
+     * @return true if day is a valid day of the week
+     */
     public static boolean checkValidDay(String day) {
         return daysOfWeek.contains(day);
     }
 
+    /**
+     * Returns a boolean indicating validity of input hour
+     * @param hour hour provided by the user
+     * @return true if hour is valid (between 0 and 23, inclusive)
+     */
     public static boolean checkValidHour(int hour) {
         return (hour >= 0 && hour <= 23);
     }
 
+    /**
+     * Returns a boolean indicating validity of input minute
+     * @param minute minute provided by the user
+     * @return true if minute is valid (00 or 30)
+     */
     public static boolean checkValidMinute(int minute) {
         return (minute == 0 || minute == 30);
     }
 
+    /**
+     * Returns a boolean indicating validity of the input interval
+     * @param startTime start time of booking
+     * @param endTime end time of booking
+     * @return true if start time is before end time
+     */
     public static boolean checkValidStartEnd(Datetime startTime, Datetime endTime) {
         if (isDayBeforeOrEqual(startTime.day, endTime.day)) {
             return (startTime.hour * 60 + startTime.minute < endTime.hour * 60 + endTime.minute);
@@ -316,6 +387,12 @@ public class ServiceManager {
         return false;
     }
 
+    /**
+     * Returns a boolean indicating if the first day is before or same as the second day
+     * @param start day of start datetime given by user
+     * @param end day of end datetime given by user
+     * @return true if start is before or same as end
+     */
     public static boolean isDayBeforeOrEqual(String start, String end) {
         return daysOfWeek.indexOf(start) <= daysOfWeek.indexOf(end);
     }

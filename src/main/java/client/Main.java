@@ -6,6 +6,10 @@ import client.CLI;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+/**
+ * Entrypoint for client, takes in 2 runtime arguments: server hostname and server port
+ * @param args list of String arguments to configure the server (hostname nad port)
+ */
 public class Main {
     public static void main(String[] args) {
         InetAddress serverAddress = null;

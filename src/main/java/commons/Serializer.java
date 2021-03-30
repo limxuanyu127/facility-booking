@@ -14,6 +14,12 @@ public class Serializer {
         ByteBuffer bb = ByteBuffer.allocate(2000);
         serializeObject(r, bb);
     }
+
+    /**
+     * Generic serialisation methods to serialise any request or response objects
+     * @param o object to be serialised
+     * @param bb ByteBuffer to hold sequence of bytes
+     */
     public static void serializeObject(Object o, ByteBuffer bb) {
 //         TODO: add more primitive checks if necessary
         if (o.getClass().equals(Integer.class)) {
@@ -24,7 +30,6 @@ public class Serializer {
             serializeList((ArrayList<?>) o, bb);
         } else {
             String className = o.getClass().getName();
-            System.out.println("Serializing " + className);
             serializeString(className, bb);
             Field[] fields = o.getClass().getDeclaredFields();
             serializeInteger(fields.length, bb);
@@ -40,18 +45,33 @@ public class Serializer {
         }
 
     }
+
+    /**
+     * Helper method to serialise integer
+     * @param i
+     * @param bb
+     */
     public static void serializeInteger(Integer i, ByteBuffer bb) {
         bb.putInt(i);
     }
 
+    /**
+     * Helper method to serialise string
+     * @param s
+     * @param bb
+     */
     public static void serializeString(String s, ByteBuffer bb) {
         byte[] sBytes = s.getBytes();
         Integer length = sBytes.length;
-//        System.out.println("serializing string " + s + " with length " + length);
         bb.putInt(length);
         bb.put(sBytes);
     }
 
+    /**
+     * Helper method to serialise list
+     * @param l
+     * @param bb
+     */
     public static void serializeList(List<?> l, ByteBuffer bb) {
         Integer length = l.size();
         serializeInteger(length, bb);

@@ -16,6 +16,15 @@ public class ObserverManager {
     public ObserverManager(){
     }
 
+    /**
+     * Add facility observer
+     * @param facilName name of the facility
+     * @param numDays number of days to monitor
+     * @param facilTable facility table
+     * @param ip client IP address
+     * @param port client port
+     * @return
+     */
     public Exception addObserver(String facilName, int numDays, Hashtable facilTable, InetAddress ip, int port){
         //TODO fix sync with client
         // for demo purposes, we monitor in the magnitude of minutes instead (1 day = 1 minute)
@@ -37,6 +46,12 @@ public class ObserverManager {
         return null;
     }
 
+    /**
+     * Check if facility exists
+     * @param facilName name of the facility
+     * @param facilTable facility table
+     * @return
+     */
     private Exception doFacilCheck(String facilName, Hashtable facilTable){
         if (facilTable.containsKey(facilName)){
             return null;
@@ -47,6 +62,12 @@ public class ObserverManager {
         }
     }
 
+    /**
+     * Retrieve list of observers
+     * @param facilName name of the facility
+     * @param facilTable facility table
+     * @return
+     */
     public ArrayList<FacilityObserver> getObservers(String facilName, Hashtable facilTable){
         Facility facil = (Facility) facilTable.get(facilName);
         ArrayList observers = facil.getUpdatedObservers();

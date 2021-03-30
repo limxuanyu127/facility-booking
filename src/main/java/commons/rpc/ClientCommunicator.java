@@ -107,6 +107,12 @@ public class ClientCommunicator {
         }
     }
 
+    /**
+     * Sends a request, retransmitting if necessary, to the server and
+     * receives a corresponding response object
+     * @param r request object constructed by ServiceManager
+     * @return response object
+     */
     public Response sendRequest(Request r){
         int currTries = 0;
         Response response = null;
@@ -134,7 +140,12 @@ public class ClientCommunicator {
         return new NullResponse(responseMessage);
     }
 
-    //To send duplicate requests
+    /**
+     * Helper method to send duplicate requests
+     * @param r request object
+     * @param requestID request identifier
+     * @return response object
+     */
     public Response sendRequest(Request r, int requestID){
         int currTries = 0;
         Response response = null;
@@ -160,6 +171,11 @@ public class ClientCommunicator {
         return new NullResponse(responseMessage);
     }
 
+    /**
+     * Helper method used by sendRequest to send individual datagram packets to the server
+     * @param dataBuf ByteBuffer that contains the byte sequence of serialised request
+     * @param requestID request identifier
+     */
     public void send(ByteBuffer dataBuf, int requestID) {
 
         int totalDatagramPackets = (int) Math.ceil(dataBuf.position() / (float) this.messageSize);
@@ -198,8 +214,7 @@ public class ClientCommunicator {
 
     /**
      * Allows socket to listen for UDP packets
-     *
-     * @return ByteBuffer containing only message data
+     * @return Response object, deserialised from the ByteBuffer
      */
     public Response receive() {
         System.out.println("receiving");
@@ -239,6 +254,10 @@ public class ClientCommunicator {
         return response;
     }
 
+    /**
+     * Helper method to receive individual datagram packets
+     * @return datagram packet
+     */
     private Packet receivePacket(){
         System.out.println("Receive packet");
         byte[] buffer = new byte[this.packetSize];
@@ -265,10 +284,17 @@ public class ClientCommunicator {
         return new Packet(requestID, datagramNum, totalDatagramPackets, messageSize, senderAddress, senderPort, messageBuffer);
     }
 
+    /**
+     * Helper method to close the socket
+     */
     public void close(){
         this.socket.close();
     }
 
+    /**
+     * Helper method to set socket timeout
+     * @param timeout
+     */
     public void setSocketTimeout(int timeout){
         try {
             this.socket.setSoTimeout(timeout);

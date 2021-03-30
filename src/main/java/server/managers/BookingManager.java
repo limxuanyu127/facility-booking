@@ -19,7 +19,13 @@ public class BookingManager {
         return closeTime;
     }
 
-
+    /**
+     * Returns the list of availabilities for a particular facility
+     * @param facilName name of facility
+     * @param dates days to query
+     * @param facilTable facility table
+     * @return pair of hashtable keyed on day of the week with list of availabilities, and exception to be returned to the user
+     */
     public Pair<Hashtable, Exception> queryAvailability(String facilName, ArrayList<String> dates, Hashtable facilTable){
 
         Exception e;
@@ -88,7 +94,17 @@ public class BookingManager {
         return new Pair<Hashtable, Exception>(allResults, null);
     }
 
-
+    /**
+     * Creates a booking
+     * @param day day of the week
+     * @param bookingId identifier of booking
+     * @param clientId identifier of client
+     * @param facilName name of facility
+     * @param newStart start time of booking
+     * @param newEnd end time of booking
+     * @param facilTable facility table
+     * @return Pair of Booking object and exception (if any error is thrown)
+     */
     public Pair<Booking, Exception> createBooking(String day, int bookingId, int clientId, String facilName, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
 
         Exception e;
@@ -121,6 +137,14 @@ public class BookingManager {
         return new Pair<Booking, Exception>(b, null);
     }
 
+    /**
+     * Offset a booking
+     * @param facilName name of the facility
+     * @param bookingId identifier of the booking
+     * @param offset number of slots to offset by
+     * @param facilTable facility table
+     * @return Pair of updated booking object and exception (if any error is thrown)
+     */
     public Pair<Booking, Exception> offsetBooking(String facilName, int bookingId, int offset, Hashtable facilTable){
         //FIXME offset should be in minutes
         Exception e;
@@ -153,6 +177,15 @@ public class BookingManager {
         return new Pair<Booking, Exception>(b, null);
 
     }
+
+    /**
+     * Extend a booking
+     * @param facilName name of the facility
+     * @param bookingId identifier of the booking
+     * @param offset number of slots to offset by
+     * @param facilTable facility table
+     * @return Pair of updated booking object and exception (if any error is thrown)
+     */
     public Pair<Booking, Exception> extendBooking(String facilName, int bookingId, int offset, Hashtable facilTable){
         //FIXME offset should be in minutes
         Exception e;
@@ -185,7 +218,13 @@ public class BookingManager {
         return new Pair<Booking, Exception>(b, null);
     }
 
-
+    /**
+     * Deletes a booking
+     * @param facilName name of the facility
+     * @param bookingId identifier of booking
+     * @param facilTable facility table
+     * @return exception (if error is thrown, else nil)
+     */
     public Exception deleteBooking(String facilName, int bookingId, Hashtable facilTable){
 
         Exception e;
@@ -213,16 +252,34 @@ public class BookingManager {
     }
 
 /*------------------------------------- Helper Functions ----------------------------------------------------------------------*/
+
+    /**
+     * Helper method to sort bookings
+     * @param bookingsList list of bookings
+     */
     public void sortBookings(ArrayList<Booking> bookingsList){
         Collections.sort(bookingsList, Booking.BookingComparator);
     }
 
+    /**
+     * Helper method to get Booking object by ID and facility name
+     * @param facilName name of the facility
+     * @param bookingId identifier of booking
+     * @param facilTable facility table
+     * @return booking object
+     */
     private Booking findFacilBookingById(String facilName, int bookingId, Hashtable facilTable){
         Facility facil = (Facility) facilTable.get(facilName);
         Booking b = facil.getBookingById(bookingId);
         return b;
     }
 
+    /**
+     * Helper method to check if facility exists
+     * @param facilName name of the facility
+     * @param facilTable facility table
+     * @return exception if facility name is invalid, else null
+     */
     private Exception doValidFacilCheck(String facilName, Hashtable facilTable){
         if (!facilTable.containsKey(facilName)){
             Exception e = new NoSuchElementException("Facility does not exist");
@@ -233,7 +290,11 @@ public class BookingManager {
         }
     }
 
-
+    /**
+     * Helper method to check if booking exists
+     * @param b booking object
+     * @return exception if booking does not exist, else null
+     */
     private Exception doBookingNotNullCheck(Booking b){
         if(b == null){
             Exception e = new NoSuchElementException("Booking does not exist");
@@ -245,6 +306,15 @@ public class BookingManager {
 
     }
 
+    /**
+     * Helper method to check if new booking does not overlap with existing bookings, for
+     * @param day day of the week
+     * @param facilName name of the facility
+     * @param newStart start time of new booking
+     * @param newEnd end time of new booking
+     * @param facilTable facility table
+     * @return exception if slot is not available, else null
+     */
     private Exception doAvailabilityCheck(String day, String facilName, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
         //Check if timeslot is available
         ArrayList<String> queryDates = new ArrayList<>();
@@ -276,7 +346,16 @@ public class BookingManager {
         }
     }
 
-    // doAvailabilityCheckExceptCurrent() checks if the timeslots of a booking is valid
+    /**
+     * Helper method to check if updated booking overlaps with existing bookings (for offset/extend use cases)
+     * @param day day of the week
+     * @param bookingId identifier of booking
+     * @param facilName name of the facility
+     * @param newStart start time of booking
+     * @param newEnd end time of booking
+     * @param facilTable facility table
+     * @return exception if slot is not available, else null
+     */
     private Exception doAvailabilityCheckExceptCurrent(String day, int bookingId, String facilName, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
 
 
@@ -306,7 +385,14 @@ public class BookingManager {
         return null;
     }
 
-    // doBookingCheck() checks if a booking is valid, independent of other bookings
+    /**
+     * Helper method to check if booking is valid
+     * @param facilName name of the facility
+     * @param newStart start time of booking
+     * @param newEnd end time of booking
+     * @param facilTable facility table
+     * @return exception if slot is not available, else null
+     */
     private Exception doBookingCheck(String facilName, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
 //        if (!isValidFacil(facilName, facilTable)){
 //            Exception e = new NoSuchElementException("Facility does not exist"); //TODO review this exception
@@ -325,7 +411,12 @@ public class BookingManager {
         return null;
     }
 
-
+    /**
+     * Helper method to check if start time is before end time
+     * @param newStart start time
+     * @param newEnd end time
+     * @return boolean
+     */
     private Boolean isStartBeforeEnd(LocalTime newStart, LocalTime newEnd){
         if(newStart.compareTo(newEnd) < 0){
             return true;
@@ -344,6 +435,12 @@ public class BookingManager {
 //        }
 //    }
 
+    /**
+     * Helper method to check if time is within bounds of facility's opening and closing
+     * @param newStart start time
+     * @param newEnd end time
+     * @return boolean
+     */
     private Boolean isValidStartEndTime(LocalTime newStart, LocalTime newEnd){
         Boolean conditionOne = newStart.compareTo(this.openTime) <0;
         Boolean conditionTwo = newEnd.compareTo(this.closeTime)>0;
