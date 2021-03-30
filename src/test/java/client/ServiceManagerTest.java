@@ -1,5 +1,6 @@
 package client;
 
+import commons.exceptions.InvalidTimeException;
 import commons.exceptions.InvalidDateFormatException;
 import commons.exceptions.InvalidDayException;
 import org.junit.jupiter.api.Test;
@@ -70,7 +71,7 @@ class ServiceManagerTest {
             assertEquals(actualDatetime.day, expectedDatetime.day);
             assertEquals(actualDatetime.hour, expectedDatetime.hour);
             assertEquals(actualDatetime.minute, expectedDatetime.minute);
-        } catch (InvalidDateFormatException | InvalidDayException e) {
+        } catch (InvalidDateFormatException | InvalidDayException | InvalidTimeException e) {
             e.printStackTrace();
         }
 

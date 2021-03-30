@@ -3,6 +3,10 @@ package client;
 import java.net.InetAddress;
 import java.util.Scanner;
 import client.ServiceManager;
+import commons.exceptions.InvalidDateFormatException;
+import commons.exceptions.InvalidDayException;
+import commons.exceptions.InvalidIntervalException;
+import commons.exceptions.InvalidTimeException;
 import commons.rpc.ClientCommunicator;
 
 public class CLI {
@@ -31,10 +35,18 @@ public class CLI {
             }
             switch (choice) {
                 case 1:
-                    serviceManager.queryAvailability();
+                    try {
+                        serviceManager.queryAvailability();
+                    } catch (InvalidDayException e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case 2:
-                    serviceManager.bookFacility();
+                    try {
+                        serviceManager.bookFacility();
+                    } catch (InvalidDateFormatException | InvalidDayException | InvalidTimeException | InvalidIntervalException e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case 3:
                     serviceManager.offsetBooking();
