@@ -35,6 +35,10 @@ public class Facility {
 
     }
 
+    /**
+     * Removes a booking from the bookingsTable
+     * @param booking
+     */
     public void removeBooking(Booking booking){
         String bookingDay = booking.getDay();
         ArrayList bookingsList = this.bookingsTable.get(bookingDay);
@@ -49,6 +53,12 @@ public class Facility {
 //        return e;
     }
 
+    /**
+     * Offsets a booking
+     * @param booking
+     * @param newStart
+     * @param newEnd
+     */
     public void offsetBooking(Booking booking, LocalTime newStart, LocalTime newEnd){
         String bookingDay = booking.getDay();
         ArrayList bookingsList = this.bookingsTable.get(bookingDay);
@@ -61,6 +71,11 @@ public class Facility {
         }
     }
 
+    /**
+     * Extends the end time of a booking
+     * @param booking
+     * @param newEnd
+     */
     public void extendBooking(Booking booking, LocalTime newEnd){
         String bookingDay = booking.getDay();
         ArrayList bookingsList = this.bookingsTable.get(bookingDay);
@@ -72,10 +87,18 @@ public class Facility {
         }
     }
 
+    /**
+     * Aads an observer for this facility
+     * @param o
+     */
     public void addObserver(FacilityObserver o){
         observerList.add(o);
     }
 
+    /**
+     * Updates list of observers
+     * @return
+     */
     public ArrayList<FacilityObserver> getUpdatedObservers(){
 
         ArrayList<FacilityObserver> observersToRemove = new ArrayList<>();
@@ -93,6 +116,11 @@ public class Facility {
         return observerList;
     }
 
+    /**
+     * Checks if valid observer is valid
+     * @param o
+     * @return
+     */
     private Boolean isValidObserver(FacilityObserver o){
 
         if (o.getEndDate().compareTo(LocalDateTime.now()) <0 ){
@@ -104,11 +132,20 @@ public class Facility {
 
     }
 
-
+    /**
+     * Retrieves booking by day
+     * @param day
+     * @return
+     */
     public ArrayList<Booking> getBookingsByDay(String day){
         return this.bookingsTable.get(day);
     }
 
+    /**
+     * Retrieves booking by ID
+     * @param bookingId
+     * @return
+     */
     public Booking getBookingById (int bookingId){
         Enumeration<ArrayList<Booking>> allbookings = this.bookingsTable.elements();
 
@@ -124,6 +161,10 @@ public class Facility {
         return null;
     }
 
+    /**
+     * Retrieves bookings table
+     * @return
+     */
     public Hashtable getBookingsTable(){
         return this.bookingsTable;
     }

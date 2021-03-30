@@ -58,6 +58,10 @@ public class ServerCommunicator {
         }
     }
 
+    /**
+     * Allows server to listen for requests from client
+     * @return ClientRequest object which is a wrapper for a Request object with metadata such as client IP and port
+     */
     public Optional<ClientRequest> receive() {
         System.out.println("receiving");
         Packet currPacket = this.receivePacket();
@@ -102,7 +106,11 @@ public class ServerCommunicator {
         }
     }
 
-    // to test timeout
+    /**
+     * Helper method to test server timeout
+     * @param timeout
+     * @return ClientRequest object which is a wrapper for a Request object with metadata such as client IP and port
+     */
     public Optional<ClientRequest> receive(int timeout) {
         try {
             this.socket.setSoTimeout(timeout);
@@ -120,6 +128,12 @@ public class ServerCommunicator {
         return Optional.empty();
     }
 
+    /**
+     * Sends a Response object to a client
+     * @param r Response object constructed by Translator object
+     * @param clientAddress IP address of client
+     * @param clientPort Port of client socket
+     */
     public void send(Response r, InetAddress clientAddress, int clientPort) {
         System.out.println("Sending " + r.getClass().getName() + " to " + clientAddress + " port " + clientPort);
         ByteBuffer dataBuf = ByteBuffer.allocate(20000);
@@ -167,6 +181,10 @@ public class ServerCommunicator {
         System.out.println("Sent" + " to Address: " + clientAddress + ", Port: " + clientPort);
     }
 
+    /**
+     * Helper method to receive indiviudal datagram packets
+     * @return datagram packet
+     */
     private Packet receivePacket(){
         byte[] buffer = new byte[this.packetSize];
         DatagramPacket message = new DatagramPacket(buffer, buffer.length);
@@ -193,6 +211,11 @@ public class ServerCommunicator {
         return new Packet(requestID, datagramNum, totalDatagramPackets, messageSize, senderAddress, senderPort, messageBuffer);
     }
 
+    /**
+     * Helper method to check for duplicate request
+     * @param clientRequest
+     * @return index of request object in the list of cached request objects
+     */
     private int checkDuplicateRequest(ClientRequest clientRequest){
         int clientRequestHash = hashClientRequest(clientRequest);
 //        System.out.println("Hashed: " + clientRequestHash);
@@ -208,6 +231,11 @@ public class ServerCommunicator {
         }
     }
 
+    /**
+     * Helper method to hash a client request
+     * @param clientRequest
+     * @return hashcode
+     */
     private int hashClientRequest(ClientRequest clientRequest){
         int hash = 0;
         hash += clientRequest.clientAddress.hashCode();
@@ -222,6 +250,9 @@ public class ServerCommunicator {
         return hash;
     }
 
+    /**
+     * Helper method to close the socket
+     */
     public void close() {
         System.out.println("Closing socket");
         this.socket.close();

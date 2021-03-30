@@ -10,6 +10,12 @@ import commons.exceptions.InvalidTimeException;
 import commons.rpc.ClientCommunicator;
 
 public class CLI {
+    /**
+     * Starts the command line interface, loops until user signals to exit
+     * @param router ClientCommunicator object for sending and receving of packets
+     * @param serverAddress IP address of server
+     * @param serverPort Port number of server
+     */
     public static void run(ClientCommunicator router, InetAddress serverAddress, int serverPort) {
         ServiceManager serviceManager = new ServiceManager(router, serverAddress, serverPort);
         while (true) {

@@ -22,6 +22,9 @@ public class Booking {
         this.end = end;
     }
 
+    /**
+     * Comparator to sort bookings
+     */
     public static Comparator<Booking> BookingComparator = new Comparator<Booking>(){
         public int compare(Booking b1, Booking b2){
             LocalTime s1 = b1.getStart();

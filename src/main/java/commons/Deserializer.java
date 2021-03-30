@@ -15,10 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Deserializer {
+    /**
+     * Generic deserialisation method for any request or response objects
+     * @param bb input ByteBuffer to hold sequence of bytes of the deserialised object
+     * @return
+     */
     public static Object deserializeObject(ByteBuffer bb) {
         String className = deserializeString(bb);
         int numFields = deserializeInteger(bb);
-        System.out.println(className);
         try {
             Class<?> c = Class.forName(className);
             Object o = c.newInstance();
@@ -28,11 +32,9 @@ public class Deserializer {
             for (Field f: fields) {
                 fieldTypeMap.put(f.getName(), f.getType());
             }
-//            System.out.println(fieldTypeMap);
             for (int i = 0; i < numFields; i++) {
                 String fieldName = deserializeString(bb);
                 Object val;
-//                System.out.println(fieldTypeMap.get(fieldName));
                 if (fieldTypeMap.get(fieldName).equals(String.class)) {
                     val = deserializeString(bb);
                 } else if (fieldTypeMap.get(fieldName).equals(Integer.class)) {
@@ -55,10 +57,21 @@ public class Deserializer {
         }
         return null;
     }
+
+    /**
+     * Helper method to deserialise an integer
+     * @param bb ByteBuffer holding the sequence of bytes
+     * @return deserialised integer
+     */
     public static int deserializeInteger(ByteBuffer bb) {
         return bb.getInt();
     }
 
+    /**
+     * Helper method to deserialise a string
+     * @param bb ByteBuffer holding the sequence of bytes
+     * @return deserialised string
+     */
     public static String deserializeString(ByteBuffer bb) {
         int length = bb.getInt();
         byte[] bytes = new byte[length];
@@ -68,6 +81,11 @@ public class Deserializer {
         return new String(bytes);
     }
 
+    /**
+     * Helper method to deserialise a list
+     * @param bb ByteBuffer holding the sequence of bytes
+     * @return deserialised list
+     */
     public static List<Object> deserializeList(ByteBuffer bb) {
         int length = deserializeInteger(bb);
         if (length == 0) {
