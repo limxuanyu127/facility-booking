@@ -3,6 +3,8 @@ package commons;
 import commons.requests.Request;
 import commons.requests.TestRequest;
 import commons.responses.Response;
+import commons.utils.Day;
+
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -28,6 +30,8 @@ public class Serializer {
             serializeString((String) o, bb);
         } else if (o.getClass().equals(ArrayList.class)) {
             serializeList((ArrayList<?>) o, bb);
+        } else if (o.getClass().equals(Day.class)) {
+            serializeDayEnum((Day) o, bb);
         } else {
             String className = o.getClass().getName();
             serializeString(className, bb);
@@ -85,6 +89,11 @@ public class Serializer {
         for (Object o: l) {
             serializeObject(o, bb);
         }
+    }
+
+    public static void serializeDayEnum(Day d, ByteBuffer bb) {
+        String eName = d.name();
+        serializeString(eName, bb);
     }
 
 }

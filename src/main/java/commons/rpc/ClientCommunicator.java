@@ -220,7 +220,7 @@ public class ClientCommunicator {
         System.out.println("receiving");
         Packet currPacket = this.receivePacket();
         int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
-        System.out.println("total packets" + currPacket.totalDatagramPackets);
+//        System.out.println("total packets" + currPacket.totalDatagramPackets);
 
         ArrayList<Packet> packetsOrdered = new ArrayList<>(currPacket.totalDatagramPackets);
         packetsOrdered.add(currPacket.datagramNum, currPacket);
@@ -242,14 +242,14 @@ public class ClientCommunicator {
         }
 
         for (Packet p : packetsOrdered){
-            System.out.println("datagram no. " + p.datagramNum);
+//            System.out.println("datagram no. " + p.datagramNum);
             combinedMessageBuffer.put(p.messageBuffer);
         }
 
 //        System.out.println(combinedMessageBuffer.position(), combinedMessageBuffer.limit());
         combinedMessageBuffer.flip();
         Response response = (Response) Deserializer.deserializeObject(combinedMessageBuffer);
-        System.out.println(response.getClass().getName());
+//        System.out.println(response.getClass().getName());
 
         return response;
     }
@@ -259,7 +259,7 @@ public class ClientCommunicator {
      * @return datagram packet
      */
     private Packet receivePacket(){
-        System.out.println("Receive packet");
+//        System.out.println("Receive packet");
         byte[] buffer = new byte[this.packetSize];
         DatagramPacket message = new DatagramPacket(buffer, buffer.length);
         try {

@@ -1,5 +1,6 @@
 package server.entities;
 
+import commons.utils.Day;
 import server.managers.*;
 
 import java.time.*;
@@ -8,7 +9,7 @@ import java.util.*;
 public class Facility {
     private ArrayList<FacilityObserver> observerList = new ArrayList<FacilityObserver>();
     private String name;
-    private Hashtable<String, ArrayList<Booking>> bookingsTable = new Hashtable<String, ArrayList<Booking>>();
+    private Hashtable<Day, ArrayList<Booking>> bookingsTable = new Hashtable<Day, ArrayList<Booking>>();
 
 
     public Facility(String name){
@@ -20,7 +21,7 @@ public class Facility {
         //Check
         LocalTime startTime = booking.getStart();
         LocalTime endTime = booking.getEnd();
-        String day =booking.getDay();
+        Day day = booking.getDay();
 
         // All timing related checks are done in booking manager
 
@@ -40,7 +41,7 @@ public class Facility {
      * @param booking
      */
     public void removeBooking(Booking booking){
-        String bookingDay = booking.getDay();
+        Day bookingDay = booking.getDay();
         ArrayList bookingsList = this.bookingsTable.get(bookingDay);
         for (int i =0; i< bookingsList.size(); i++){
             Booking b = (Booking) bookingsList.get(i);
@@ -60,7 +61,7 @@ public class Facility {
      * @param newEnd
      */
     public void offsetBooking(Booking booking, LocalTime newStart, LocalTime newEnd){
-        String bookingDay = booking.getDay();
+        Day bookingDay = booking.getDay();
         ArrayList bookingsList = this.bookingsTable.get(bookingDay);
         for (int i =0; i< bookingsList.size(); i++){
             Booking b = (Booking) bookingsList.get(i);
@@ -77,7 +78,7 @@ public class Facility {
      * @param newEnd
      */
     public void extendBooking(Booking booking, LocalTime newEnd){
-        String bookingDay = booking.getDay();
+        Day bookingDay = booking.getDay();
         ArrayList bookingsList = this.bookingsTable.get(bookingDay);
         for (int i =0; i< bookingsList.size(); i++){
             Booking b = (Booking) bookingsList.get(i);
@@ -137,7 +138,7 @@ public class Facility {
      * @param day
      * @return
      */
-    public ArrayList<Booking> getBookingsByDay(String day){
+    public ArrayList<Booking> getBookingsByDay(Day day){
         return this.bookingsTable.get(day);
     }
 

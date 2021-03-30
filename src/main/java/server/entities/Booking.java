@@ -1,5 +1,7 @@
 package server.entities;
 
+import commons.utils.Day;
+
 import java.time.*;
 import java.util.Comparator;
 //import java.util.Date;
@@ -9,12 +11,12 @@ public class Booking {
     private int bookingId;
     private int clientId; //TODO check if client it is int or string
     private String facilityName;
-    private String day;
+    private Day day;
     private LocalTime start;
     private LocalTime end;
 
 
-    public Booking(String day, int bookingId, String facilityName, LocalTime start, LocalTime end) {
+    public Booking(Day day, int bookingId, String facilityName, LocalTime start, LocalTime end) {
         this.day = day;
         this.bookingId = bookingId;
         this.facilityName = facilityName;
@@ -34,7 +36,7 @@ public class Booking {
         }
     };
 
-    public String getDay() {
+    public Day getDay() {
         return day;
     }
 

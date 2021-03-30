@@ -1,5 +1,6 @@
 package server.managers;
 
+import commons.utils.Day;
 import server.entities.*;
 
 import java.util.*;
@@ -26,7 +27,7 @@ public class BookingManager {
      * @param facilTable facility table
      * @return pair of hashtable keyed on day of the week with list of availabilities, and exception to be returned to the user
      */
-    public Pair<Hashtable, Exception> queryAvailability(String facilName, ArrayList<String> dates, Hashtable facilTable){
+    public Pair<Hashtable, Exception> queryAvailability(String facilName, ArrayList<Day> dates, Hashtable facilTable){
 
         Exception e;
         Hashtable allResults = new Hashtable();
@@ -39,7 +40,7 @@ public class BookingManager {
         }
 
         for (int j=0; j < dates.size();j++){
-            String currDay = dates.get(j);
+            Day currDay = dates.get(j);
             ArrayList dayResults = new ArrayList<>();
 
             if(!currFacil.getBookingsTable().containsKey(currDay)){
@@ -105,7 +106,7 @@ public class BookingManager {
      * @param facilTable facility table
      * @return Pair of Booking object and exception (if any error is thrown)
      */
-    public Pair<Booking, Exception> createBooking(String day, int bookingId, int clientId, String facilName, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
+    public Pair<Booking, Exception> createBooking(Day day, int bookingId, int clientId, String facilName, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
 
         Exception e;
 
@@ -160,7 +161,7 @@ public class BookingManager {
             return new Pair<Booking, Exception>(null, e);
         }
 
-        String day = b.getDay();
+        Day day = b.getDay();
         LocalTime newStart = b.getStart().plusMinutes(offset);
         LocalTime newEnd = b.getEnd().plusMinutes(offset);
         e = doBookingCheck(facilName,newStart,newEnd,facilTable);
@@ -204,7 +205,7 @@ public class BookingManager {
         LocalTime bStart = b.getStart();
         LocalTime bEnd = b.getEnd();
         LocalTime newEnd = bEnd.plusMinutes(offset);
-        String day = b.getDay();
+        Day day = b.getDay();
         e = doBookingCheck(facilName,bStart,newEnd,facilTable);
         if (e != null){
             return new Pair<Booking, Exception>(null, e);
@@ -315,9 +316,9 @@ public class BookingManager {
      * @param facilTable facility table
      * @return exception if slot is not available, else null
      */
-    private Exception doAvailabilityCheck(String day, String facilName, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
+    private Exception doAvailabilityCheck(Day day, String facilName, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
         //Check if timeslot is available
-        ArrayList<String> queryDates = new ArrayList<>();
+        ArrayList<Day> queryDates = new ArrayList<>();
         queryDates.add(day);
 
 
@@ -356,7 +357,7 @@ public class BookingManager {
      * @param facilTable facility table
      * @return exception if slot is not available, else null
      */
-    private Exception doAvailabilityCheckExceptCurrent(String day, int bookingId, String facilName, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
+    private Exception doAvailabilityCheckExceptCurrent(Day day, int bookingId, String facilName, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
 
 
         Facility facil =(Facility) facilTable.get(facilName);

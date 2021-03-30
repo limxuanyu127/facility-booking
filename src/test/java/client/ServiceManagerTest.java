@@ -3,6 +3,7 @@ package client;
 import commons.exceptions.InvalidTimeException;
 import commons.exceptions.InvalidDateFormatException;
 import commons.exceptions.InvalidDayException;
+import commons.utils.Day;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import commons.utils.Datetime;
@@ -66,7 +67,7 @@ class ServiceManagerTest {
         String datetimeString = "Monday/13/30";
         Datetime actualDatetime;
         actualDatetime = ServiceManager.getDatetimeFromString(datetimeString);
-        Datetime expectedDatetime = new Datetime("Monday", 13, 30);
+        Datetime expectedDatetime = new Datetime(Day.Monday, 13, 30);
         assertEquals(actualDatetime.day, expectedDatetime.day);
         assertEquals(actualDatetime.hour, expectedDatetime.hour);
         assertEquals(actualDatetime.minute, expectedDatetime.minute);

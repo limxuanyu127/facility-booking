@@ -1,16 +1,10 @@
 package commons;
 
-import commons.Serializer;
-import commons.requests.DeleteBookingRequest;
-import commons.requests.QueryAvailabilityRequest;
-import commons.requests.TestRequest;
-import commons.utils.Datetime;
+import commons.utils.Day;
 
-import javax.management.Query;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,8 +35,9 @@ public class Deserializer {
                     val = deserializeInteger(bb);
                 } else if (fieldTypeMap.get(fieldName).equals(List.class)) {
                     val = deserializeList(bb);
-                }
-                else {
+                } else if (fieldTypeMap.get(fieldName).equals(Day.class)) {
+                    val = deserializeDayEnum(bb);
+                } else {
                     val = Deserializer.deserializeObject(bb);
                 }
                 try {
@@ -100,10 +95,17 @@ public class Deserializer {
                 l.add(deserializeInteger(bb));
             } else if (listObjectType.equals("java.util.ArrayList")) {
                 l.add(deserializeList(bb));
+            } else if (listObjectType.equals("commons.utils.Day")) {
+                l.add(deserializeDayEnum(bb));
             } else {
                 l.add(deserializeObject(bb));
             }
         }
         return l;
+    }
+
+    public static Day deserializeDayEnum(ByteBuffer bb) {
+        String eName = deserializeString(bb);
+        return Day.valueOf(eName);
     }
 }
