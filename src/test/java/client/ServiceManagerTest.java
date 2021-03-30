@@ -65,16 +65,11 @@ class ServiceManagerTest {
     void getDatetimeFromString() {
         String datetimeString = "Monday/13/30";
         Datetime actualDatetime;
-        try {
-            actualDatetime = ServiceManager.getDatetimeFromString(datetimeString);
-            Datetime expectedDatetime = new Datetime("Monday", 13, 30);
-            assertEquals(actualDatetime.day, expectedDatetime.day);
-            assertEquals(actualDatetime.hour, expectedDatetime.hour);
-            assertEquals(actualDatetime.minute, expectedDatetime.minute);
-        } catch (InvalidDateFormatException | InvalidDayException | InvalidTimeException e) {
-            e.printStackTrace();
-        }
-
+        actualDatetime = ServiceManager.getDatetimeFromString(datetimeString);
+        Datetime expectedDatetime = new Datetime("Monday", 13, 30);
+        assertEquals(actualDatetime.day, expectedDatetime.day);
+        assertEquals(actualDatetime.hour, expectedDatetime.hour);
+        assertEquals(actualDatetime.minute, expectedDatetime.minute);
     }
 
 
