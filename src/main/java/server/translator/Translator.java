@@ -44,7 +44,7 @@ public class Translator {
         Exception outputException = outputPair.getValue();
 
         if (outputException != null){
-            responseMessage = new ResponseMessage(400, outputException.getMessage());
+            responseMessage = new ResponseMessage(getStatusCode(outputException), outputException.getMessage());
             response = new ErrorResponse(responseMessage);
         }
         else{
@@ -75,7 +75,7 @@ public class Translator {
         Exception outputException = outputPair.getValue();
 
         if (outputException != null){
-            responseMessage = new ResponseMessage(400, outputException.getMessage()) ;
+            responseMessage = new ResponseMessage(getStatusCode(outputException), outputException.getMessage()) ;
             response = new ErrorResponse(responseMessage);
         }
         else{
@@ -102,7 +102,7 @@ public class Translator {
         Exception outputException = outputPair.getValue();
 
         if (outputException != null){
-            responseMessage = new ResponseMessage(400, outputException.getMessage()) ;
+            responseMessage = new ResponseMessage(getStatusCode(outputException), outputException.getMessage()) ;
             response = new ErrorResponse(responseMessage);
 
         }
@@ -131,7 +131,7 @@ public class Translator {
         Exception outputException = outputPair.getValue();
 
         if (outputException != null){
-            responseMessage = new ResponseMessage(400, outputException.getMessage()) ;
+            responseMessage = new ResponseMessage(getStatusCode(outputException), outputException.getMessage()) ;
             response = new ErrorResponse(responseMessage);
 
         }
@@ -155,7 +155,7 @@ public class Translator {
 
         Exception outputException = bookingManager.deleteBooking(facilName, bookingId, facilTable);
         if (outputException != null){
-            responseMessage = new ResponseMessage(400, outputException.getMessage()) ;
+            responseMessage = new ResponseMessage(getStatusCode(outputException), outputException.getMessage()) ;
             response = new ErrorResponse(responseMessage);
 
         }
@@ -176,7 +176,7 @@ public class Translator {
         Exception outputException = observerManager.addObserver(facilName, numDays, facilTable, ip, port);
 
         if (outputException != null){
-            responseMessage = new ResponseMessage(400, outputException.getMessage()) ;
+            responseMessage = new ResponseMessage(getStatusCode(outputException), outputException.getMessage()) ;
             response = new ErrorResponse(responseMessage);
 
         }
@@ -250,6 +250,37 @@ public class Translator {
         }
         return allConvertedAvailability;
     }
+
+    public int getStatusCode(Exception e){
+
+        int statusCode = 400;
+        String message = e.getMessage();
+        switch (message){
+            case "Facility does not exist":
+                statusCode = 401;
+                break;
+            case "Booking does not exist":
+                statusCode = 402;
+                break;
+            case "Timeslot is not available":
+                statusCode = 403;
+                break;
+
+            case "Start time must be before end time":
+                statusCode = 404;
+                break;
+            case "Start time is before 08:00 or End time is after 22:00":
+                statusCode = 405;
+                break;
+            default:
+                statusCode = 400;
+
+        }
+        return statusCode;
+
+    }
+
+
 
 }
 

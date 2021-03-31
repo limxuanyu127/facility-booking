@@ -427,15 +427,6 @@ public class BookingManager {
         }
     }
 
-//    private Boolean isValidFacil(String facilName, Hashtable facilTable){
-//        if (facilTable.containsKey(facilName)){
-//            return true;
-//        }
-//        else{
-//            return false;
-//        }
-//    }
-
     /**
      * Helper method to check if time is within bounds of facility's opening and closing
      * @param newStart start time
@@ -455,55 +446,3 @@ public class BookingManager {
 
 }
 
-
-//    public Pair<Booking, Exception> updateBooking(String facilName, int bookingId, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
-//
-//        Exception e;
-//        Booking b = findFacilBooking(facilName, bookingId, facilTable);
-//        String day = b.getDay();
-//        int clientId = b.getClientId();
-//        Facility facil =(Facility) facilTable.get(facilName);
-//
-//        e = doBookingNotNullCheck(b);
-//        if(e != null){
-//            return new Pair<Booking, Exception>(null, e);
-//        }
-//        e = doBookingCheck(facilName,newStart,newEnd,facilTable);
-//        if (e != null){
-//            return new Pair<Booking, Exception>(null, e);
-//        }
-//        e = doAvailabilityCheckExceptCurrent(bookingId, facilName,newStart,newEnd,facilTable);
-//        if (e != null){
-//            return new Pair<Booking, Exception>(null, e);
-//        }
-//
-//        e = facil.removeBooking(b);
-//        if (e!= null){
-//            return new Pair<Booking, Exception>(null, e);
-//        }else{
-//            Booking newBooking = new Booking(bookingId, clientId, facilName, newStart, newEnd);
-//            facil.addBooking(newBooking);
-//            return new Pair<Booking, Exception>(newBooking, null);
-//        }
-//    }
-
-
-
-//    public ArrayList localToDatetime(ArrayList results, String day){
-//        ArrayList convertedResults = new ArrayList();
-//        for (ArrayList slot:(ArrayList<ArrayList>)results){
-//            ArrayList newSlot = new ArrayList();
-//            LocalTime start = (LocalTime) newSlot.get(0);
-//            LocalTime end = (LocalTime) newSlot.get(1);
-//
-//            Datetime newStart = new Datetime(day, start.getHour(), start.getMinute());
-//            Datetime newEnd = new Datetime(day, end.getHour(), end.getMinute());
-//
-//            newSlot.add(newStart);
-//            newSlot.add(newEnd);
-//
-//            convertedResults.add(newSlot);
-//        }
-//
-//        return convertedResults;
-//    }

@@ -141,8 +141,9 @@ class TranslatorTest {
         assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
         String message = ((ErrorResponse) response).responseMessage.message;
         int statusCode = ((ErrorResponse) response).responseMessage.statusCode;
-        assertEquals(statusCode, 400);
+        assertEquals(statusCode, 401);
         assertEquals(message, "Facility does not exist");
+
     }
 
     @Test
@@ -167,6 +168,7 @@ class TranslatorTest {
 
         assertEquals("success", ((BookFacilityResponse) response).responseMessage.message);
 
+
     }
 
     @Test
@@ -185,6 +187,50 @@ class TranslatorTest {
         Response response = translator.createBooking(request, bookingId, clientId, bookingManager, facilTable);
         assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
         assertEquals("Timeslot is not available", ((ErrorResponse) response).responseMessage.message);
+        int statusCode = ((ErrorResponse) response).responseMessage.statusCode;
+        assertEquals(statusCode, 403);
+
+    }
+
+    @Test
+    void createBooking_StartTimeTooEarly_Exception(){
+
+        int bookingId = 100;
+        int clientId = 22;
+
+        String facilName = "badmintoncourt";
+        Day day = Day.Tuesday;
+        Datetime start = new Datetime(day,7,30 );
+        Datetime end = new Datetime(day,14,30 );
+
+        BookFacilityRequest request = new BookFacilityRequest(facilName, start, end);
+
+        Response response = translator.createBooking(request, bookingId, clientId, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
+        assertEquals("Start time is before 08:00 or End time is after 22:00", ((ErrorResponse) response).responseMessage.message);
+        int statusCode = ((ErrorResponse) response).responseMessage.statusCode;
+        assertEquals(statusCode, 405);
+
+    }
+
+    @Test
+    void createBooking_StartTimeAfterEnd_Exception(){
+
+        int bookingId = 100;
+        int clientId = 22;
+
+        String facilName = "badmintoncourt";
+        Day day = Day.Tuesday;
+        Datetime start = new Datetime(day,13,30 );
+        Datetime end = new Datetime(day,12,30 );
+
+        BookFacilityRequest request = new BookFacilityRequest(facilName, start, end);
+
+        Response response = translator.createBooking(request, bookingId, clientId, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
+        assertEquals("Start time must be before end time", ((ErrorResponse) response).responseMessage.message);
+        int statusCode = ((ErrorResponse) response).responseMessage.statusCode;
+        assertEquals(statusCode, 404);
 
     }
 
@@ -229,6 +275,9 @@ class TranslatorTest {
         Response response = translator.offsetBooking(request, bookingManager, facilTable);
         assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
         assertEquals("Timeslot is not available", ((ErrorResponse) response).responseMessage.message);
+
+        int statusCode = ((ErrorResponse) response).responseMessage.statusCode;
+        assertEquals(statusCode, 403);
     }
 
 
