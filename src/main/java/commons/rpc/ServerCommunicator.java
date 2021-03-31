@@ -187,7 +187,6 @@ public class ServerCommunicator {
             }
             DatagramPacket message = new DatagramPacket(packetByteArray, packetByteArray.length, clientAddress, clientPort);
 
-
             if (Math.random() > this.packetDropOffRate){
                 try {
                     this.socket.send(message);
@@ -196,7 +195,7 @@ public class ServerCommunicator {
                 }
             }
             else {
-                System.out.println("Packet Dropped");
+                System.out.println("Packet " + i +" Dropped");
             }
         }
         /**
@@ -246,7 +245,7 @@ public class ServerCommunicator {
         int clientRequestHash = hashClientRequest(clientRequest);
 //        System.out.println("Hashed: " + clientRequestHash);
         if (clientRequestsHashed.contains(clientRequestHash)){
-            System.out.println("Duplicate request received");
+            System.out.println("Duplicate request of " + clientRequest.request.getClass().getName() + " received");
             int index = clientRequestsHashed.indexOf(clientRequestHash);
             return index;
         }

@@ -17,10 +17,10 @@ public class Main {
 
         String hostname = args[0];
         int serverPort = Integer.parseInt(args[1]);
-        int clientPort = 3000;
+        int clientPort = 3002;
         int timeout = 1000; // in ms
-        int maxTries = 3;
-        double packetDropOffRate = 0.3;
+        int maxTries = 5;
+        double packetDropOffRate = 0;
         
 //        String hostname = "localhost";
         //        int serverPort = 5000;
