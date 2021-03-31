@@ -290,8 +290,6 @@ public class ClientCommunicator {
         }
         combinedMessageBuffer.flip();
         Response response = (Response) Deserializer.deserializeObject(combinedMessageBuffer);
-
-//        return new Pair<Response, Packet[]>(response, null);
         return response;
     }
 
@@ -321,7 +319,6 @@ public class ClientCommunicator {
         messageBuffer.put(buffer, this.headerSize, messageSize);
         messageBuffer.position(0);
 
-//        System.out.println("received packet " + datagramNum);
         return new Packet(requestID, datagramNum, totalDatagramPackets, messageSize, senderAddress, senderPort, messageBuffer);
     }
 

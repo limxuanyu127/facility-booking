@@ -1,5 +1,6 @@
 package server.managers;
 
+import commons.utils.Day;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,11 +35,11 @@ class BookingManagerTest {
         //Populate booking
         LocalTime startOne = LocalTime.of(14, 00);
         LocalTime endOne = LocalTime.of( 16, 00);
-        Booking bookingOne = new Booking("Tuesday",1, "badmintoncourt", startOne, endOne);
+        Booking bookingOne = new Booking(Day.Tuesday,1, "badmintoncourt", startOne, endOne);
 
         LocalTime startTwo = LocalTime.of(20, 00);
         LocalTime endTwo = LocalTime.of(22, 00);
-        Booking bookingTwo = new Booking("Tuesday", 2, "badmintoncourt", startTwo, endTwo);
+        Booking bookingTwo = new Booking(Day.Tuesday, 2, "badmintoncourt", startTwo, endTwo);
 
         Facility targetFacil = facilTable.get("badmintoncourt");
         targetFacil.addBooking(bookingOne);
@@ -53,9 +54,8 @@ class BookingManagerTest {
 
     @Test
     void queryAvailability_NoConflict_NoException() {
-
-        String expectedDay = "Tuesday";
-        ArrayList<String> queryDays = new ArrayList<String>();
+        Day expectedDay = Day.Tuesday;
+        ArrayList<Day> queryDays = new ArrayList<Day>();
         queryDays.add(expectedDay);
         Pair<Hashtable, Exception> queryResults = bookingManager.queryAvailability("badmintoncourt", queryDays, facilTable);
         Hashtable outputBookings = queryResults.getKey();
@@ -87,7 +87,7 @@ class BookingManagerTest {
     void createBooking_NoConflict_NoException() {
         int bookingId = 1;
         int clientId = 100;
-        String day = "Tuesday";
+        Day day = Day.Tuesday;
         String facilName = "badmintoncourt";
 
         LocalTime startThree = LocalTime.of( 18, 00);
@@ -108,7 +108,7 @@ class BookingManagerTest {
     void createBooking_Conflict_Exception() {
         int bookingId = 1;
         int clientId = 100;
-        String day = "Tuesday";
+        Day day = Day.Tuesday;
         String facilName = "badmintoncourt";
 
         LocalTime startThree = LocalTime.of(19, 00);

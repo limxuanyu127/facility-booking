@@ -6,6 +6,7 @@ import commons.responses.*;
 import commons.rpc.ClientCommunicator;
 import commons.utils.Datetime;
 import commons.utils.ResponseMessage;
+import commons.utils.Day;
 
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
@@ -46,12 +47,15 @@ public class ServiceManager {
         String daysString = scanner.nextLine();
 
         List<String> days = new ArrayList<>(Arrays.asList(daysString.split(" ")));
+        List<Day> daysEnum = new ArrayList<Day>();
         for (String d : days) {
             if (!checkValidDay(d)) {
                 throw new InvalidDayException();
+            } else {
+                daysEnum.add(Day.valueOf(d));
             }
         }
-        Request req = new QueryAvailabilityRequest(facilityName, days);
+        Request req = new QueryAvailabilityRequest(facilityName, daysEnum);
         request(router, req);
     }
 
@@ -71,25 +75,30 @@ public class ServiceManager {
         if (!checkValidDateFormat(startDatetimeStr)) {
             throw new InvalidDateFormatException();
         }
-        Datetime startDatetime = getDatetimeFromString(startDatetimeStr);
-        if (!checkValidDay(startDatetime.day)) {
+        String[] startDatetimeParts = startDatetimeStr.split("/");
+
+        if (!checkValidDay(startDatetimeParts[0])) {
             throw new InvalidDayException();
         }
-        if (!checkValidHour(startDatetime.hour) || !checkValidMinute(startDatetime.minute)) {
+        if (!checkValidHour(startDatetimeParts[1]) || !checkValidMinute(startDatetimeParts[2])) {
             throw new InvalidTimeException();
         }
+        Datetime startDatetime = getDatetimeFromString(startDatetimeStr);
+
         System.out.println("Please enter end day and time [D/HH/MM]: ");
         String endDatetimeStr = scanner.nextLine();
-        Datetime endDatetime = getDatetimeFromString(endDatetimeStr);
         if (!checkValidDateFormat(endDatetimeStr)) {
             throw new InvalidDateFormatException();
         }
-        if (!checkValidDay(endDatetime.day)) {
+        String[] endDatetimeParts = endDatetimeStr.split("/");
+
+        if (!checkValidDay(endDatetimeParts[0])) {
             throw new InvalidDayException();
         }
-        if (!checkValidHour(endDatetime.hour) || !checkValidMinute(endDatetime.minute)) {
+        if (!checkValidHour(endDatetimeParts[1]) || !checkValidMinute(endDatetimeParts[2])) {
             throw new InvalidTimeException();
         }
+        Datetime endDatetime = getDatetimeFromString(endDatetimeStr);
 
         if (!checkValidStartEnd(startDatetime, endDatetime)) {
             throw new InvalidIntervalException();
@@ -204,7 +213,7 @@ public class ServiceManager {
     public static Datetime getDatetimeFromString(String datetime) {
         String[] datetimeParts = datetime.split("/");
         return new Datetime(
-                datetimeParts[0],
+                Day.valueOf(datetimeParts[0]),
                 Integer.parseInt(datetimeParts[1]),
                 Integer.parseInt(datetimeParts[2])
         );
@@ -220,12 +229,12 @@ public class ServiceManager {
     public static void generateBookingDetails(int bookingID, String facilityName, Datetime startTime, Datetime endTime) {
         System.out.println("Booking Confirmation ID: " + bookingID);
         System.out.println("Facility Name: " + facilityName);
-        String day = startTime.day;
+        Day day = startTime.day;
         String startHour = startTime.hour > 9 ? String.valueOf(startTime.hour) : "0" + startTime.hour;
         String startMinute = startTime.minute > 0 ? String.valueOf(startTime.minute) : "00";
         String endHour = endTime.hour > 9 ? String.valueOf(endTime.hour) : "0" + endTime.hour;
         String endMinute = endTime.minute > 0 ? String.valueOf(endTime.minute) : "00";
-        String dayTime = day + " " + startHour + ":" + startMinute + " - " + endHour + ":" + endMinute;
+        String dayTime = day.name() + " " + startHour + ":" + startMinute + " - " + endHour + ":" + endMinute;
         System.out.println("Day and time: " + dayTime);
     }
 
@@ -245,12 +254,12 @@ public class ServiceManager {
                     for (List<Datetime> m : l){
                         Datetime startDatetime = m.get(0);
                         Datetime endDatetime = m.get(1);
-                        String day = startDatetime.day;
+                        Day day = startDatetime.day;
                         String startHour = startDatetime.hour > 9 ? String.valueOf(startDatetime.hour) : "0" + startDatetime.hour;
                         String startMinute = startDatetime.minute > 0 ? String.valueOf(startDatetime.minute) : "00";
                         String endHour = endDatetime.hour > 9 ? String.valueOf(endDatetime.hour) : "0" + endDatetime.hour;
                         String endMinute = endDatetime.minute > 0 ? String.valueOf(endDatetime.minute) : "00";
-                        System.out.println(day + " " + startHour + ":" + startMinute + " - " + endHour + ":" + endMinute);
+                        System.out.println(day.name() + " " + startHour + ":" + startMinute + " - " + endHour + ":" + endMinute);
 
                     }
                 }
@@ -348,28 +357,35 @@ public class ServiceManager {
 
     /**
      * Returns a boolean indicating validity of input day
-     * @param day day of the week provided by user
+     * @param inputDay day of the week provided by user
      * @return true if day is a valid day of the week
      */
-    public static boolean checkValidDay(String day) {
-        return daysOfWeek.contains(day);
+    public static boolean checkValidDay(String inputDay) {
+        for (Day d: Day.values()){
+            if (d.name().equals(inputDay)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * Returns a boolean indicating validity of input hour
-     * @param hour hour provided by the user
+     * @param hourStr hour provided by the user
      * @return true if hour is valid (between 0 and 23, inclusive)
      */
-    public static boolean checkValidHour(int hour) {
+    public static boolean checkValidHour(String hourStr) {
+        int hour = Integer.parseInt(hourStr);
         return (hour >= 0 && hour <= 23);
     }
 
     /**
      * Returns a boolean indicating validity of input minute
-     * @param minute minute provided by the user
+     * @param minuteStr minute provided by the user
      * @return true if minute is valid (00 or 30)
      */
-    public static boolean checkValidMinute(int minute) {
+    public static boolean checkValidMinute(String minuteStr) {
+        int minute = Integer.parseInt(minuteStr);
         return (minute == 0 || minute == 30);
     }
 
@@ -392,7 +408,7 @@ public class ServiceManager {
      * @param end day of end datetime given by user
      * @return true if start is before or same as end
      */
-    public static boolean isDayBeforeOrEqual(String start, String end) {
-        return daysOfWeek.indexOf(start) <= daysOfWeek.indexOf(end);
+    public static boolean isDayBeforeOrEqual(Day start, Day end) {
+        return start.ordinal() <= end.ordinal();
     }
 }
