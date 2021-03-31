@@ -6,6 +6,10 @@ import server.managers.*;
 import java.time.*;
 import java.util.*;
 
+/**
+ * Represents a facility, holds a table of bookings keyed by day
+ * and a list of clients who registered interest for the facility
+ */
 public class Facility {
     private ArrayList<FacilityObserver> observerList = new ArrayList<FacilityObserver>();
     private String name;
@@ -16,6 +20,10 @@ public class Facility {
         this.name = name;
     }
 
+    /**
+     * Adds a booking to the bookingsTable
+     * @param booking
+     */
     public void addBooking(Booking booking){
 
         //Check

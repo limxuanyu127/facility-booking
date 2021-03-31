@@ -1,6 +1,5 @@
 package commons.responses;
 
-import commons.requests.BookFacilityRequest;
 import commons.utils.Datetime;
 import commons.utils.ResponseMessage;
 

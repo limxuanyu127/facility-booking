@@ -20,6 +20,10 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
+/**
+ * Interfaces between the ServerCommunicator and the Manager classes handling the business logics,
+ * parses the Request objects into individual function parameters required by the corresponding business logic.
+ */
 public class Translator {
     private ArrayList<String> allDays = new ArrayList<String>();
     private ServerCommunicator serverCommunicator;
@@ -31,6 +35,13 @@ public class Translator {
         this.serverCommunicator = serverCommunicator;
     }
 
+    /**
+     * Calls BookingManager's queryAvailability method with appropriate parameters
+     * @param r Request object
+     * @param bookingManager
+     * @param facilTable facility table initialised in Server class
+     * @return QueryAvailabilityResponse
+     */
     public Response queryAvailability(QueryAvailabilityRequest r, BookingManager bookingManager, Hashtable facilTable) {
 
         Response response;
@@ -57,6 +68,15 @@ public class Translator {
 
     }
 
+    /**
+     * Calls BookingManager's createBooking method with appropriate parameters
+     * @param r Request object
+     * @param bookingId booking identifier
+     * @param clientId client identifier
+     * @param bookingManager
+     * @param facilTable facility table initialised in Server class
+     * @return CreateBookingResponse
+     */
     public Response createBooking(BookFacilityRequest r, int bookingId, int clientId, BookingManager bookingManager, Hashtable facilTable){
 
         Response response;
@@ -87,6 +107,13 @@ public class Translator {
         return response;
     }
 
+    /**
+     * Calls BookingManager's offsetBooking method with appropriate parameters
+     * @param r Request object
+     * @param bookingManager
+     * @param facilTable facility table initialised in Server class
+     * @return OffsetBookingResposne
+     */
     public Response offsetBooking(OffsetBookingRequest r, BookingManager bookingManager,Hashtable facilTable ){
 
         Response response;
@@ -117,6 +144,13 @@ public class Translator {
         return response;
     }
 
+    /**
+     * Calls BookingManager's extendBooking method with appropriate parameters
+     * @param r Request object
+     * @param bookingManager
+     * @param facilTable facility table initialised in Server class
+     * @return ExtendBookingResponse
+     */
     public Response extendBooking(ExtendBookingRequest r, BookingManager bookingManager,Hashtable facilTable){
         Response response;
         ResponseMessage responseMessage;
@@ -146,6 +180,13 @@ public class Translator {
         return response;
     }
 
+    /**
+     * Calls BookingManager's deleteBooking method with appropriate parameters
+     * @param r Request object
+     * @param bookingManager
+     * @param facilTable facility table initialised in Server class
+     * @return DeleteBookingResponse
+     */
     public Response deleteBooking(DeleteBookingRequest r, BookingManager bookingManager, Hashtable facilTable){
         Response response;
         ResponseMessage responseMessage;
@@ -166,6 +207,15 @@ public class Translator {
         return response;
     }
 
+    /**
+     * Calls ObserverManager's addObserver method with appropriate parameters
+     * @param r Request object
+     * @param observerManager
+     * @param facilTable facility table initialised in Server class
+     * @param ip client IP address
+     * @param port client port
+     * @return RegisterInterestResponse
+     */
     public Response addObserver(RegisterInterestRequest r, ObserverManager observerManager, Hashtable facilTable, InetAddress ip, int port){
         Response response;
         ResponseMessage responseMessage;
@@ -187,6 +237,14 @@ public class Translator {
         return response;
     }
 
+    /**
+     * Sends a notification to all clients monitoring a facility's availability
+     * @param facilName name of the facility
+     * @param bookingManager
+     * @param observerManager
+     * @param facilTable facility table initialised in Server class
+     * @return
+     */
     public Exception notifyObservers(String facilName,BookingManager bookingManager, ObserverManager observerManager, Hashtable facilTable){
 
         Exception e =null;
@@ -213,13 +271,23 @@ public class Translator {
 
     /*---------------------Helper Functions-----------------------------------------------*/
 
+    /**
+     * Helper method to convert java's LocalTime object to custom Datetime object
+     * @param localTime
+     * @param day
+     * @return
+     */
     public Datetime localToDatetime(LocalTime localTime, Day day){
         Datetime datetime = new Datetime(day, localTime.getHour(), localTime.getMinute());
         return datetime;
 
     }
 
-
+    /**
+     * Helper method to convert java's LocalTime object to custom datetime object in list of computed availabilities
+     * @param resultsTable
+     * @return
+     */
     public ArrayList localToDatetime(Hashtable resultsTable) {
 
         ArrayList allConvertedAvailability = new ArrayList();
@@ -251,6 +319,11 @@ public class Translator {
         return allConvertedAvailability;
     }
 
+    /**
+     * Helper method to get status code from exception
+     * @param e exception thrown by the Managers
+     * @return
+     */
     public int getStatusCode(Exception e){
 
         int statusCode = 400;

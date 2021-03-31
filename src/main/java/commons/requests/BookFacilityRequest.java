@@ -2,8 +2,6 @@ package commons.requests;
 
 import commons.utils.Datetime;
 
-import java.awt.print.Book;
-
 
 public class BookFacilityRequest extends Request{
     public String facilityName;

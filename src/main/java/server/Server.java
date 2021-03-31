@@ -19,6 +19,11 @@ import java.net.InetAddress;
 import java.util.Hashtable;
 import java.util.Optional;
 
+/**
+ * Entrypoint for server, initialises state of in-memory store and
+ * instantiates Managers. Keeps listening for requests and calls on
+ * the corresponding Translator methods
+ */
 public class Server {
     BookingManager bookingManager;
     ObserverManager observerManager;
@@ -44,6 +49,10 @@ public class Server {
         facilTable.put("gym", gym);
     }
 
+    /**
+     * Infinite loop to keep socket on to listen for requests
+     * @param args server port and flag to select at-most-once or at-least-once semantics
+     */
     public static void main(String[] args) {
         int serverPort = Integer.parseInt(args[0]);
         boolean atMostOnce = Boolean.parseBoolean(args[1]);

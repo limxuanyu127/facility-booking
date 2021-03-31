@@ -14,6 +14,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Optional;
 
+/**
+ * Server's communicator module to receive incoming requests and send responses,
+ * handles duplicate requests and caches responses for at-most-once semantics
+ */
 public class ServerCommunicator {
     public ArrayList<ClientRequest> clientRequests;
     ArrayList<Integer> clientRequestsHashed;

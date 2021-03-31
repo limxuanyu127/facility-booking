@@ -17,6 +17,11 @@ import java.util.*;
 import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
 
+/**
+ * Handles all client-side business logic,
+ * constructs Request objects to be sent to server and
+ * processes Response objects for display to the user.
+ */
 public class ServiceManager {
     ClientCommunicator router;
     InetAddress serverAddress;

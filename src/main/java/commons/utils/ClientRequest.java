@@ -13,6 +13,13 @@ public class ClientRequest {
     public Request request;
     public Response sentResponse;
 
+    /**
+     * Wrapper class for Request objects with client metadata
+     * @param clientAddress client IP address
+     * @param clientPort client port
+     * @param requestID request identifier
+     * @param request Request object
+     */
     public ClientRequest(InetAddress clientAddress, int clientPort, int requestID, Request request) {
         this.clientAddress = clientAddress;
         this.clientPort = clientPort;

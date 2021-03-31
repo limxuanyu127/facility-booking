@@ -13,7 +13,14 @@ public class Booking {
     private LocalTime start;
     private LocalTime end;
 
-
+    /**
+     * Represents a user booking for a facility for a period of time
+     * @param day
+     * @param bookingId
+     * @param facilityName
+     * @param start
+     * @param end
+     */
     public Booking(Day day, int bookingId, String facilityName, LocalTime start, LocalTime end) {
         this.day = day;
         this.bookingId = bookingId;

@@ -17,6 +17,10 @@ import java.lang.Math;
 
 // To use, run TestServer on 1 terminal then run TestClient on another terminal
 
+/**
+ * Client's communicator module to send requests and receive responses via sockets using UDP,
+ * handles retransmissions upon socket timeout
+ */
 public class ClientCommunicator {
     int clientPort;
     InetAddress serverAddress;

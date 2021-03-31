@@ -7,6 +7,11 @@ import java.util.*;
 import java.time.*;
 import javafx.util.Pair;
 
+/**
+ * Manages all booking-related queries, which include
+ * computing availability from list of bookings, creating,
+ * extending, offsetting and deleting of bookings.
+ */
 public class BookingManager {
 
     private static LocalTime openTime = LocalTime.of(8,0,0);

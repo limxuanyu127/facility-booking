@@ -10,7 +10,13 @@ public class FacilityObserver {
     InetAddress ip;
     int port;
 
-
+    /**
+     * Represents a client monitoring the availability of a facility
+     * @param facilityName name of the facility
+     * @param endDate end date of monitoring
+     * @param ip client IP address
+     * @param port client port
+     */
     public FacilityObserver(String facilityName, LocalDateTime endDate, InetAddress ip, int port){
         this.facilityName = facilityName;
         this.endDate = endDate;

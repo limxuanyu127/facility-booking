@@ -1,7 +1,5 @@
 package commons.requests;
 
-import commons.utils.Datetime;
-
 
 public class DeleteBookingRequest extends Request{
     public Integer bookingID;
