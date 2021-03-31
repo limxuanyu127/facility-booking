@@ -217,15 +217,13 @@ public class ServerCommunicator {
                     e.printStackTrace();
                 }
             }
-
-
         }
         /**
          * comment out row below to test duplicate request
          */
 //        this.requestID += 1;
+//        System.out.println("Sent" + " to Address: " + clientAddress + ", Port: " + clientPort);
 
-        System.out.println("Sent" + " to Address: " + clientAddress + ", Port: " + clientPort);
     }
 
     /**

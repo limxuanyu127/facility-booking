@@ -14,19 +14,13 @@ import java.net.UnknownHostException;
 public class Main {
     public static void main(String[] args) {
         InetAddress serverAddress = null;
-
         String hostname = args[0];
         int serverPort = Integer.parseInt(args[1]);
-        int clientPort = 3000;
-        int timeout = 1000; // in ms
-        int maxTries = 3;
-        double packetDropOffRate = 0.2;
+        int clientPort = Integer.parseInt(args[2]);
+        double packetDropOffRate = Double.parseDouble(args[3]);
+        int timeout = Integer.parseInt(args[4]);; // in ms
+        int maxTries = Integer.parseInt(args[5]);
 
-//        int p = Integer.parseInt(null);
-//        System.out.println(p.hashcode());
-        
-//        String hostname = "localhost";
-        //        int serverPort = 5000;
         try {
             serverAddress = InetAddress.getByName(hostname);
         } catch (UnknownHostException e) {

@@ -56,7 +56,7 @@ public class Server {
     public static void main(String[] args) {
         int serverPort = Integer.parseInt(args[0]);
         boolean atMostOnce = Boolean.parseBoolean(args[1]);
-        double packetDropOffRate = 0.2;
+        double packetDropOffRate = Double.parseDouble(args[2]);
         Server server = new Server(serverPort, atMostOnce, packetDropOffRate);
         while (true) {
             server.run(0);
