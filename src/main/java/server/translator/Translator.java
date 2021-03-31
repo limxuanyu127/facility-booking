@@ -76,7 +76,6 @@ public class Translator {
         if (outputException != null){
             responseMessage = new ResponseMessage(400, outputException.getMessage()) ;
             response = new ErrorResponse(responseMessage);
-
         }
         else{
             responseMessage = new ResponseMessage(200, "success") ;
@@ -84,9 +83,7 @@ public class Translator {
             Datetime dtEnd = localToDatetime(outputBooking.getEnd(), day);
             response = new BookFacilityResponse(outputBooking.getBookingId(), facilName, dtStart, dtEnd, responseMessage);
         }
-
         return response;
-
     }
 
     public Response offsetBooking(OffsetBookingRequest r, BookingManager bookingManager,Hashtable facilTable ){
@@ -207,8 +204,6 @@ public class Translator {
             }catch(Exception newE){
                 e = newE;
             }
-//            System.out.println(ip);
-//            System.out.println(port);
 
         }
 

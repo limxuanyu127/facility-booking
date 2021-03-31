@@ -1,5 +1,6 @@
 package server;
 
+import commons.exceptions.LostPacketError;
 import commons.requests.DeleteBookingRequest;
 import commons.requests.QueryAvailabilityRequest;
 import commons.requests.Request;
@@ -34,11 +35,11 @@ public class Server {
     int bookingIdCounter;
 
 
-    public Server(int serverPort, boolean atMostOnce) {
+    public Server(int serverPort, boolean atMostOnce, double packetDropOffRate) {
         this.bookingManager = new BookingManager();
         this.observerManager = new ObserverManager();
         this.facilTable = new Hashtable<>();
-        this.serverCommunicator = new ServerCommunicator(serverPort, atMostOnce);
+        this.serverCommunicator = new ServerCommunicator(serverPort, atMostOnce, packetDropOffRate);
         this.translator = new Translator(serverCommunicator);
 
         bookingIdCounter =0;
@@ -52,7 +53,8 @@ public class Server {
     public static void main(String[] args) {
         int serverPort = Integer.parseInt(args[0]);
         boolean atMostOnce = Boolean.parseBoolean(args[1]);
-        Server server = new Server(serverPort, atMostOnce);
+        double packetDropOffRate = 0.3;
+        Server server = new Server(serverPort, atMostOnce, packetDropOffRate);
         while (true) {
             server.run(0);
         }
@@ -60,11 +62,14 @@ public class Server {
 
     void run(int timeout) {
         Optional<ClientRequest> optionalClientRequest;
-        if (timeout == 0){
-            optionalClientRequest = serverCommunicator.receive();
-        }
-        else{
-            optionalClientRequest = serverCommunicator.receive(timeout);
+        try {
+            if (timeout == 0) {
+                optionalClientRequest = serverCommunicator.receive();
+            } else {
+                optionalClientRequest = serverCommunicator.receive(timeout);
+            }
+        } catch (LostPacketError e){ //if request packet is lost, listen again
+            return;
         }
 
         if (optionalClientRequest.isPresent()) {
@@ -84,7 +89,7 @@ public class Server {
 
             switch(request.getClass().getName()){
                 case "commons.requests.BookFacilityRequest":
-                    System.out.println("Book Facility Received, calling Translator Function...");
+                    System.out.println("Book Facility Received, processing...");
                     Response createResponse = translator.createBooking((BookFacilityRequest)request, bookingIdCounter, 0, bookingManager, facilTable);
                     if (createResponse instanceof BookFacilityResponse) {
                         bookingIdCounter +=1;
@@ -94,7 +99,7 @@ public class Server {
                     response = createResponse;
                     break;
                 case "commons.requests.DeleteBookingRequest":
-                    System.out.println("Delete Booking Received, calling Translator Function...");
+                    System.out.println("Delete Booking Received, processing...");
                     Response deleteResponse = translator.deleteBooking((DeleteBookingRequest) request, bookingManager, facilTable);
                     if (deleteResponse instanceof DeleteBookingResponse) {
                         facilName = ((DeleteBookingRequest) request).facilityName;
@@ -103,7 +108,7 @@ public class Server {
                     response = deleteResponse;
                     break;
                 case "commons.requests.OffsetBookingRequest":
-                    System.out.println("Offset Booking Request Received, calling Translator Function...");
+                    System.out.println("Offset Booking Request Received, processing...");
                     Response offsetResponse = translator.offsetBooking((OffsetBookingRequest) request, bookingManager, facilTable);
                     if (offsetResponse instanceof  OffsetBookingResponse){
                         facilName = ((OffsetBookingRequest) request).facilityName;
@@ -112,11 +117,11 @@ public class Server {
                     response = offsetResponse;
                     break;
                 case "commons.requests.QueryAvailabilityRequest":
-                    System.out.println("Query Availability Request Received, calling Translator Function...");
+                    System.out.println("Query Availability Request Received, processing...");
                     response = translator.queryAvailability((QueryAvailabilityRequest) request, bookingManager, facilTable);
                     break;
                 case "commons.requests.RegisterInterestRequest":
-                    System.out.println("Register Interest Request Received, calling Translator Function...");
+                    System.out.println("Register Interest Request Received, processing...");
                     InetAddress clientAddress = clientRequest.clientAddress;
                     int clientPort = clientRequest.clientPort;
 //                    try {
@@ -127,7 +132,7 @@ public class Server {
                     response = translator.addObserver((RegisterInterestRequest) request, observerManager, facilTable, clientAddress, clientPort);
                     break;
                 case "commons.requests.ExtendBookingRequest":
-                    System.out.println("Extend Booking Request Received, calling Translator Function...");
+                    System.out.println("Extend Booking Request Received, processing...");
                     Response extendResponse = translator.extendBooking((ExtendBookingRequest) request, bookingManager, facilTable);
                     if (extendResponse instanceof  ExtendBookingResponse){
                         facilName = ((ExtendBookingRequest) request).facilityName;
@@ -136,7 +141,7 @@ public class Server {
                     response = extendResponse;
                     break;
                 case "commons.requests.TestRequest":
-                    System.out.println("Test Request Received, calling Translator Function...");
+                    System.out.println("Test Request Received, processing...");
                     this.testCounter++;
                     response = new TestResponse();
                     break;
@@ -145,7 +150,6 @@ public class Server {
                     throw new RuntimeException("Invalid Request Type");
             }
             clientRequest.setSentResponse(response);
-            System.out.println(response.getClass().getName());
             serverCommunicator.send(response, clientRequest.clientAddress, clientRequest.clientPort);
         }
     }

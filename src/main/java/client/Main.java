@@ -8,8 +8,9 @@ import java.net.UnknownHostException;
 
 /**
  * Entrypoint for client, takes in 2 runtime arguments: server hostname and server port
- * @param args list of String arguments to configure the server (hostname nad port)
+ * @param args list of String arguments to configure the server (hostname and port)
  */
+
 public class Main {
     public static void main(String[] args) {
         InetAddress serverAddress = null;
@@ -19,6 +20,7 @@ public class Main {
         int clientPort = 3000;
         int timeout = 1000; // in ms
         int maxTries = 3;
+        double packetDropOffRate = 0.3;
         
 //        String hostname = "localhost";
         //        int serverPort = 5000;
@@ -27,7 +29,7 @@ public class Main {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        ClientCommunicator router = new ClientCommunicator(clientPort, serverAddress, serverPort, maxTries, timeout);
+        ClientCommunicator router = new ClientCommunicator(clientPort, serverAddress, serverPort, maxTries, timeout, packetDropOffRate);
         CLI.run(router, serverAddress, serverPort);
     }
 

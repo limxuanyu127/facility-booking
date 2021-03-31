@@ -21,12 +21,13 @@ class LostResponseNonIdempotentTestClient {
         InetAddress serverAddress = null;
         String hostname = "localhost";
         int serverPort = 5000;
+        float packetDropOffRate = 0;
         try {
             serverAddress = InetAddress.getByName(hostname);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        ClientCommunicator router = new ClientCommunicator(3000, serverAddress, serverPort, 3, 1);
+        ClientCommunicator router = new ClientCommunicator(3000, serverAddress, serverPort, 3, 1, packetDropOffRate);
         Request req = new TestRequest();
         ServiceManager.request(router, req);
         router.close();

@@ -3,9 +3,12 @@ package server;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.entities.Booking;
 
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,7 +17,8 @@ class LostRequestTestServer {
     void LostRequestTest() {
         int serverPort = 5000;
         int sleep = 5000;
-        Server server = new Server(serverPort, true);
+        float packetDropOffRate = 0;
+        Server server = new Server(serverPort, true, packetDropOffRate);
         System.out.println("Lost Request Test");
         // only open port for 1ms every 5000ms
         server.serverCommunicator.close();
@@ -29,11 +33,13 @@ class LostRequestTestServer {
             } catch (SocketException e) {
                 e.printStackTrace();
             }
-            server.run(1);
+            server.run(5000);
             server.serverCommunicator.close();
         }
         // server never receives request
-        assertEquals(0, server.getTestCounter());
-        System.out.println("Expected: 0, Actual: " + server.getTestCounter());
+        Hashtable bookingsTable = server.facilTable.get("gym").getBookingsTable();
+        System.out.println(bookingsTable);
+        assertEquals(0, bookingsTable.size());
+        System.out.println("Number of Bookings: Expected: 0, Actual: " + bookingsTable.size());
     }
 }
