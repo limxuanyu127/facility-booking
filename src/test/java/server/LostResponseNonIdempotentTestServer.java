@@ -11,7 +11,8 @@ class LostResponseNonIdempotentTestServer {
     void Main(){
         System.out.println("Lost Response Test");
         int serverPort = 5000;
-        Server server = new Server(serverPort, false);
+        float packetDropOffRate = 0;
+        Server server = new Server(serverPort, false, packetDropOffRate);
 
         for (int i = 0; i < 3; i++) {
             server.run(10000);

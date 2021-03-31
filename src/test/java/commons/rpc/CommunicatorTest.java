@@ -32,8 +32,8 @@ class CommunicatorTest {
 
     @BeforeEach
     void setUp() {
-        this.serverCommunicator = new ServerCommunicator(this.serverPort, true);
-        this.clientCommunicator = new ClientCommunicator(this.clientPort, this.serverAddress, this.serverPort, 1, 1000);
+        this.serverCommunicator = new ServerCommunicator(this.serverPort, true, 0);
+        this.clientCommunicator = new ClientCommunicator(this.clientPort, this.serverAddress, this.serverPort, 1, 1000, 0);
     }
 
     @AfterEach
@@ -63,11 +63,14 @@ class CommunicatorTest {
     void serverToClientBasic() {
         System.out.println("\nServer To Client Test: sending Test Response to Client");
         TestResponse testResponse = new TestResponse();
-        serverCommunicator.send(testResponse, clientAddress, clientPort);
+        serverCommunicator.send(testResponse, clientAddress, clientPort, true);
 
-        TestResponse received = (TestResponse) this.clientCommunicator.receive();
+        TestResponse received = null;
+
+        received = (TestResponse) this.clientCommunicator.receive();
         assertEquals(testResponse.testInt, received.testInt);
         assertEquals(testResponse.testString, received.testString);
         assertEquals(testResponse.name, received.name);
+
     }
 }

@@ -67,6 +67,11 @@ public class Booking {
     public void setEnd(LocalTime end) {
         this.end = end;
     }
+
+    @Override
+    public String toString() {
+        return "Booking from " + this.start + " to " + this.end;
+    }
 }
 
 

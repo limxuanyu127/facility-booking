@@ -1,23 +1,18 @@
 package client;
 
-import commons.exceptions.InvalidTimeException;
-import commons.exceptions.InvalidDateFormatException;
-import commons.exceptions.InvalidDayException;
-import commons.exceptions.InvalidIntervalException;
+import commons.exceptions.*;
 import commons.requests.*;
 import commons.responses.*;
 import commons.rpc.ClientCommunicator;
 import commons.utils.Datetime;
+import commons.utils.ResponseMessage;
 import commons.utils.Day;
 
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
@@ -193,11 +188,14 @@ public class ServiceManager {
         while (LocalDateTime.now().isBefore(endTime)) {
             int timeout = toIntExact(LocalDateTime.now().until(endTime, ChronoUnit.MILLIS));
             System.out.println("Time left: " + timeout);
-            try {
                 // expecting QueryAvailabilityResponse; can use the same one because it is essentially a query for availability
-                router.setSocketTimeout(timeout); // allow socket to listen for the duration of the listen
+            router.setSocketTimeout(timeout); // allow socket to listen for the duration of the listen
+            try{
                 Response res = router.receive();
                 generateResponse(res);
+//                ResponseMessage responseMessage = new ResponseMessage(200, "success");
+//                AcknowledgementRequest reply = new AcknowledgementRequest(responseMessage);
+//                router.sendRequest(reply);
             } catch (RuntimeException e) {
                 if (e.getCause() instanceof SocketTimeoutException) {
                     System.out.println("Listening Duration Over");
