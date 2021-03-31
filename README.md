@@ -2,13 +2,13 @@
 
 ## To compile
 
-`cd src/main/java`
-`javac client/Main.java`
+`cd src/main/java` \
+`javac client/Main.java` \
 `javac server/Server.java`
 
 ## To start a server
 
-`cd src/main/java`
+`cd src/main/java` \
 `java server.Server [PORT_NUMBER] [AT_MOST_ONCE] [PACKET_DROP_RATE]`
 
 - PORT_NUMBER: server port number
@@ -16,7 +16,7 @@
 - PACKET_DROP_RATE: probability that a packet will be dropped by the server
 
 ## To start a client
-`cd src/main/java`
+`cd src/main/java` \
 `java client.Main [HOST_NAME] [SERVER_PORT] [CLIENT_PORT] [PACKET_DROP_RATE] [TIMEOUT] [MAX_TRIES]`
 
 - HOST_NAME: IP address of server
