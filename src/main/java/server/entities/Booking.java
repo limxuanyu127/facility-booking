@@ -42,10 +42,6 @@ public class Booking {
         return bookingId;
     }
 
-    public int getClientId() {
-        return clientId;
-    }
-
     public String getFacilityName() {
         return facilityName;
     }
