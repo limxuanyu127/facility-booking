@@ -396,6 +396,28 @@ class TranslatorTest {
     }
 
     @Test
+    void addObserver_SameObserver_Exception(){
+        String facilNameOne = "badmintoncourt";
+        Facility facil = facilTable.get(facilNameOne);
+        int numDays = 3;
+        InetAddress ipOne = null;
+        int portOne = 22;
+        try {
+            ipOne = InetAddress.getByName("127.0.0.1");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        RegisterInterestRequest request = new RegisterInterestRequest(facilNameOne, numDays);
+
+
+        Response response = translator.addObserver(request, observerManager, facilTable, ipOne, portOne);
+        response = translator.addObserver(request, observerManager, facilTable, ipOne, portOne);
+        assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
+        assertEquals("Observer already exists", ((ErrorResponse) response).responseMessage.message);
+    }
+
+    @Test
     void notifyObservers_wip(){
 
         String facilName = "badmintoncourt";

@@ -31,17 +31,22 @@ public class ObserverManager {
         Exception e;
 
         e = doFacilCheck(facilName, facilTable);
-
         if (e != null){
             return e;
         }
-        else{
-            LocalDateTime endDate = LocalDateTime.now().plusMinutes(numDays);
-            FacilityObserver o = new FacilityObserver(facilName,endDate, ip, port);
 
-            Facility f  = (Facility) facilTable.get(facilName);
-            f.addObserver(o);
+        e = doNewObserverCheck(facilName, facilTable, ip, port);
+        if (e!= null) {
+            return e;
         }
+
+
+        LocalDateTime endDate = LocalDateTime.now().plusMinutes(numDays);
+        FacilityObserver o = new FacilityObserver(facilName,endDate, ip, port);
+
+        Facility f  = (Facility) facilTable.get(facilName);
+        f.addObserver(o);
+
         return null;
     }
 
@@ -59,6 +64,30 @@ public class ObserverManager {
             Exception e = new NoSuchElementException("Facility does not exist");
             return e;
         }
+    }
+
+    /**
+     * Check if facility observer exists
+     * @param facilName name of the facility
+     * @param facilTable facility table
+     * @param ip client IP address
+     * @param port client port
+     * @return
+     */
+    private Exception doNewObserverCheck(String facilName, Hashtable facilTable, InetAddress ip, int port){
+        Exception e = null;
+        Facility f  = (Facility) facilTable.get(facilName);
+        ArrayList<FacilityObserver> observers = getObservers(facilName, facilTable);
+        for (FacilityObserver o: observers){
+            InetAddress oIp = o.getIp();
+            int oPort = o.getPort();
+
+            if (oIp == ip && oPort ==port){
+                e = new NoSuchElementException("Observer already exists");
+                return e;
+            }
+        }
+        return e;
     }
 
     /**

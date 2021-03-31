@@ -272,6 +272,9 @@ public class Translator {
             case "Start time is before 08:00 or End time is after 22:00":
                 statusCode = 405;
                 break;
+            case "Observer already exists":
+                statusCode = 406;
+                break;
             default:
                 statusCode = 400;
 
