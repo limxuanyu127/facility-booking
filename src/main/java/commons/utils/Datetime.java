@@ -1,13 +1,13 @@
 package commons.utils;
 
 public class Datetime {
-    public String day;
+    public Day day;
     public Integer hour;
     public Integer minute;
 
     public Datetime(){}
 
-    public Datetime(String day, int hour, int minute) {
+    public Datetime(Day day, int hour, int minute) {
         this.day = day;
         this.hour = hour;
         this.minute = minute;

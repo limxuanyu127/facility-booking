@@ -5,6 +5,7 @@ import commons.requests.*;
 import commons.responses.*;
 import commons.rpc.ServerCommunicator;
 import commons.utils.Datetime;
+import commons.utils.Day;
 import commons.utils.ResponseMessage;
 import javafx.util.Pair;
 import server.entities.Booking;
@@ -66,7 +67,7 @@ public class Translator {
 
         LocalTime start = LocalTime.of(requestStart.hour, requestStart.minute, 00);
         LocalTime end = LocalTime.of(requestEnd.hour, requestEnd.minute, 00);
-        String day = requestStart.day;
+        Day day = requestStart.day;
         String facilName = r.facilityName;
 
         Pair<Booking,Exception> outputPair = bookingManager.createBooking(day, bookingId, clientId, facilName, start, end, facilTable);
@@ -110,7 +111,7 @@ public class Translator {
         }
         else{
             responseMessage = new ResponseMessage(200, "success") ;
-            String day = outputBooking.getDay();
+            Day day = outputBooking.getDay();
             Datetime dtStart = localToDatetime(outputBooking.getStart(),day);
             Datetime dtEnd = localToDatetime(outputBooking.getEnd(), day);
             response = new OffsetBookingResponse(bookingId, facilName, dtStart, dtEnd, responseMessage);
@@ -139,7 +140,7 @@ public class Translator {
         }
         else{
             responseMessage = new ResponseMessage(200, "success") ;
-            String day = outputBooking.getDay();
+            Day day = outputBooking.getDay();
             Datetime dtStart = localToDatetime(outputBooking.getStart(),day);
             Datetime dtEnd = localToDatetime(outputBooking.getEnd(), day);
             response = new ExtendBookingResponse(bookingId, facilName, dtStart, dtEnd, responseMessage);
@@ -195,7 +196,7 @@ public class Translator {
 
         ArrayList<FacilityObserver> observers = observerManager.getObservers(facilName, facilTable);
 
-        QueryAvailabilityRequest request = new QueryAvailabilityRequest(facilName, this.allDays);
+        QueryAvailabilityRequest request = new QueryAvailabilityRequest(facilName, new ArrayList<Day>(Arrays.asList(Day.values())));
         Response response = this.queryAvailability(request, bookingManager, facilTable);
 
         for (FacilityObserver o : observers){
@@ -218,7 +219,7 @@ public class Translator {
 
     /*---------------------Helper Functions-----------------------------------------------*/
 
-    public Datetime localToDatetime(LocalTime localTime, String day){
+    public Datetime localToDatetime(LocalTime localTime, Day day){
         Datetime datetime = new Datetime(day, localTime.getHour(), localTime.getMinute());
         return datetime;
 
@@ -229,7 +230,7 @@ public class Translator {
 
         ArrayList allConvertedAvailability = new ArrayList();
 
-        for (String day: allDays){
+        for (Day day: Day.values()){
             ArrayList dayResults = new ArrayList();
             if (!resultsTable.containsKey(day)){
                 allConvertedAvailability.add(dayResults);

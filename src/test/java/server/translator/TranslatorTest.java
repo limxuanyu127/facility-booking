@@ -3,6 +3,7 @@ package server.translator;
 import commons.requests.*;
 import commons.responses.*;
 import commons.utils.Datetime;
+import commons.utils.Day;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,11 +52,11 @@ class TranslatorTest {
         //Populate booking
         LocalTime startOne = LocalTime.of(14, 00);
         LocalTime endOne = LocalTime.of( 16, 00);
-        Booking bookingOne = new Booking("Tuesday",1, "badmintoncourt", startOne, endOne);
+        Booking bookingOne = new Booking(Day.Tuesday,1, "badmintoncourt", startOne, endOne);
 
         LocalTime startTwo = LocalTime.of(20, 00);
         LocalTime endTwo = LocalTime.of(22, 00);
-        Booking bookingTwo = new Booking("Tuesday", 2, "badmintoncourt", startTwo, endTwo);
+        Booking bookingTwo = new Booking(Day.Tuesday, 2, "badmintoncourt", startTwo, endTwo);
 
         Facility targetFacil = facilTable.get("badmintoncourt");
         targetFacil.addBooking(bookingOne);
@@ -100,9 +101,9 @@ class TranslatorTest {
         expectedInterval.addAll(Arrays.asList(8,22,8,14,16,20));
         ArrayList outputInterval = new ArrayList<>();
 
-        List<String> days = new ArrayList<>();
-        days.add("Monday");
-        days.add("Tuesday");
+        List<Day> days = new ArrayList<>();
+        days.add(Day.Monday);
+        days.add(Day.Tuesday);
 
         QueryAvailabilityRequest request = new QueryAvailabilityRequest(facilName, days);
 
@@ -130,9 +131,9 @@ class TranslatorTest {
         ArrayList expectedInterval = new ArrayList();
         ArrayList outputInterval = new ArrayList<>();
 
-        List<String> days = new ArrayList<>();
-        days.add("Monday");
-        days.add("Tuesday");
+        List<Day> days = new ArrayList<>();
+        days.add(Day.Monday);
+        days.add(Day.Tuesday);
 
         QueryAvailabilityRequest request = new QueryAvailabilityRequest(facilName, days);
 
@@ -151,7 +152,7 @@ class TranslatorTest {
         int clientId = 22;
 
         String facilName = "badmintoncourt";
-        String day = "Wednesday";
+        Day day = Day.Wednesday;
         Datetime start = new Datetime(day,11,30 );
         Datetime end = new Datetime(day,13,30 );
 
@@ -175,7 +176,7 @@ class TranslatorTest {
         int clientId = 22;
 
         String facilName = "badmintoncourt";
-        String day = "Tuesday";
+        Day day = Day.Tuesday;
         Datetime start = new Datetime(day,13,30 );
         Datetime end = new Datetime(day,14,30 );
 
@@ -212,7 +213,7 @@ class TranslatorTest {
         //Populate booking
         LocalTime startOne = LocalTime.of(16, 00);
         LocalTime endOne = LocalTime.of( 17, 00);
-        Booking bookingOne = new Booking("Tuesday",3, "badmintoncourt", startOne, endOne);
+        Booking bookingOne = new Booking(Day.Tuesday,3, "badmintoncourt", startOne, endOne);
         Facility targetFacil = facilTable.get("badmintoncourt");
         targetFacil.addBooking(bookingOne);
 
@@ -270,7 +271,7 @@ class TranslatorTest {
         //Populate booking
         LocalTime startOne = LocalTime.of(16, 00);
         LocalTime endOne = LocalTime.of( 17, 00);
-        Booking bookingOne = new Booking("Tuesday",3, "badmintoncourt", startOne, endOne);
+        Booking bookingOne = new Booking(Day.Tuesday,3, "badmintoncourt", startOne, endOne);
         Facility targetFacil = facilTable.get("badmintoncourt");
         targetFacil.addBooking(bookingOne);
 
