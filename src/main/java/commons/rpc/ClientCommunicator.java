@@ -8,7 +8,6 @@ import commons.responses.Response;
 import commons.responses.TestResponse;
 import commons.utils.Packet;
 import commons.utils.ResponseMessage;
-import javafx.util.Pair;
 
 import java.io.*;
 import java.net.*;
@@ -168,7 +167,6 @@ public class ClientCommunicator {
         Response response = null;
         ByteBuffer dataBuf = ByteBuffer.allocate(2000);
         Serializer.serializeObject(r, dataBuf);
-        Pair<Response, Packet[]> received;
 
         while (currTries < this.maxTries){
             currTries += 1;
