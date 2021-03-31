@@ -1,7 +1,6 @@
 package commons.rpc;
 import commons.Deserializer;
 import commons.Serializer;
-import commons.exceptions.LostPacketError;
 import commons.requests.Request;
 import commons.requests.TestRequest;
 import commons.responses.NullResponse;
@@ -14,8 +13,6 @@ import javafx.util.Pair;
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Optional;
 import java.lang.Math;
 
 // To use, run TestServer on 1 terminal then run TestClient on another terminal
@@ -65,7 +62,8 @@ public class ClientCommunicator {
         this.socketTimeout = timeout;
         this.packetDropOffRate = packetDropOffRate;
         this.retryReceive = false;
-        System.out.println(clientPort);
+        System.out.println("Starting Client on Port " + clientPort);
+        System.out.println();
     }
 
     /**
@@ -131,7 +129,6 @@ public class ClientCommunicator {
             System.out.println("Sending " + r.getClass().getName() + " to server with ID " + this.requestID);
             this.send(dataBuf, this.requestID);
             try{
-                System.out.println("receiving No. " + currTries);
                 response = this.receive();
                 if (response != null){ //message is complete
                     this.retryReceive = false;
@@ -141,12 +138,10 @@ public class ClientCommunicator {
                 this.retryReceive = true; //need to retry
             } catch (RuntimeException e){
                 if (e.getCause() instanceof SocketTimeoutException) {
-                    System.out.println("Socket Timeout send");
+                    System.out.println("Socket Timeout, No Response Received");
                 } else{
                     e.printStackTrace();
                 }
-            } catch (LostPacketError e){
-                System.out.println("Response Packet Lost in Transmission, Retrying");
             }
         }
         if (currTries == this.maxTries){
@@ -191,10 +186,8 @@ public class ClientCommunicator {
                 }
             } catch (RuntimeException e){
                 if (e.getCause() instanceof SocketTimeoutException) {
-                    System.out.println("Socket Timeout send w ID");
+                    System.out.println("Socket Timeout");
                 }
-            } catch (LostPacketError e){
-                System.out.println("Response Packet Lost in Transmission, Retrying");
             }
         }
         if (currTries == this.maxTries){
@@ -254,8 +247,8 @@ public class ClientCommunicator {
      * Allows socket to listen for UDP packets
      * @return Response object, deserialised from the ByteBuffer
      */
-    public Response receive() throws LostPacketError {
-        System.out.println("receiving");
+    public Response receive() {
+        System.out.println("listening...");
         Packet currPacket = this.receivePacket();
         int combinedMessageSize = currPacket.totalDatagramPackets * this.packetSize;
         if (!this.retryReceive){ //init new array of correct size for new Response
@@ -281,13 +274,13 @@ public class ClientCommunicator {
             Packet p = this.packetsOrdered[j];
             if (p == null) { // any packet is missing from the message
 //                throw new LostPacketError();
-                System.out.println("packet " + j + "lost");
+                System.out.println("packet " + j + " lost");
                 packetsLost++;
             }
         }
 
         if (packetsLost > 0){
-            System.out.println(packetsLost + " packets lost");
+            System.out.println(packetsLost + " Response Packet(s) Lost in Transmission, Retrying...");
             return null;
         }
         else{
@@ -328,7 +321,7 @@ public class ClientCommunicator {
         messageBuffer.put(buffer, this.headerSize, messageSize);
         messageBuffer.position(0);
 
-        System.out.println("Receiving packet " + datagramNum);
+//        System.out.println("received packet " + datagramNum);
         return new Packet(requestID, datagramNum, totalDatagramPackets, messageSize, senderAddress, senderPort, messageBuffer);
     }
 

@@ -1,8 +1,6 @@
 package commons.rpc;
 
-import commons.exceptions.LostPacketError;
 import commons.requests.TestRequest;
-import commons.responses.Response;
 import commons.responses.TestResponse;
 import commons.utils.ClientRequest;
 import org.junit.jupiter.api.AfterEach;
@@ -11,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -66,16 +63,14 @@ class CommunicatorTest {
     void serverToClientBasic() {
         System.out.println("\nServer To Client Test: sending Test Response to Client");
         TestResponse testResponse = new TestResponse();
-        serverCommunicator.send(testResponse, clientAddress, clientPort);
+        serverCommunicator.send(testResponse, clientAddress, clientPort, true);
 
         TestResponse received = null;
-        try {
-            received = (TestResponse) this.clientCommunicator.receive();
-            assertEquals(testResponse.testInt, received.testInt);
-            assertEquals(testResponse.testString, received.testString);
-            assertEquals(testResponse.name, received.name);
-        } catch (LostPacketError e) {
-            System.out.println("Packet Lost");
-        }
+
+        received = (TestResponse) this.clientCommunicator.receive();
+        assertEquals(testResponse.testInt, received.testInt);
+        assertEquals(testResponse.testString, received.testString);
+        assertEquals(testResponse.name, received.name);
+
     }
 }

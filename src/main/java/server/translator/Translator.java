@@ -198,9 +198,8 @@ public class Translator {
         for (FacilityObserver o : observers){
             InetAddress ip = o.getIp();
             int port = o.getPort();
-            //TODO try this
             try{
-                serverCommunicator.send(response, ip, port);
+                serverCommunicator.send(response, ip, port, false);
             }catch(Exception newE){
                 e = newE;
             }

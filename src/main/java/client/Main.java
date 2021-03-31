@@ -17,10 +17,10 @@ public class Main {
 
         String hostname = args[0];
         int serverPort = Integer.parseInt(args[1]);
-        int clientPort = 3002;
+        int clientPort = 3000;
         int timeout = 1000; // in ms
-        int maxTries = 5;
-        double packetDropOffRate = 0;
+        int maxTries = 3;
+        double packetDropOffRate = 0.2;
 
 //        int p = Integer.parseInt(null);
 //        System.out.println(p.hashcode());

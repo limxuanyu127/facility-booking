@@ -191,8 +191,6 @@ public class ServiceManager {
                 if (e.getCause() instanceof SocketTimeoutException) {
                     System.out.println("Listening Duration Over");
                 }
-            } catch (LostPacketError e){
-                System.out.println("Response Packet Lost in Transmission, Retrying");
             }
         }
         router.setSocketTimeout(router.socketTimeout); //reset socket to default timeout

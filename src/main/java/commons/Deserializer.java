@@ -74,13 +74,10 @@ public class Deserializer {
      */
     public static String deserializeString(ByteBuffer bb) {
         int length = bb.getInt();
-        System.out.print("Pos: " + bb.position());
-//        System.out.println("Str Len : " + length);
         byte[] bytes = new byte[length];
         for (int i = 0; i < length; i++){
             bytes[i] = bb.get();
         }
-        System.out.println("message: " + new String(bytes));
         return new String(bytes);
     }
 

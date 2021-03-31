@@ -2,7 +2,6 @@ package commons.rpc;
 
 import commons.Deserializer;
 import commons.Serializer;
-import commons.exceptions.LostPacketError;
 import commons.requests.Request;
 import commons.responses.Response;
 import commons.utils.ClientRequest;
@@ -68,8 +67,8 @@ public class ServerCommunicator {
      * Allows server to listen for requests from client
      * @return ClientRequest object which is a wrapper for a Request object with metadata such as client IP and port
      */
-    public Optional<ClientRequest> receive() throws LostPacketError {
-        System.out.println("receiving");
+    public Optional<ClientRequest> receive() {
+        System.out.println("listening...");
         Packet currPacket = this.receivePacket();
         int combinedMessageSize = currPacket.totalDatagramPackets * this.packetSize;
         if (!this.retryReceive){ //init new array of correct size for new Response
@@ -77,10 +76,6 @@ public class ServerCommunicator {
         }
         this.packetsOrdered[currPacket.datagramNum] = currPacket;
         ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);
-//        int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
-//        Packet[] packetsOrdered = new Packet[currPacket.totalDatagramPackets];
-//        packetsOrdered[currPacket.datagramNum] = currPacket;
-//        ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);
 
         if (currPacket.totalDatagramPackets != 1) {
             for (int i = 0; i < currPacket.totalDatagramPackets - 1; i++){
@@ -94,7 +89,6 @@ public class ServerCommunicator {
                 }
             }
         }
-
         int packetsLost = 0;
         for (int j = 0; j < this.packetsOrdered.length; j++) {
             Packet p = this.packetsOrdered[j];
@@ -136,7 +130,7 @@ public class ServerCommunicator {
             if (this.atMostOnce){ // at most once implementation
                 System.out.println("At Most Once Implementation - sending Original Response...");
                 ClientRequest orgRequest = this.clientRequests.get(duplicateIndex);
-                send(orgRequest.sentResponse, clientRequest.clientAddress, clientRequest.clientPort);
+                send(orgRequest.sentResponse, clientRequest.clientAddress, clientRequest.clientPort, true);
                 return Optional.empty();
             }
             else{ // at least once implementation
@@ -164,8 +158,6 @@ public class ServerCommunicator {
             if (e.getCause() instanceof SocketTimeoutException) {
                 System.out.println("Socket Timeout");
             }
-        } catch (LostPacketError e){
-            System.out.println("Request Packet Lost");
         }
         return Optional.empty();
     }
@@ -176,7 +168,7 @@ public class ServerCommunicator {
      * @param clientAddress IP address of client
      * @param clientPort Port of client socket
      */
-    public void send(Response r, InetAddress clientAddress, int clientPort) {
+    public void send(Response r, InetAddress clientAddress, int clientPort, boolean packetDrop) {
         System.out.println("Sending " + r.getClass().getName() + " to " + clientAddress + " port " + clientPort);
         ByteBuffer dataBuf = ByteBuffer.allocate(20000);
         Serializer.serializeObject(r, dataBuf);
@@ -208,24 +200,28 @@ public class ServerCommunicator {
                 dataBufPtr += this.messageSize;
             }
             DatagramPacket message = new DatagramPacket(packetByteArray, packetByteArray.length, clientAddress, clientPort);
+            boolean sendPacket = true;
+            if (packetDrop && Math.random() < this.packetDropOffRate){
+                sendPacket = false;
+                System.out.println("Packet " + i +" Dropped");
+            }
 
-            if (Math.random() > this.packetDropOffRate){
+            if (sendPacket){
                 try {
                     this.socket.send(message);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            else {
-                System.out.println("Packet " + i +" Dropped");
-            }
+
+
         }
         /**
          * comment out row below to test duplicate request
          */
 //        this.requestID += 1;
 
-//        System.out.println("Sent" + " to Address: " + clientAddress + ", Port: " + clientPort);
+        System.out.println("Sent" + " to Address: " + clientAddress + ", Port: " + clientPort);
     }
 
     /**
