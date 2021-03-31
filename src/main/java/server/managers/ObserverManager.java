@@ -26,7 +26,6 @@ public class ObserverManager {
      * @return
      */
     public Exception addObserver(String facilName, int numDays, Hashtable facilTable, InetAddress ip, int port){
-        //TODO fix sync with client
         // for demo purposes, we monitor in the magnitude of minutes instead (1 day = 1 minute)
 
         Exception e;

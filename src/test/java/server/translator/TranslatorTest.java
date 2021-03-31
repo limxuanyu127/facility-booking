@@ -45,7 +45,6 @@ class TranslatorTest {
         //Populate facilityList
         Facility badmintonCourt = new Facility("badmintonCourt");
         Facility gym = new Facility("gym");
-        //FIXME Have to ensure that facil name is lower case
         facilTable.put("badmintoncourt", badmintonCourt);
         facilTable.put("gym", gym);
 
@@ -111,7 +110,6 @@ class TranslatorTest {
         assertEquals(response.getClass().getName(), "commons.responses.QueryAvailabilityResponse");
         List availabilities =  ((QueryAvailabilityResponse) response).intervals;
 
-        //TODO make the check check minutes also maybe
         for (ArrayList dayAvail: (ArrayList<ArrayList>) availabilities){
             for (ArrayList slot: (ArrayList<ArrayList>) dayAvail){
                 Datetime start = (Datetime) slot.get(0);
@@ -397,7 +395,6 @@ class TranslatorTest {
         assertEquals("success", ((RegisterInterestResponse) response).responseMessage.message);
     }
 
-    //TODO test it through client-server communication
     @Test
     void notifyObservers_wip(){
 

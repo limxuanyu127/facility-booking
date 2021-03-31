@@ -19,9 +19,6 @@ import java.net.InetAddress;
 import java.util.Hashtable;
 import java.util.Optional;
 
-//TODO implement bookId count
-//TODO remove client id from bookings(?)
-
 public class Server {
     BookingManager bookingManager;
     ObserverManager observerManager;
@@ -43,7 +40,6 @@ public class Server {
         bookingIdCounter =0;
         Facility badmintonCourt = new Facility("badmintonCourt");
         Facility gym = new Facility("gym");
-        //FIXME Have to ensure that facil name is lower case
         facilTable.put("badmintoncourt", badmintonCourt);
         facilTable.put("gym", gym);
     }
@@ -74,13 +70,6 @@ public class Server {
             String facilName = null;
             Exception e = null;
 
-            //TODO
-            // Run tests to see if type castings (eg. BookingFacilityResponse to Response) is valid
-            // For translator -> bookingManager + entities, there are some that still takes in client id, but those should be removed
-            // Update translator.notifyObservers() function to send notifications
-
-            //DONE
-            //for the addObserver function, figure out how to get inet addr + port number
 
             switch(request.getClass().getName()){
                 case "commons.requests.BookFacilityRequest":

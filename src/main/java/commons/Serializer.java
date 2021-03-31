@@ -23,7 +23,6 @@ public class Serializer {
      * @param bb ByteBuffer to hold sequence of bytes
      */
     public static void serializeObject(Object o, ByteBuffer bb) {
-//         TODO: add more primitive checks if necessary
         if (o.getClass().equals(Integer.class)) {
             serializeInteger((Integer) o, bb);
         } else if (o.getClass().equals(String.class)) {

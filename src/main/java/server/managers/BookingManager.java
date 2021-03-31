@@ -147,7 +147,6 @@ public class BookingManager {
      * @return Pair of updated booking object and exception (if any error is thrown)
      */
     public Pair<Booking, Exception> offsetBooking(String facilName, int bookingId, int offset, Hashtable facilTable){
-        //FIXME offset should be in minutes
         Exception e;
         Facility f = (Facility) facilTable.get(facilName);
         e = doValidFacilCheck(facilName, facilTable);
@@ -188,7 +187,6 @@ public class BookingManager {
      * @return Pair of updated booking object and exception (if any error is thrown)
      */
     public Pair<Booking, Exception> extendBooking(String facilName, int bookingId, int offset, Hashtable facilTable){
-        //FIXME offset should be in minutes
         Exception e;
         Facility f = (Facility) facilTable.get(facilName);
         e = doValidFacilCheck(facilName, facilTable);
@@ -342,7 +340,7 @@ public class BookingManager {
             return null;
         }
         else{
-            Exception e = new NoSuchElementException("Timeslot is not available"); //TODO review this exception
+            Exception e = new NoSuchElementException("Timeslot is not available");
             return e;
         }
     }
@@ -378,7 +376,7 @@ public class BookingManager {
                     continue;
                 }
                 else{
-                    Exception e = new NoSuchElementException("Timeslot is not available"); //TODO review this exception
+                    Exception e = new NoSuchElementException("Timeslot is not available");
                     return e;
                 }
             }
@@ -395,17 +393,14 @@ public class BookingManager {
      * @return exception if slot is not available, else null
      */
     private Exception doBookingCheck(String facilName, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
-//        if (!isValidFacil(facilName, facilTable)){
-//            Exception e = new NoSuchElementException("Facility does not exist"); //TODO review this exception
-//            return e;
-//        }
+
         if (!isStartBeforeEnd(newStart, newEnd)){
-            Exception e = new NoSuchElementException("Start time must be before end time"); //TODO review this exception
+            Exception e = new NoSuchElementException("Start time must be before end time");
             return e;
         }
 
         if (!this.isValidStartEndTime(newStart, newEnd)){
-            Exception e = new NoSuchElementException(String.format("Start time is before %s or End time is after %s", this.openTime.toString(), this.closeTime.toString())); //TODO review this exception
+            Exception e = new NoSuchElementException(String.format("Start time is before %s or End time is after %s", this.openTime.toString(), this.closeTime.toString()));
             return e;
         }
 

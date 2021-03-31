@@ -28,7 +28,6 @@ class BookingManagerTest {
         //Populate facilityList
         Facility badmintonCourt = new Facility("badmintonCourt");
         Facility gym = new Facility("gym");
-        //FIXME Have to ensure that facil name is lower case
         facilTable.put("badmintoncourt", badmintonCourt);
         facilTable.put("gym", gym);
 
