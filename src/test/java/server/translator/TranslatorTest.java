@@ -45,7 +45,6 @@ class TranslatorTest {
         //Populate facilityList
         Facility badmintonCourt = new Facility("badmintonCourt");
         Facility gym = new Facility("gym");
-        //FIXME Have to ensure that facil name is lower case
         facilTable.put("badmintoncourt", badmintonCourt);
         facilTable.put("gym", gym);
 
@@ -111,7 +110,6 @@ class TranslatorTest {
         assertEquals(response.getClass().getName(), "commons.responses.QueryAvailabilityResponse");
         List availabilities =  ((QueryAvailabilityResponse) response).intervals;
 
-        //TODO make the check check minutes also maybe
         for (ArrayList dayAvail: (ArrayList<ArrayList>) availabilities){
             for (ArrayList slot: (ArrayList<ArrayList>) dayAvail){
                 Datetime start = (Datetime) slot.get(0);
@@ -141,8 +139,9 @@ class TranslatorTest {
         assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
         String message = ((ErrorResponse) response).responseMessage.message;
         int statusCode = ((ErrorResponse) response).responseMessage.statusCode;
-        assertEquals(statusCode, 400);
+        assertEquals(statusCode, 401);
         assertEquals(message, "Facility does not exist");
+
     }
 
     @Test
@@ -167,6 +166,7 @@ class TranslatorTest {
 
         assertEquals("success", ((BookFacilityResponse) response).responseMessage.message);
 
+
     }
 
     @Test
@@ -185,6 +185,50 @@ class TranslatorTest {
         Response response = translator.createBooking(request, bookingId, clientId, bookingManager, facilTable);
         assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
         assertEquals("Timeslot is not available", ((ErrorResponse) response).responseMessage.message);
+        int statusCode = ((ErrorResponse) response).responseMessage.statusCode;
+        assertEquals(statusCode, 403);
+
+    }
+
+    @Test
+    void createBooking_StartTimeTooEarly_Exception(){
+
+        int bookingId = 100;
+        int clientId = 22;
+
+        String facilName = "badmintoncourt";
+        Day day = Day.Tuesday;
+        Datetime start = new Datetime(day,7,30 );
+        Datetime end = new Datetime(day,14,30 );
+
+        BookFacilityRequest request = new BookFacilityRequest(facilName, start, end);
+
+        Response response = translator.createBooking(request, bookingId, clientId, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
+        assertEquals("Start time is before 08:00 or End time is after 22:00", ((ErrorResponse) response).responseMessage.message);
+        int statusCode = ((ErrorResponse) response).responseMessage.statusCode;
+        assertEquals(statusCode, 405);
+
+    }
+
+    @Test
+    void createBooking_StartTimeAfterEnd_Exception(){
+
+        int bookingId = 100;
+        int clientId = 22;
+
+        String facilName = "badmintoncourt";
+        Day day = Day.Tuesday;
+        Datetime start = new Datetime(day,13,30 );
+        Datetime end = new Datetime(day,12,30 );
+
+        BookFacilityRequest request = new BookFacilityRequest(facilName, start, end);
+
+        Response response = translator.createBooking(request, bookingId, clientId, bookingManager, facilTable);
+        assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
+        assertEquals("Start time must be before end time", ((ErrorResponse) response).responseMessage.message);
+        int statusCode = ((ErrorResponse) response).responseMessage.statusCode;
+        assertEquals(statusCode, 404);
 
     }
 
@@ -229,6 +273,9 @@ class TranslatorTest {
         Response response = translator.offsetBooking(request, bookingManager, facilTable);
         assertEquals(response.getClass().getName(), "commons.responses.ErrorResponse");
         assertEquals("Timeslot is not available", ((ErrorResponse) response).responseMessage.message);
+
+        int statusCode = ((ErrorResponse) response).responseMessage.statusCode;
+        assertEquals(statusCode, 403);
     }
 
 
@@ -348,7 +395,6 @@ class TranslatorTest {
         assertEquals("success", ((RegisterInterestResponse) response).responseMessage.message);
     }
 
-    //TODO test it through client-server communication
     @Test
     void notifyObservers_wip(){
 

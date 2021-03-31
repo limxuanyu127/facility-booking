@@ -4,12 +4,10 @@ import commons.utils.Day;
 
 import java.time.*;
 import java.util.Comparator;
-//import java.util.Date;
 
 
 public class Booking {
     private int bookingId;
-    private int clientId; //TODO check if client it is int or string
     private String facilityName;
     private Day day;
     private LocalTime start;

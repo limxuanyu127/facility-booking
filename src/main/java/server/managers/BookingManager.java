@@ -147,7 +147,6 @@ public class BookingManager {
      * @return Pair of updated booking object and exception (if any error is thrown)
      */
     public Pair<Booking, Exception> offsetBooking(String facilName, int bookingId, int offset, Hashtable facilTable){
-        //FIXME offset should be in minutes
         Exception e;
         Facility f = (Facility) facilTable.get(facilName);
         e = doValidFacilCheck(facilName, facilTable);
@@ -188,7 +187,6 @@ public class BookingManager {
      * @return Pair of updated booking object and exception (if any error is thrown)
      */
     public Pair<Booking, Exception> extendBooking(String facilName, int bookingId, int offset, Hashtable facilTable){
-        //FIXME offset should be in minutes
         Exception e;
         Facility f = (Facility) facilTable.get(facilName);
         e = doValidFacilCheck(facilName, facilTable);
@@ -342,7 +340,7 @@ public class BookingManager {
             return null;
         }
         else{
-            Exception e = new NoSuchElementException("Timeslot is not available"); //TODO review this exception
+            Exception e = new NoSuchElementException("Timeslot is not available");
             return e;
         }
     }
@@ -378,7 +376,7 @@ public class BookingManager {
                     continue;
                 }
                 else{
-                    Exception e = new NoSuchElementException("Timeslot is not available"); //TODO review this exception
+                    Exception e = new NoSuchElementException("Timeslot is not available");
                     return e;
                 }
             }
@@ -395,17 +393,14 @@ public class BookingManager {
      * @return exception if slot is not available, else null
      */
     private Exception doBookingCheck(String facilName, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
-//        if (!isValidFacil(facilName, facilTable)){
-//            Exception e = new NoSuchElementException("Facility does not exist"); //TODO review this exception
-//            return e;
-//        }
+
         if (!isStartBeforeEnd(newStart, newEnd)){
-            Exception e = new NoSuchElementException("Start time must be before end time"); //TODO review this exception
+            Exception e = new NoSuchElementException("Start time must be before end time");
             return e;
         }
 
         if (!this.isValidStartEndTime(newStart, newEnd)){
-            Exception e = new NoSuchElementException(String.format("Start time is before %s or End time is after %s", this.openTime.toString(), this.closeTime.toString())); //TODO review this exception
+            Exception e = new NoSuchElementException(String.format("Start time is before %s or End time is after %s", this.openTime.toString(), this.closeTime.toString()));
             return e;
         }
 
@@ -427,15 +422,6 @@ public class BookingManager {
         }
     }
 
-//    private Boolean isValidFacil(String facilName, Hashtable facilTable){
-//        if (facilTable.containsKey(facilName)){
-//            return true;
-//        }
-//        else{
-//            return false;
-//        }
-//    }
-
     /**
      * Helper method to check if time is within bounds of facility's opening and closing
      * @param newStart start time
@@ -455,55 +441,3 @@ public class BookingManager {
 
 }
 
-
-//    public Pair<Booking, Exception> updateBooking(String facilName, int bookingId, LocalTime newStart, LocalTime newEnd, Hashtable facilTable){
-//
-//        Exception e;
-//        Booking b = findFacilBooking(facilName, bookingId, facilTable);
-//        String day = b.getDay();
-//        int clientId = b.getClientId();
-//        Facility facil =(Facility) facilTable.get(facilName);
-//
-//        e = doBookingNotNullCheck(b);
-//        if(e != null){
-//            return new Pair<Booking, Exception>(null, e);
-//        }
-//        e = doBookingCheck(facilName,newStart,newEnd,facilTable);
-//        if (e != null){
-//            return new Pair<Booking, Exception>(null, e);
-//        }
-//        e = doAvailabilityCheckExceptCurrent(bookingId, facilName,newStart,newEnd,facilTable);
-//        if (e != null){
-//            return new Pair<Booking, Exception>(null, e);
-//        }
-//
-//        e = facil.removeBooking(b);
-//        if (e!= null){
-//            return new Pair<Booking, Exception>(null, e);
-//        }else{
-//            Booking newBooking = new Booking(bookingId, clientId, facilName, newStart, newEnd);
-//            facil.addBooking(newBooking);
-//            return new Pair<Booking, Exception>(newBooking, null);
-//        }
-//    }
-
-
-
-//    public ArrayList localToDatetime(ArrayList results, String day){
-//        ArrayList convertedResults = new ArrayList();
-//        for (ArrayList slot:(ArrayList<ArrayList>)results){
-//            ArrayList newSlot = new ArrayList();
-//            LocalTime start = (LocalTime) newSlot.get(0);
-//            LocalTime end = (LocalTime) newSlot.get(1);
-//
-//            Datetime newStart = new Datetime(day, start.getHour(), start.getMinute());
-//            Datetime newEnd = new Datetime(day, end.getHour(), end.getMinute());
-//
-//            newSlot.add(newStart);
-//            newSlot.add(newEnd);
-//
-//            convertedResults.add(newSlot);
-//        }
-//
-//        return convertedResults;
-//    }
