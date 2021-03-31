@@ -21,6 +21,9 @@ public class Main {
         int timeout = 1000; // in ms
         int maxTries = 5;
         double packetDropOffRate = 0;
+
+//        int p = Integer.parseInt(null);
+//        System.out.println(p.hashcode());
         
 //        String hostname = "localhost";
         //        int serverPort = 5000;

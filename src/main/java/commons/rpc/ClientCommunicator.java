@@ -131,9 +131,9 @@ public class ClientCommunicator {
             System.out.println("Sending " + r.getClass().getName() + " to server with ID " + this.requestID);
             this.send(dataBuf, this.requestID);
             try{
+                System.out.println("receiving No. " + currTries);
                 response = this.receive();
                 if (response != null){ //message is complete
-                    System.out.println("Received message");
                     this.retryReceive = false;
                     this.requestID += 1;
                     return response;
@@ -142,6 +142,8 @@ public class ClientCommunicator {
             } catch (RuntimeException e){
                 if (e.getCause() instanceof SocketTimeoutException) {
                     System.out.println("Socket Timeout send");
+                } else{
+                    e.printStackTrace();
                 }
             } catch (LostPacketError e){
                 System.out.println("Response Packet Lost in Transmission, Retrying");
@@ -184,6 +186,9 @@ public class ClientCommunicator {
                     return response;
                 }
                 this.retryReceive = true;
+                for (int i = 0; i < this.packetsOrdered.length; i++){
+                    System.out.println("Global Packet Hash " + this.packetsOrdered[i].messageBuffer.hashCode());
+                }
             } catch (RuntimeException e){
                 if (e.getCause() instanceof SocketTimeoutException) {
                     System.out.println("Socket Timeout send w ID");
@@ -199,7 +204,6 @@ public class ClientCommunicator {
         return new NullResponse(responseMessage);
     }
 
-
     /**
      * Helper method used by sendRequest to send individual datagram packets to the server
      * @param dataBuf ByteBuffer that contains the byte sequence of serialised request
@@ -209,7 +213,7 @@ public class ClientCommunicator {
         int totalDatagramPackets = (int) Math.ceil(dataBuf.position() / (float) this.messageSize);
         int dataBufPtr = 0;
         int dataBufMaxPos = dataBuf.position();
-        System.out.println("Number of packets required: " + totalDatagramPackets);
+//        System.out.println("Number of packets required: " + totalDatagramPackets);
 
         for (int i = 0; i < totalDatagramPackets; i++){
             ByteBuffer packetBuf = ByteBuffer.allocate(this.packetSize);
@@ -252,15 +256,12 @@ public class ClientCommunicator {
      */
     public Response receive() throws LostPacketError {
         System.out.println("receiving");
-        int datagramCounter = 0;
         Packet currPacket = this.receivePacket();
-        int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
+        int combinedMessageSize = currPacket.totalDatagramPackets * this.packetSize;
         if (!this.retryReceive){ //init new array of correct size for new Response
-            System.out.println("Length of array " + currPacket.totalDatagramPackets);
             this.packetsOrdered = new Packet[currPacket.totalDatagramPackets];
         }
         this.packetsOrdered[currPacket.datagramNum] = currPacket;
-        System.out.println("Filling in pos " + currPacket.datagramNum);
         ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);
 
         if (currPacket.totalDatagramPackets != 1) {
@@ -268,10 +269,9 @@ public class ClientCommunicator {
                 try{
                     currPacket = this.receivePacket();
                     this.packetsOrdered[currPacket.datagramNum] = currPacket;
-                    System.out.println("Filling in pos " + currPacket.datagramNum);
                 } catch (RuntimeException e){
                     if (e.getCause() instanceof SocketTimeoutException) {
-                        System.out.println("Socket Timeout rcv");
+                        System.out.println("Socket Timeout");
                     }
                 }
             }
@@ -283,15 +283,17 @@ public class ClientCommunicator {
 //                throw new LostPacketError();
                 System.out.println("packet " + j + "lost");
                 packetsLost++;
-            } else{
-                System.out.println("Parsing packet No.: " + p.datagramNum);
-//                System.out.println(p.messageBuffer.get());
-                combinedMessageBuffer.put(p.messageBuffer);
             }
         }
+
         if (packetsLost > 0){
             System.out.println(packetsLost + " packets lost");
             return null;
+        }
+        else{
+            for (Packet p : this.packetsOrdered){
+                combinedMessageBuffer.put(p.messageBuffer);
+            }
         }
         combinedMessageBuffer.flip();
         Response response = (Response) Deserializer.deserializeObject(combinedMessageBuffer);

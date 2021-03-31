@@ -27,6 +27,8 @@ public class ServerCommunicator {
     int requestID;
     boolean atMostOnce;
     double packetDropOffRate;
+    boolean retryReceive;
+    Packet[] packetsOrdered;
 
     public ServerCommunicator(int serverPort, boolean atMostOnce, double packetDropOffRate) {
         this.clientRequests = new ArrayList<>();
@@ -38,6 +40,7 @@ public class ServerCommunicator {
         this.serverPort = serverPort;
         this.atMostOnce = atMostOnce;
         this.packetDropOffRate = packetDropOffRate;
+        this.retryReceive = false;
         try {
             this.socket = new DatagramSocket(serverPort);
         } catch (SocketException e) {}
@@ -68,16 +71,22 @@ public class ServerCommunicator {
     public Optional<ClientRequest> receive() throws LostPacketError {
         System.out.println("receiving");
         Packet currPacket = this.receivePacket();
-        int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
-        Packet[] packetsOrdered = new Packet[currPacket.totalDatagramPackets];
-        packetsOrdered[currPacket.datagramNum] = currPacket;
+        int combinedMessageSize = currPacket.totalDatagramPackets * this.packetSize;
+        if (!this.retryReceive){ //init new array of correct size for new Response
+            this.packetsOrdered = new Packet[currPacket.totalDatagramPackets];
+        }
+        this.packetsOrdered[currPacket.datagramNum] = currPacket;
         ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);
+//        int combinedMessageSize = currPacket.totalDatagramPackets * currPacket.messageSize;
+//        Packet[] packetsOrdered = new Packet[currPacket.totalDatagramPackets];
+//        packetsOrdered[currPacket.datagramNum] = currPacket;
+//        ByteBuffer combinedMessageBuffer = ByteBuffer.allocate(combinedMessageSize);
 
         if (currPacket.totalDatagramPackets != 1) {
-            while (currPacket.datagramNum < currPacket.totalDatagramPackets - 1) {
+            for (int i = 0; i < currPacket.totalDatagramPackets - 1; i++){
                 try{
                     currPacket = this.receivePacket();
-                    packetsOrdered[currPacket.datagramNum] = currPacket;
+                    this.packetsOrdered[currPacket.datagramNum] = currPacket;
                 } catch (RuntimeException e){
                     if (e.getCause() instanceof SocketTimeoutException) {
                         System.out.println("Socket Timeout");
@@ -86,11 +95,24 @@ public class ServerCommunicator {
             }
         }
 
-        for (Packet p : packetsOrdered) {
+        int packetsLost = 0;
+        for (int j = 0; j < this.packetsOrdered.length; j++) {
+            Packet p = this.packetsOrdered[j];
             if (p == null) { // any packet is missing from the message
-                throw new LostPacketError();
+//                throw new LostPacketError();
+                System.out.println("packet " + j + "lost");
+                packetsLost++;
             }
-            combinedMessageBuffer.put(p.messageBuffer);
+        }
+
+        if (packetsLost > 0){
+            System.out.println(packetsLost + " packets lost");
+            return Optional.empty();
+        }
+        else{
+            for (Packet p : this.packetsOrdered){
+                combinedMessageBuffer.put(p.messageBuffer);
+            }
         }
 
         combinedMessageBuffer.flip();
