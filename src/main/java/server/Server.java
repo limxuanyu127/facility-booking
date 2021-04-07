@@ -78,6 +78,7 @@ public class Server {
             Response response = null;
             String facilName = null;
             Exception e = null;
+            Boolean packetDrop = true;
 
 
             switch(request.getClass().getName()){
@@ -118,6 +119,7 @@ public class Server {
                     InetAddress clientAddress = clientRequest.clientAddress;
                     int clientPort = clientRequest.clientPort;
                     response = translator.addObserver((RegisterInterestRequest) request, observerManager, facilTable, clientAddress, clientPort);
+                    packetDrop = false;
                     break;
                 case "commons.requests.ExtendBookingRequest":
                     System.out.println("Extend Booking Request with ID " + clientRequest.requestID + " received, processing...");
@@ -138,7 +140,7 @@ public class Server {
                     throw new RuntimeException("Invalid Request Type");
             }
             clientRequest.setSentResponse(response);
-            serverCommunicator.send(response, clientRequest.clientAddress, clientRequest.clientPort, true);
+            serverCommunicator.send(response, clientRequest.clientAddress, clientRequest.clientPort, packetDrop);
         }
     }
 
